@@ -14,23 +14,29 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const sinleer = searchParams.get('unread') === 'true';
+    const search = searchParams.get('search') || '';
+    const status = searchParams.get('status') || 'todos';
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
     let contactos;
     
-    if (sinleer) {
-      contactos = await db.contactos.findUnread();
+    // Si hay búsqueda o filtro, usar búsqueda en BD
+    if (search || status !== 'todos') {
+      contactos = await db.contactos.search(search, status, limit, offset);
     } else {
       contactos = await db.contactos.findAll(limit, offset);
     }
 
     const totalNoLeidos = await db.contactos.countUnread();
+    const total = await db.contactos.countAll();
+    const totalRespondidos = await db.contactos.countResponded();
 
     return NextResponse.json({
       contactos,
       totalNoLeidos,
+      total,
+      totalRespondidos,
     });
   } catch (error) {
     console.error('Error al obtener contactos:', error);

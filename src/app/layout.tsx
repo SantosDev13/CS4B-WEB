@@ -7,6 +7,9 @@ import { AuthProvider } from "@/context/AuthContext";
 export const metadata: Metadata = {
   title: "CS4B | Consulting Strategic for Digital Business",
   description: "Consultoría en transformación digital. Licencias Microsoft, antivirus, hardware, desarrollo de software, consultoría IT y capacitación.",
+  icons: {
+    icon: "/logo_cs4b.png",
+  },
 };
 
 export default function RootLayout({

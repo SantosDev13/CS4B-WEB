@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, LogIn, User } from "lucide-react";
@@ -42,7 +43,14 @@ export default function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/logo_cs4b.png"
+              alt="CS4B Logo"
+              width={40}
+              height={40}
+              className="rounded-lg"
+            />
             <span className="text-2xl font-bold tracking-tight text-white">
               CS<span className="text-accent">4</span>B
             </span>

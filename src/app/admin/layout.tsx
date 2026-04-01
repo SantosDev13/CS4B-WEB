@@ -12,7 +12,6 @@ import {
   LogOut,
   Menu,
   X,
-  User,
   Package,
   MessageSquare,
   Shield
@@ -27,7 +26,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: "/admin", label: "Mi Perfil", icon: <User className="w-5 h-5" /> },
+  { href: "/admin", label: "Panel de Administración", icon: <LayoutDashboard className="w-5 h-5" /> },
   { href: "/admin/servicios", label: "Servicios", icon: <Package className="w-5 h-5" /> },
   { href: "/admin/posts", label: "Publicaciones", icon: <FileText className="w-5 h-5" /> },
   { href: "/admin/contactos", label: "Contactos", icon: <MessageSquare className="w-5 h-5" /> },

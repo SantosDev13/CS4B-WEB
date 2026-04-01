@@ -312,6 +312,42 @@ export const db = {
     findById: async (id: string) => {
       return sql<Contacto[]>`SELECT * FROM contactos WHERE id = ${id} LIMIT 1`;
     },
+    search: async (search: string, status: string, limit = 20, offset = 0) => {
+      // Build parameterized query step by step using sql template
+      let baseQuery = sql<Contacto[]>`SELECT * FROM contactos WHERE 1=1`;
+      
+      // Add search filter if provided
+      if (search && search.trim()) {
+        const searchTerm = `%${search.trim().toLowerCase()}%`;
+        baseQuery = sql<Contacto[]>`${baseQuery} AND (LOWER(nombre) LIKE ${searchTerm} OR LOWER(email) LIKE ${searchTerm} OR LOWER(empresa) LIKE ${searchTerm})`;
+      }
+      
+      // Add status filter
+      if (status === "no_leidos") {
+        baseQuery = sql<Contacto[]>`${baseQuery} AND leido = false`;
+      } else if (status === "leidos") {
+        baseQuery = sql<Contacto[]>`${baseQuery} AND leido = true`;
+      } else if (status === "respondidos") {
+        baseQuery = sql<Contacto[]>`${baseQuery} AND respondido = true`;
+      } else if (status === "pendientes") {
+        baseQuery = sql<Contacto[]>`${baseQuery} AND respondido = false`;
+      }
+      
+      // Add order and pagination
+      return sql<Contacto[]>`${baseQuery} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+    },
+    countUnread: async () => {
+      const result = await sql<{count: number}[]>`SELECT COUNT(*) as count FROM contactos WHERE leido = false`;
+      return result[0]?.count || 0;
+    },
+    countAll: async () => {
+      const result = await sql<{count: number}[]>`SELECT COUNT(*) as count FROM contactos`;
+      return result[0]?.count || 0;
+    },
+    countResponded: async () => {
+      const result = await sql<{count: number}[]>`SELECT COUNT(*) as count FROM contactos WHERE respondido = true`;
+      return result[0]?.count || 0;
+    },
     create: async (data: { nombre: string; email: string; telefono?: string; empresa?: string; servicio_interes?: string; mensaje: string; ip?: string }) => {
       return sql<Contacto[]>`INSERT INTO contactos (nombre, email, telefono, empresa, servicio_interes, mensaje, ip) VALUES (${data.nombre}, ${data.email}, ${data.telefono || null}, ${data.empresa || null}, ${data.servicio_interes || null}, ${data.mensaje}, ${data.ip || null}) RETURNING *`;
     },
@@ -323,10 +359,6 @@ export const db = {
     },
     delete: async (id: string) => {
       return sql`DELETE FROM contactos WHERE id = ${id}`;
-    },
-    countUnread: async () => {
-      const result = await sql<{count: number}[]>`SELECT COUNT(*) as count FROM contactos WHERE leido = false`;
-      return result[0]?.count || 0;
     },
   },
 
