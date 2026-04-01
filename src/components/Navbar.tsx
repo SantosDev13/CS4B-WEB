@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { href: "/", label: "Inicio" },
@@ -17,6 +18,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,29 +50,57 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-10">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors duration-200 ${
-                  pathname === link.href
-                    ? "text-accent"
-                    : "text-white/70 hover:text-white"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || 
+                (link.href !== '/' && pathname?.startsWith(link.href));
+              
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="relative text-sm font-medium transition-colors duration-200 group"
+                >
+                  <span className={isActive ? "text-white" : "text-white/70 hover:text-white"}>
+                    {link.label}
+                  </span>
+                  {/* Underline indicator */}
+                  <span 
+                    className={`absolute left-0 -bottom-1 h-0.5 bg-accent transition-all duration-300 ${
+                      isActive ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Link
-              href="/contacto"
-              className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg hover:bg-accent/90 transition-all hover:scale-105"
-            >
-              Contáctanos
-            </Link>
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated ? (
+              <Link
+                href="/admin"
+                className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg hover:bg-accent/90 transition-all hover:scale-105 flex items-center gap-2"
+              >
+                <User size={18} />
+                Admin
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-semibold text-white/70 hover:text-white px-4 py-2.5 transition-colors flex items-center gap-2"
+                >
+                  <LogIn size={18} />
+                  Login
+                </Link>
+                <Link
+                  href="/contacto"
+                  className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg hover:bg-accent/90 transition-all hover:scale-105"
+                >
+                  Contáctanos
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -94,27 +124,53 @@ export default function Navbar() {
               className="md:hidden py-4 border-t border-white/10 mt-4"
             >
               <div className="flex flex-col gap-4">
-                {navLinks.map((link) => (
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href || 
+                    (link.href !== '/' && pathname?.startsWith(link.href));
+                  
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`relative text-sm font-medium py-2 flex items-center gap-2 ${
+                        isActive ? "text-accent" : "text-white/70"
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-accent rounded-r" />
+                      )}
+                    </Link>
+                  );
+                })}
+                {isAuthenticated ? (
                   <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`text-sm font-medium py-2 ${
-                      pathname === link.href
-                        ? "text-accent"
-                        : "text-white/70"
-                    }`}
+                    href="/admin"
+                    className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg text-center mt-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {link.label}
+                    Admin
                   </Link>
-                ))}
-                <Link
-                  href="/contacto"
-                  className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg text-center mt-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Contáctanos
-                </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="text-sm font-semibold text-white/70 hover:text-white px-4 py-2.5 transition-colors flex items-center gap-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <LogIn size={18} />
+                      Login
+                    </Link>
+                    <Link
+                      href="/contacto"
+                      className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg text-center mt-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Contáctanos
+                    </Link>
+                  </>
+                )}
               </div>
             </motion.div>
           )}

@@ -100,7 +100,7 @@ export default function Partners() {
                 <img
                   src={partner.logo}
                   alt={partner.name}
-                  className="max-h-full max-w-full object-contain filter brightness-0 invert-[1] group-hover:invert-0 transition-all duration-300"
+                  className="max-h-full max-w-full object-contain"
                 />
               </div>
               

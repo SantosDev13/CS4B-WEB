@@ -3,7 +3,7 @@ import postgres from 'postgres';
 // Conexión a PostgreSQL - usar variables de entorno en producción
 // Railway proporciona DATABASE_URL automáticamente
 const connectionString = process.env.DATABASE_URL || 
-  'postgresql://postgres:postgres@localhost:5432/cs4b';
+  'postgresql://postgres:database@@@localhost:5432/CS4B';
 
 const sql = postgres(connectionString, {
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
@@ -162,26 +162,47 @@ export const db = {
       return sql<Servicio[]>`SELECT * FROM servicios WHERE categoria = ${categoria} AND visible = true ORDER BY orden ASC`;
     },
     create: async (data: Partial<Servicio>) => {
-      const fields = Object.keys(data).filter(k => k !== 'id' && k !== 'created_at' && k !== 'updated_at');
-      const values = fields.map(f => data[f as keyof Servicio] as string | number | boolean | Date | null);
+      const allowedFields = ['titulo', 'slug', 'descripcion', 'descripcion_corta', 'icono', 'imagen', 'categoria', 'orden', 'visible'];
       
-      return sql<Servicio[]>`INSERT INTO servicios (${sql(fields)}) VALUES (${sql(values)}) RETURNING *`;
+      const insertData: Record<string, any> = {};
+      
+      for (const [key, value] of Object.entries(data)) {
+        if (!allowedFields.includes(key)) continue;
+        if (key === 'id' || key === 'created_at' || key === 'updated_at') continue;
+        if (value === undefined) continue;
+        
+        insertData[key] = value;
+      }
+      
+      const fields = Object.keys(insertData);
+      const values = Object.values(insertData);
+      
+      if (fields.length === 0) return [];
+      
+      const fieldList = fields.join(', ');
+      const valuePlaceholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      
+      const query = `INSERT INTO servicios (${fieldList}) VALUES (${valuePlaceholders}) RETURNING *`;
+      const result = await sql.unsafe(query, values);
+      return result as Servicio[];
     },
     update: async (id: string, data: Partial<Servicio>) => {
       const fields: string[] = [];
       const values: any[] = [];
       
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'id' && key !== 'created_at') {
-          fields.push(`${key} = $${values.length + 1}`);
-          values.push(value);
-        }
-      });
+      for (const [key, value] of Object.entries(data)) {
+        if (key === 'id' || key === 'created_at' || key === 'updated_at') continue;
+        if (value === undefined) continue;
+        
+        fields.push(`${key} = $${values.length + 1}`);
+        values.push(value);
+      }
       
       if (fields.length === 0) return [];
       
       values.push(id);
-      return sql<Servicio[]>`UPDATE servicios SET ${sql(fields)} WHERE id = $${values.length} RETURNING *`;
+      const setClause = fields.join(', ');
+      return sql<Servicio[]>`UPDATE servicios SET ${setClause} WHERE id = $${values.length} RETURNING *`;
     },
     delete: async (id: string) => {
       return sql`DELETE FROM servicios WHERE id = ${id}`;
@@ -212,26 +233,65 @@ export const db = {
       return result[0]?.count || 0;
     },
     create: async (data: Partial<Post>) => {
-      const fields = Object.keys(data).filter(k => k !== 'id' && k !== 'created_at' && k !== 'updated_at');
-      const values = fields.map(f => data[f as keyof Post] as string | number | boolean | string[] | Date | null);
+      const allowedFields = ['titulo', 'slug', 'contenido', 'excerpt', 'imagen_destacada', 'categoria_id', 'autor_id', 'etiquetas', 'publicado', 'fecha_publicacion', 'meta_title', 'meta_description'];
       
-      return sql<Post[]>`INSERT INTO posts (${sql(fields)}) VALUES (${sql(values)}) RETURNING *`;
-    },
-    update: async (id: string, data: Partial<Post>) => {
-      const fields: string[] = [];
-      const values: any[] = [];
+      const insertData: Record<string, any> = {};
       
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'id' && key !== 'created_at') {
-          fields.push(`${key} = $${values.length + 1}`);
-          values.push(value);
+      for (const [key, value] of Object.entries(data)) {
+        if (!allowedFields.includes(key)) continue;
+        if (key === 'id' || key === 'created_at' || key === 'updated_at') continue;
+        if (value === undefined) continue;
+        
+        // Handle special types
+        if (key === 'etiquetas' && Array.isArray(value)) {
+          insertData[key] = JSON.stringify(value);
+        } else {
+          insertData[key] = value;
         }
-      });
+      }
+      
+      const fields = Object.keys(insertData);
+      const values = Object.values(insertData);
       
       if (fields.length === 0) return [];
       
-      values.push(id);
-      return sql<Post[]>`UPDATE posts SET ${sql(fields)} WHERE id = $${values.length} RETURNING *`;
+      const fieldList = fields.join(', ');
+      const valuePlaceholders = fields.map((_, i) => `$${i + 1}`).join(', ');
+      
+      // Use simple query with typed parameters
+      const query = `INSERT INTO posts (${fieldList}) VALUES (${valuePlaceholders}) RETURNING *`;
+      const result = await sql.unsafe(query, values);
+      return result as Post[];
+    },
+    update: async (id: string, data: Partial<Post>) => {
+      const allowedFields = ['titulo', 'slug', 'contenido', 'excerpt', 'imagen_destacada', 'categoria_id', 'etiquetas', 'publicado', 'fecha_publicacion', 'meta_title', 'meta_description'];
+      
+      const updateData: Record<string, any> = {};
+      
+      for (const [key, value] of Object.entries(data)) {
+        if (!allowedFields.includes(key)) continue;
+        if (key === 'id' || key === 'created_at' || key === 'updated_at') continue;
+        if (value === undefined) continue;
+        
+        // Handle special types
+        if (key === 'etiquetas' && Array.isArray(value)) {
+          updateData[key] = JSON.stringify(value);
+        } else {
+          updateData[key] = value;
+        }
+      }
+      
+      const fields = Object.keys(updateData);
+      const values = Object.values(updateData);
+      
+      if (fields.length === 0) return [];
+      
+      const setClause = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
+      const allValues = [...values, id];
+      
+      const query = `UPDATE posts SET ${setClause} WHERE id = $${allValues.length} RETURNING *`;
+      const result = await sql.unsafe(query, allValues);
+      return result as Post[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM posts WHERE id = ${id}`;

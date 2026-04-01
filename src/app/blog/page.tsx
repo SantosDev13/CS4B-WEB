@@ -1,76 +1,86 @@
 import Link from "next/link";
+import { db } from "@/lib/db";
 
-const posts = [
-  {
-    id: 1,
-    title: "Cómo transformar digitalmente tu pyme en Perú",
-    excerpt: "Descubre las estrategias que están usando las empresas peruanas para competir en el mercado digital. Desde la adopción de herramientas en la nube hasta la automatización de procesos.",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
-    slug: "transformacion-digital-pyme-peru",
-    date: "15 Mar 2026",
-    category: "Transformación Digital",
-  },
-  {
-    id: 2,
-    title: "Microsoft 365: Todo lo que tu empresa necesita",
-    excerpt: "Una guía completa sobre las herramientas de Microsoft para mejorar la productividad de tu equipo. Word, Excel, Teams y más.",
-    image: "https://images.unsplash.com/photo-1633419461186-7d40a38105ec?w=600&q=80",
-    slug: "microsoft-365-guia-completa",
-    date: "10 Mar 2026",
-    category: "Productos",
-  },
-  {
-    id: 3,
-    title: "Ciberseguridad: Protege tu negocio en línea",
-    excerpt: "Los principales amenazas cibernéticas para empresas en Perú y cómo prevenirlas. Tips de seguridad para tu infraestructura IT.",
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&q=80",
-    slug: "ciberseguridad-empresas-peru",
-    date: "5 Mar 2026",
-    category: "Seguridad",
-  },
-  {
-    id: 4,
-    title: "Cloud Computing: El futuro de los negocios",
-    excerpt: "Por qué migrar a la nube es esencial para las empresas modernas. Ventajas, beneficios y casos de éxito en Perú.",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80",
-    slug: "cloud-computing-futuro-negocios",
-    date: "28 Feb 2026",
-    category: "Tecnología",
-  },
-  {
-    id: 5,
-    title: "Cómo elegir el mejor software para tu empresa",
-    excerpt: "Guía práctica para seleccionar herramientas tecnológicas que se adapten a las necesidades de tu negocio.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
-    slug: "elegir-software-empresa",
-    date: "20 Feb 2026",
-    category: "Consultoría",
-  },
-  {
-    id: 6,
-    title: "Importancia del respaldo de datos para empresas",
-    excerpt: "Por qué todo negocio necesita una estrategia de backup. Protege tu información crítica contra pérdida de datos.",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&q=80",
-    slug: "respaldo-datos-empresas",
-    date: "15 Feb 2026",
-    category: "Seguridad",
-  },
-];
+// Tipos
+interface Post {
+  id: string;
+  titulo: string;
+  slug: string;
+  contenido: string;
+  excerpt: string | null;
+  imagen_destacada: string | null;
+  categoria_id: string | null;
+  publicado: boolean;
+  fecha_publicacion: Date | null;
+  created_at: Date;
+  categoria?: {
+    nombre: string;
+    slug: string;
+    color: string;
+  };
+}
 
-const categories = [
-  "Todos",
-  "Transformación Digital",
-  "Productos",
-  "Seguridad",
-  "Tecnología",
-  "Consultoría",
-];
+interface Categoria {
+  id: string;
+  nombre: string;
+  slug: string;
+  color: string;
+}
 
-export default function BlogPage() {
+// Función para obtener posts
+async function getPosts() {
+  try {
+    const posts = await db.posts.findAll(true, 20, 0);
+    
+    // Obtener categoría para cada post
+    const postsWithCategoria = await Promise.all(
+      posts.map(async (post) => {
+        let categoria = null;
+        if (post.categoria_id) {
+          const categorias = await db.categorias.findById(post.categoria_id);
+          if (categorias[0]) {
+            categoria = {
+              nombre: categorias[0].nombre,
+              slug: categorias[0].slug,
+              color: categorias[0].color,
+            };
+          }
+        }
+        return { ...post, categoria };
+      })
+    );
+    
+    return postsWithCategoria;
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return [];
+  }
+}
+
+// Función para obtener categorías
+async function getCategorias() {
+  try {
+    return await db.categorias.findAll();
+  } catch (error) {
+    console.error("Error fetching categorias:", error);
+    return [];
+  }
+}
+
+export default async function BlogPage() {
+  const posts = await getPosts();
+  const categorias = await getCategorias();
+
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return "";
+    const d = new Date(date);
+    return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
+  };
+
   return (
     <div className="pt-0">
-      {/* Header con imagen de fondo */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center">
+      {/* Header con imagen de fondo - combinado con navbar */}
+      <section className="relative h-[60vh] min-h-[500px] flex flex-col justify-end">
         <div className="absolute inset-0">
           <img 
             src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1920&q=80" 
@@ -79,7 +89,7 @@ export default function BlogPage() {
           />
           <div className="absolute inset-0 bg-primary/85" />
         </div>
-        <div className="relative container-custom">
+        <div className="relative container-custom pb-12">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
             Blog
           </h1>
@@ -94,17 +104,20 @@ export default function BlogPage() {
       <section className="bg-white border-b border-gray-100">
         <div className="container-custom py-6">
           <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                  category === "Todos"
-                    ? "bg-primary text-white"
-                    : "bg-bg-light text-text-secondary hover:bg-primary hover:text-white"
-                }`}
+            <Link
+              href="/blog"
+              className="px-5 py-2 rounded-full text-sm font-medium transition-colors bg-primary text-white"
+            >
+              Todos
+            </Link>
+            {categorias.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/blog?categoria=${cat.slug}`}
+                className="px-5 py-2 rounded-full text-sm font-medium transition-colors bg-bg-light text-text-secondary hover:bg-primary hover:text-white"
               >
-                {category}
-              </button>
+                {cat.nombre}
+              </Link>
             ))}
           </div>
         </div>
@@ -113,62 +126,70 @@ export default function BlogPage() {
       {/* Posts Grid - Estilo BCG: cards con imágenes grandes */}
       <section className="py-24 bg-white">
         <div className="container-custom">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => (
-              <article key={post.id} className="group">
-                <Link href={`/blog/${post.slug}`}>
-                  <div className="relative aspect-[16/10] rounded-xl overflow-hidden mb-4">
-                    <img 
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="text-xs font-medium text-white bg-primary/80 px-3 py-1 rounded-full">
-                        {post.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <span className="text-sm text-text-secondary">
-                      {post.date}
-                    </span>
-                    <h2 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors">
-                      {post.title}
-                    </h2>
-                    <p className="text-text-secondary line-clamp-2">
-                      {post.excerpt}
-                    </p>
-                  </div>
-                </Link>
-              </article>
-            ))}
-          </div>
-
-          {/* Pagination - Minimal */}
-          <div className="flex justify-center mt-16">
-            <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center">
-                1
-              </button>
-              <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
-                2
-              </button>
-              <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
-                3
-              </button>
-              <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+          {posts.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-xl text-gray-500">No hay publicaciones disponibles</p>
+              <p className="text-gray-400 mt-2">Pronto we'll have new content</p>
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.map((post) => (
+                <article key={post.id} className="group">
+                  <Link href={`/blog/${post.slug}`}>
+                    <div className="relative aspect-[16/10] rounded-xl overflow-hidden mb-4">
+                      <img 
+                        src={post.imagen_destacada || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80"}
+                        alt={post.titulo}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {post.categoria && (
+                        <div className="absolute top-4 left-4">
+                          <span 
+                            className="text-xs font-medium text-white px-3 py-1 rounded-full"
+                            style={{ backgroundColor: post.categoria.color }}
+                          >
+                            {post.categoria.nombre}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <span className="text-sm text-text-secondary">
+                        {formatDate(post.fecha_publicacion)}
+                      </span>
+                      <h2 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors">
+                        {post.titulo}
+                      </h2>
+                      <p className="text-text-secondary line-clamp-2">
+                        {post.excerpt || post.contenido.substring(0, 150) + "..."}
+                      </p>
+                    </div>
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination - Simple */}
+          {posts.length > 0 && (
+            <div className="flex justify-center mt-16">
+              <div className="flex gap-2">
+                <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center">
+                  1
+                </button>
+                <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
