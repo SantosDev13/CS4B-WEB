@@ -1,4 +1,69 @@
+"use client";
+
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+
 export default function ContactoPage() {
+  const [formData, setFormData] = useState({
+    nombre: "",
+    email: "",
+    telefono: "",
+    empresa: "",
+    servicio_interes: "",
+    mensaje: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess(false);
+
+    try {
+      const res = await fetch("/api/contactos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSuccess(true);
+        setFormData({
+          nombre: "",
+          email: "",
+          telefono: "",
+          empresa: "",
+          servicio_interes: "",
+          mensaje: "",
+        });
+      } else {
+        setError(data.error || "Error al enviar el mensaje");
+      }
+    } catch (err) {
+      setError("Error de conexión. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="pt-0">
       {/* Header con imagen de fondo */}
@@ -31,27 +96,61 @@ export default function ContactoPage() {
               <h2 className="text-2xl font-bold text-primary mb-8">
                 Envíanos un mensaje
               </h2>
-              <form className="space-y-6">
+
+              {/* Success Message */}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3"
+                >
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-green-800 font-medium">¡Recibimos tu Mensaje Exitosamente!</p>
+                    <p className="text-green-600 text-sm">Te contactaremos pronto.</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3"
+                >
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                  <p className="text-red-800">{error}</p>
+                </motion.div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-text-secondary mb-2">
+                    <label htmlFor="nombre" className="block text-sm font-medium text-text-secondary mb-2">
                       Nombre completo *
                     </label>
                     <input
                       type="text"
-                      id="name"
+                      id="nombre"
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
                       placeholder="Juan Pérez"
                     />
                   </div>
                   <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-text-secondary mb-2">
+                    <label htmlFor="empresa" className="block text-sm font-medium text-text-secondary mb-2">
                       Empresa
                     </label>
                     <input
                       type="text"
-                      id="company"
+                      id="empresa"
+                      name="empresa"
+                      value={formData.empresa}
+                      onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
                       placeholder="Mi Empresa S.A.C."
                     />
@@ -66,18 +165,24 @@ export default function ContactoPage() {
                     <input
                       type="email"
                       id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
                       placeholder="juan@empresa.com"
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-text-secondary mb-2">
+                    <label htmlFor="telefono" className="block text-sm font-medium text-text-secondary mb-2">
                       Teléfono
                     </label>
                     <input
                       type="tel"
-                      id="phone"
+                      id="telefono"
+                      name="telefono"
+                      value={formData.telefono}
+                      onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
                       placeholder="+51 999 999 999"
                     />
@@ -85,11 +190,14 @@ export default function ContactoPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="service" className="block text-sm font-medium text-text-secondary mb-2">
+                  <label htmlFor="servicio_interes" className="block text-sm font-medium text-text-secondary mb-2">
                     Servicio de interés
                   </label>
                   <select
-                    id="service"
+                    id="servicio_interes"
+                    name="servicio_interes"
+                    value={formData.servicio_interes}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-white"
                   >
                     <option value="">Selecciona un servicio</option>
@@ -104,11 +212,14 @@ export default function ContactoPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-text-secondary mb-2">
+                  <label htmlFor="mensaje" className="block text-sm font-medium text-text-secondary mb-2">
                     Mensaje *
                   </label>
                   <textarea
-                    id="message"
+                    id="mensaje"
+                    name="mensaje"
+                    value={formData.mensaje}
+                    onChange={handleChange}
                     required
                     rows={5}
                     className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors resize-none"
@@ -118,9 +229,20 @@ export default function ContactoPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-4 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+                  disabled={loading}
+                  className="w-full py-4 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Enviar mensaje
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Enviar mensaje
+                    </>
+                  )}
                 </button>
               </form>
             </div>
