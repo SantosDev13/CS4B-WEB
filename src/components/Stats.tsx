@@ -1,13 +1,13 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const stats = [
   { value: 10, suffix: "+", label: "Años de Experiencia", description: "transformando empresas" },
-  { value: 150, suffix: "+", label: "Clientes Satisfechos", description: "en Perú y Latam" },
-  { value: 500, suffix: "+", label: "Proyectos Completados", description: "entregados a tiempo" },
-  { value: 25, suffix: "+", label: "Profesionales", description: "expertos certificados" },
+  { value: 500, suffix: "+", label: "Clientes Satisfechos", description: "en Perú y Latam" },
+  { value: 1000, suffix: "+", label: "Proyectos Completados", description: "entregados a tiempo" },
+  { value: 20, suffix: "+", label: "Profesionales", description: "expertos certificados" },
 ];
 
 function Counter({ value, suffix }: { value: number; suffix: string }) {
@@ -63,24 +63,68 @@ const itemVariants: Variants = {
 };
 
 export default function Stats() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const element = containerRef.current;
+      if (!element) return;
+      
+      const rect = element.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Calcular progreso cuando la sección está en pantalla
+      if (rect.top < windowHeight && rect.bottom > 0) {
+        const progress = (windowHeight - rect.top) / (windowHeight + rect.height);
+        setScrollY(progress);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Valores de parallax
+  const bgY = (scrollY - 0.5) * 100; // -50px a 50px
+
   return (
-    <section className="py-24 bg-primary relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5" style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, #fff 1px, transparent 0)`,
-        backgroundSize: '30px 30px'
-      }} />
+    <section 
+      ref={containerRef}
+      className="py-24 min-h-[500px] flex items-center bg-primary relative overflow-hidden"
+    >
+      {/* Parallax Background */}
+      <div 
+        className="absolute inset-0 w-full h-[130%] -top-[15%]"
+        style={{ 
+          transform: `translateY(${bgY}px)`,
+          transition: 'transform 0.1s ease-out'
+        }}
+      >
+        {/* Image for Parallax Effect */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
+          style={{
+            backgroundImage: 'url("https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80")'
+          }}
+        />
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-primary/70 to-primary/90" />
+      </div>
 
       {/* Decorative Glows */}
       <motion.div
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: 0.2 }}
+        whileInView={{ opacity: 0.3 }}
         viewport={{ once: true }}
         className="absolute top-0 left-1/4 w-96 h-96 bg-secondary rounded-full blur-[150px]"
       />
       <motion.div
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: 0.15 }}
+        whileInView={{ opacity: 0.2 }}
         viewport={{ once: true }}
         className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent rounded-full blur-[120px]"
       />

@@ -16,6 +16,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
+interface Categoria {
+  id: string;
+  nombre: string;
+  slug: string;
+  descripcion: string | null;
+  color: string | null;
+  orden: number;
+}
+
 interface Servicio {
   id: string;
   titulo: string;
@@ -30,18 +39,10 @@ interface Servicio {
   created_at: string;
 }
 
-const categorias = [
-  { value: "cloud", label: "Cloud" },
-  { value: "seguridad", label: "Seguridad" },
-  { value: "hardware", label: "Hardware" },
-  { value: "software", label: "Software" },
-  { value: "capacitacion", label: "Capacitación" },
-  { value: "consultoria", label: "Consultoría" },
-];
-
 export default function AdminServiciosPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -53,7 +54,7 @@ export default function AdminServiciosPage() {
     descripcion_corta: "",
     icono: "",
     imagen: "",
-    categoria: "software",
+    categoria: "",
     orden: 0,
     visible: true,
   });
@@ -62,6 +63,7 @@ export default function AdminServiciosPage() {
 
   useEffect(() => {
     fetchServicios();
+    fetchCategorias();
   }, []);
 
   const fetchServicios = async () => {
@@ -78,16 +80,39 @@ export default function AdminServiciosPage() {
     }
   };
 
+  const fetchCategorias = async () => {
+    try {
+      const res = await fetch("/api/categorias");
+      const data = await res.json();
+      setCategorias(data);
+    } catch (err) {
+      console.error("Error fetching categorias:", err);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError("");
 
+    // Validar longitudes antes de enviar
+    if (formData.slug.length > 50) {
+      setError("El slug debe tener máximo 50 caracteres");
+      setSaving(false);
+      return;
+    }
+
+    if (formData.categoria.length > 50) {
+      setError("La categoría debe tener máximo 50 caracteres");
+      setSaving(false);
+      return;
+    }
+
     try {
       const url = editingServicio 
         ? `/api/servicios/${editingServicio.slug}`
         : "/api/servicios";
-      
+
       const method = editingServicio ? "PUT" : "POST";
 
       const body = {
@@ -102,6 +127,9 @@ export default function AdminServiciosPage() {
         visible: formData.visible,
       };
 
+      // Debug: ver cookies que se envían
+      const cookies = document.cookie;
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -112,7 +140,8 @@ export default function AdminServiciosPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Error al guardar");
+        setError(data.error || `Error ${res.status}`);
+        setSaving(false);
         return;
       }
 
@@ -121,7 +150,8 @@ export default function AdminServiciosPage() {
       resetForm();
       fetchServicios();
     } catch (err) {
-      setError("Error de conexión");
+      console.error("Error completo:", err);
+      setError("Error de conexión: " + (err as Error).message);
     } finally {
       setSaving(false);
     }
@@ -154,6 +184,9 @@ export default function AdminServiciosPage() {
 
       if (res.ok) {
         fetchServicios();
+      } else {
+        const data = await res.json();
+        setError(data.error || "Error al eliminar");
       }
     } catch (err) {
       console.error("Error deleting servicio:", err);
@@ -162,13 +195,19 @@ export default function AdminServiciosPage() {
 
   const handleToggleVisibility = async (servicio: Servicio) => {
     try {
-      await fetch(`/api/servicios/${servicio.slug}`, {
+      const res = await fetch(`/api/servicios/${servicio.slug}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ visible: !servicio.visible }),
         credentials: "include",
       });
-      fetchServicios();
+      
+      if (res.ok) {
+        fetchServicios();
+      } else {
+        const data = await res.json();
+        setError(data.error || "Error al cambiar visibilidad");
+      }
     } catch (err) {
       console.error("Error toggling visibility:", err);
     }
@@ -182,7 +221,7 @@ export default function AdminServiciosPage() {
       descripcion_corta: "",
       icono: "",
       imagen: "",
-      categoria: "software",
+      categoria: "",
       orden: 0,
       visible: true,
     });
@@ -194,7 +233,8 @@ export default function AdminServiciosPage() {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+      .replace(/(^-|-$)/g, "")
+      .substring(0, 50); // Limitar a 50 caracteres para la DB
   };
 
   const handleTituloChange = (titulo: string) => {
@@ -390,10 +430,11 @@ export default function AdminServiciosPage() {
                     <input
                       type="text"
                       value={formData.slug}
-                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value.substring(0, 50) })}
                       required
+                      maxLength={50}
                       className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
-                      placeholder="servicio-slug"
+                      placeholder="servicio-slug (max 50 caracteres)"
                     />
                   </div>
                 </div>
@@ -436,8 +477,8 @@ export default function AdminServiciosPage() {
                       className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
                     >
                       {categorias.map((cat) => (
-                        <option key={cat.value} value={cat.value}>
-                          {cat.label}
+                        <option key={cat.slug} value={cat.slug}>
+                          {cat.nombre}
                         </option>
                       ))}
                     </select>
