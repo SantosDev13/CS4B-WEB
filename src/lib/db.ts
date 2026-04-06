@@ -184,7 +184,7 @@ export const db = {
       
       const query = `INSERT INTO servicios (${fieldList}) VALUES (${valuePlaceholders}) RETURNING *`;
       const result = await sql.unsafe(query, values);
-      return result as Servicio[];
+      return result as unknown as Servicio[];
     },
     update: async (id: string, data: Partial<Servicio>) => {
       const fields: string[] = [];
@@ -261,7 +261,7 @@ export const db = {
       // Use simple query with typed parameters
       const query = `INSERT INTO posts (${fieldList}) VALUES (${valuePlaceholders}) RETURNING *`;
       const result = await sql.unsafe(query, values);
-      return result as Post[];
+      return result as unknown as Post[];
     },
     update: async (id: string, data: Partial<Post>) => {
       const allowedFields = ['titulo', 'slug', 'contenido', 'excerpt', 'imagen_destacada', 'categoria_id', 'etiquetas', 'publicado', 'fecha_publicacion', 'meta_title', 'meta_description'];
@@ -291,7 +291,7 @@ export const db = {
       
       const query = `UPDATE posts SET ${setClause} WHERE id = $${allValues.length} RETURNING *`;
       const result = await sql.unsafe(query, allValues);
-      return result as Post[];
+      return result as unknown as Post[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM posts WHERE id = ${id}`;
