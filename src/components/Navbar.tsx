@@ -20,69 +20,81 @@ const navLinks = [
 // Datos para el Mega Menú de Servicios
 const serviciosMegaMenu = [
   {
+    titulo: "Transformación Digital & Arquitectura Empresarial",
+    slug: "transformacion-digital",
+    subservicios: [
+      { label: "Diagnóstico digital empresarial", href: "/servicios/transformacion-digital" },
+      { label: "Arquitectura de soluciones", href: "/servicios/transformacion-digital" },
+      { label: "Hoja de ruta de transformación", href: "/servicios/transformacion-digital" },
+      { label: "Gestión del cambio organizacional", href: "/servicios/transformacion-digital" },
+      { label: "Estrategia de datos y analytics", href: "/servicios/transformacion-digital" },
+      { label: "Optimización de procesos", href: "/servicios/transformacion-digital" },
+    ],
+  },
+  {
     titulo: "Licencias Microsoft",
     slug: "licencias-microsoft",
     subservicios: [
-      { label: "Microsoft 365 para empresas", href: "/servicios#licencias-microsoft" },
-      { label: "Windows 10/11 Professional", href: "/servicios#licencias-microsoft" },
-      { label: "Azure Cloud Services", href: "/servicios#licencias-microsoft" },
-      { label: "Exchange Server", href: "/servicios#licencias-microsoft" },
-      { label: "SQL Server", href: "/servicios#licencias-microsoft" },
+      { label: "Microsoft 365 para empresas", href: "/servicios/licencias-microsoft" },
+      { label: "Windows 10/11 Professional", href: "/servicios/licencias-microsoft" },
+      { label: "Azure Cloud Services", href: "/servicios/licencias-microsoft" },
+      { label: "Exchange Server", href: "/servicios/licencias-microsoft" },
+      { label: "SQL Server", href: "/servicios/licencias-microsoft" },
     ],
   },
   {
     titulo: "Antivirus y Seguridad",
-    slug: "antivirus",
+    slug: "antivirus-seguridad",
     subservicios: [
-      { label: "Antivirus empresariales", href: "/servicios#antivirus" },
-      { label: "Firewall y protección perimetral", href: "/servicios#antivirus" },
-      { label: "Gestión de identidades", href: "/servicios#antivirus" },
-      { label: "Protección contra ransomware", href: "/servicios#antivirus" },
-      { label: "Monitoreo 24/7", href: "/servicios#antivirus" },
+      { label: "Antivirus empresariales", href: "/servicios/antivirus-seguridad" },
+      { label: "Firewall y protección perimetral", href: "/servicios/antivirus-seguridad" },
+      { label: "Gestión de identidades", href: "/servicios/antivirus-seguridad" },
+      { label: "Protección contra ransomware", href: "/servicios/antivirus-seguridad" },
+      { label: "Monitoreo 24/7", href: "/servicios/antivirus-seguridad" },
     ],
   },
   {
     titulo: "Hardware y Equipos",
-    slug: "hardware",
+    slug: "hardware-equipos",
     subservicios: [
-      { label: "Computadoras y laptops", href: "/servicios#hardware" },
-      { label: "Servidores y networking", href: "/servicios#hardware" },
-      { label: "Impresoras y multifuncionales", href: "/servicios#hardware" },
-      { label: "Equipos de videoconferencia", href: "/servicios#hardware" },
-      { label: "Mantenimiento preventivo", href: "/servicios#hardware" },
+      { label: "Computadoras y laptops", href: "/servicios/hardware-equipos" },
+      { label: "Servidores y networking", href: "/servicios/hardware-equipos" },
+      { label: "Impresoras y multifuncionales", href: "/servicios/hardware-equipos" },
+      { label: "Equipos de videoconferencia", href: "/servicios/hardware-equipos" },
+      { label: "Mantenimiento preventivo", href: "/servicios/hardware-equipos" },
     ],
   },
   {
     titulo: "Desarrollo de Software",
     slug: "desarrollo-software",
     subservicios: [
-      { label: "Aplicaciones web", href: "/servicios#desarrollo-software" },
-      { label: "Sistemas ERP/CRM", href: "/servicios#desarrollo-software" },
-      { label: "Apps móviles (iOS/Android)", href: "/servicios#desarrollo-software" },
-      { label: "Integraciones y APIs", href: "/servicios#desarrollo-software" },
-      { label: "Automatización de procesos", href: "/servicios#desarrollo-software" },
+      { label: "Aplicaciones web", href: "/servicios/desarrollo-software" },
+      { label: "Sistemas ERP/CRM", href: "/servicios/desarrollo-software" },
+      { label: "Apps móviles (iOS/Android)", href: "/servicios/desarrollo-software" },
+      { label: "Integraciones y APIs", href: "/servicios/desarrollo-software" },
+      { label: "Automatización de procesos", href: "/servicios/desarrollo-software" },
     ],
   },
   {
     titulo: "Consultoría IT",
     slug: "consultoria-it",
     subservicios: [
-      { label: "Auditoría de sistemas", href: "/servicios#consultoria-it" },
-      { label: "Planificación estratégica IT", href: "/servicios#consultoria-it" },
-      { label: "Arquitectura de soluciones", href: "/servicios#consultoria-it" },
-      { label: "Gestión de proyectos", href: "/servicios#consultoria-it" },
-      { label: "Optimización de costos", href: "/servicios#consultoria-it" },
+      { label: "Auditoría de sistemas", href: "/servicios/consultoria-it" },
+      { label: "Planificación estratégica IT", href: "/servicios/consultoria-it" },
+      { label: "Arquitectura de soluciones", href: "/servicios/consultoria-it" },
+      { label: "Gestión de proyectos", href: "/servicios/consultoria-it" },
+      { label: "Optimización de costos", href: "/servicios/consultoria-it" },
     ],
   },
   {
-    titulo: "Capacitación",
+    titulo: "Docencia y Capacitación",
     slug: "capacitacion",
     subservicios: [
-      { label: "Microsoft 365", href: "/servicios#capacitacion" },
-      { label: "Herramientas de productividad", href: "/servicios#capacitacion" },
-      { label: "Ciberseguridad básica", href: "/servicios#capacitacion" },
-      { label: "Gestión de proyectos", href: "/servicios#capacitacion" },
-      { label: "Análisis de datos", href: "/servicios#capacitacion" },
+      { label: "Microsoft 365", href: "/servicios/capacitacion" },
+      { label: "Herramientas de productividad", href: "/servicios/capacitacion" },
+      { label: "Ciberseguridad básica", href: "/servicios/capacitacion" },
+      { label: "Gestión de proyectos", href: "/servicios/capacitacion" },
+      { label: "Análisis de datos", href: "/servicios/capacitacion" },
     ],
   },
 ];
@@ -211,9 +223,9 @@ export default function Navbar() {
                       <div className="grid grid-cols-4 gap-8">
                         {serviciosMegaMenu.map((servicio) => (
                           <div key={servicio.slug}>
-                            {/* Título del servicio */}
+                            {/* Título del servicio --link a página individual */}
                             <Link
-                              href={`/servicios#${servicio.slug}`}
+                              href={`/servicios/${servicio.slug}`}
                               onClick={() => setIsMegaMenuOpen(false)}
                               className="block font-semibold text-white text-lg mb-3 hover:text-accent transition-colors cursor-pointer"
                               role="menuitem"
@@ -382,7 +394,7 @@ export default function Navbar() {
                       {serviciosMegaMenu.map((servicio) => (
                         <Link
                           key={servicio.slug}
-                          href={`/servicios#${servicio.slug}`}
+                          href={`/servicios/${servicio.slug}`}
                           className="block text-sm text-white/60 py-2 hover:text-white transition-colors"
                           onClick={() => {
                             setIsMegaMenuOpen(false);

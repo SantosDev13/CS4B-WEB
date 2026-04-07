@@ -1,9 +1,26 @@
 import Link from "next/link";
 
+// Datos estáticos de los servicios (mismos que en la página individual)
 const services = [
+  {
+    id: "transformacion-digital",
+    title: "Transformación Digital & Arquitectura Empresarial",
+    slug: "transformacion-digital",
+    description: "Diseñamos e implementamos la hoja de ruta tecnológica para tu empresa, asegurando que cada inversión en tecnología impulse el crecimiento del negocio.",
+    features: [
+      "Diagnóstico digital empresarial",
+      "Arquitectura de soluciones escalables",
+      "Hoja de ruta de transformación",
+      "Gestión del cambio organizacional",
+      "Estrategia de datos y analytics",
+      "Optimización de procesos",
+    ],
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=80",
+  },
   {
     id: "licencias-microsoft",
     title: "Licencias Microsoft",
+    slug: "licencias-microsoft",
     description: "Obtén las licencias que tu empresa necesita con soporte especializado y precios competitivos. Trabajamos con todo el portfolio de Microsoft para maximizar la productividad de tu equipo.",
     features: [
       "Microsoft 365 para empresas",
@@ -16,8 +33,9 @@ const services = [
     image: "https://images.unsplash.com/photo-1633419461186-7d40a38105ec?w=800&q=80",
   },
   {
-    id: "antivirus",
+    id: "antivirus-seguridad",
     title: "Antivirus y Seguridad",
+    slug: "antivirus-seguridad",
     description: "Protege tu infraestructura tecnológica con soluciones de seguridad empresarial de vanguardia. Mantén tus datos seguros contra amenazas cibernéticas.",
     features: [
       "Antivirus empresariales",
@@ -30,22 +48,24 @@ const services = [
     image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80",
   },
   {
-    id: "hardware",
+    id: "hardware-equipos",
     title: "Hardware y Equipos",
+    slug: "hardware-equipos",
     description: "Equipamiento tecnológico de calidad para equipar tu oficina o empresa con las mejores marcas del mercado.",
     features: [
       "Computadoras y laptops",
       "Servidores y networking",
       "Impresoras y multifuncionales",
       "Equipos de videoconferencia",
-      "Accesorios y periféricos",
       "Mantenimiento preventivo",
+      "Accesorios y periféricos",
     ],
     image: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&q=80",
   },
   {
     id: "desarrollo-software",
     title: "Desarrollo de Software",
+    slug: "desarrollo-software",
     description: "Software a medida para optimizar tus procesos empresariales y impulsar tu transformación digital.",
     features: [
       "Aplicaciones web",
@@ -60,6 +80,7 @@ const services = [
   {
     id: "consultoria-it",
     title: "Consultoría IT",
+    slug: "consultoria-it",
     description: "Asesoría especializada para planificar y ejecutar tu estrategia de transformación digital con resultados medibles.",
     features: [
       "Auditoría de sistemas",
@@ -73,7 +94,8 @@ const services = [
   },
   {
     id: "capacitacion",
-    title: "Capacitación",
+    title: "Docencia y Capacitación",
+    slug: "capacitacion",
     description: "Entrenamiento para tu equipo en las herramientas tecnológicas que usan diario para maximizar su productividad.",
     features: [
       "Microsoft 365",
@@ -125,9 +147,11 @@ export default function ServiciosPage() {
               >
                 {/* Content */}
                 <div className={index % 2 === 1 ? 'lg:order-2' : ''}>
-                  <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
-                    {service.title}
-                  </h2>
+                  <Link href={`/servicios/${service.slug}`} className="hover:text-accent transition-colors">
+                    <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">
+                      {service.title}
+                    </h2>
+                  </Link>
                   <p className="text-lg text-text-secondary mb-8 leading-relaxed">
                     {service.description}
                   </p>
@@ -142,10 +166,10 @@ export default function ServiciosPage() {
                     ))}
                   </ul>
                   <Link 
-                    href="/contacto" 
+                    href={`/servicios/${service.slug}`} 
                     className="inline-flex items-center gap-2 text-secondary font-semibold hover:gap-4 transition-all"
                   >
-                    Solicitar información
+                    Ver más detalles
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -155,11 +179,13 @@ export default function ServiciosPage() {
                 {/* Image - Estilo BCG */}
                 <div className={index % 2 === 1 ? 'lg:order-1' : ''}>
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
-                    <img 
-                      src={service.image}
-                      alt={service.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <Link href={`/servicios/${service.slug}`}>
+                      <img 
+                        src={service.image}
+                        alt={service.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -175,7 +201,7 @@ export default function ServiciosPage() {
             ¿No encuentras lo que buscas?
           </h2>
           <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">
-            Contáctanos y te asesoramos para encontrar la solución 
+            Contáctanos y te asesoramos para encontrar la 
             perfecta para tu empresa.
           </p>
           <Link 

@@ -34,21 +34,6 @@ export interface Categoria {
   created_at: Date;
 }
 
-export interface Servicio {
-  id: string;
-  titulo: string;
-  slug: string;
-  descripcion: string;
-  descripcion_corta: string | null;
-  icono: string | null;
-  imagen: string | null;
-  categoria: 'cloud' | 'seguridad' | 'hardware' | 'software' | 'capacitacion' | 'consultoria';
-  orden: number;
-  visible: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
-
 export interface Post {
   id: string;
   titulo: string;
@@ -141,71 +126,6 @@ export const db = {
     },
     delete: async (id: string) => {
       return sql`DELETE FROM categorias WHERE id = ${id}`;
-    },
-  },
-
-  // Servicios
-  servicios: {
-    findAll: async (onlyVisible = true) => {
-      if (onlyVisible) {
-        return sql<Servicio[]>`SELECT * FROM servicios WHERE visible = true ORDER BY orden ASC`;
-      }
-      return sql<Servicio[]>`SELECT * FROM servicios ORDER BY orden ASC`;
-    },
-    findById: async (id: string) => {
-      return sql<Servicio[]>`SELECT * FROM servicios WHERE id = ${id} LIMIT 1`;
-    },
-    findBySlug: async (slug: string) => {
-      return sql<Servicio[]>`SELECT * FROM servicios WHERE slug = ${slug} LIMIT 1`;
-    },
-    findByCategoria: async (categoria: string) => {
-      return sql<Servicio[]>`SELECT * FROM servicios WHERE categoria = ${categoria} AND visible = true ORDER BY orden ASC`;
-    },
-    create: async (data: Partial<Servicio>) => {
-      const allowedFields = ['titulo', 'slug', 'descripcion', 'descripcion_corta', 'icono', 'imagen', 'categoria', 'orden', 'visible'];
-      
-      const insertData: Record<string, any> = {};
-      
-      for (const [key, value] of Object.entries(data)) {
-        if (!allowedFields.includes(key)) continue;
-        if (key === 'id' || key === 'created_at' || key === 'updated_at') continue;
-        if (value === undefined) continue;
-        
-        insertData[key] = value;
-      }
-      
-      const fields = Object.keys(insertData);
-      const values = Object.values(insertData);
-      
-      if (fields.length === 0) return [];
-      
-      const fieldList = fields.join(', ');
-      const valuePlaceholders = fields.map((_, i) => `$${i + 1}`).join(', ');
-      
-      const query = `INSERT INTO servicios (${fieldList}) VALUES (${valuePlaceholders}) RETURNING *`;
-      const result = await sql.unsafe(query, values);
-      return result as unknown as Servicio[];
-    },
-    update: async (id: string, data: Partial<Servicio>) => {
-      const fields: string[] = [];
-      const values: any[] = [];
-      
-      for (const [key, value] of Object.entries(data)) {
-        if (key === 'id' || key === 'created_at' || key === 'updated_at') continue;
-        if (value === undefined) continue;
-        
-        fields.push(`${key} = $${values.length + 1}`);
-        values.push(value);
-      }
-      
-      if (fields.length === 0) return [];
-      
-      values.push(id);
-      const setClause = fields.join(', ');
-      return sql<Servicio[]>`UPDATE servicios SET ${setClause} WHERE id = $${values.length} RETURNING *`;
-    },
-    delete: async (id: string) => {
-      return sql`DELETE FROM servicios WHERE id = ${id}`;
     },
   },
 

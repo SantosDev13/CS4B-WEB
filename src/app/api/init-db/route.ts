@@ -58,24 +58,6 @@ export async function POST() {
       )
     `;
 
-    // Tabla de servicios
-    await sql`
-      CREATE TABLE IF NOT EXISTS servicios (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        titulo VARCHAR(255) NOT NULL,
-        slug VARCHAR(255) UNIQUE NOT NULL,
-        descripcion TEXT NOT NULL,
-        descripcion_corta VARCHAR(500),
-        icono VARCHAR(500),
-        imagen VARCHAR(500),
-        categoria VARCHAR(50) NOT NULL,
-        orden INTEGER DEFAULT 0,
-        visible BOOLEAN DEFAULT true,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `;
-
     // Tabla de posts
     await sql`
       CREATE TABLE IF NOT EXISTS posts (
@@ -95,24 +77,6 @@ export async function POST() {
         meta_description VARCHAR(300),
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `;
-
-    // Tabla de contactos
-    await sql`
-      CREATE TABLE IF NOT EXISTS contactos (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        nombre VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        telefono VARCHAR(50),
-        empresa VARCHAR(255),
-        servicio_interes VARCHAR(100),
-        mensaje TEXT NOT NULL,
-        ip VARCHAR(50),
-        leido BOOLEAN DEFAULT false,
-        respondido BOOLEAN DEFAULT false,
-        respuesta TEXT,
-        created_at TIMESTAMP DEFAULT NOW()
       )
     `;
 
@@ -144,20 +108,6 @@ export async function POST() {
         ('Tecnología', 'tecnologia', 'Artículos sobre tecnología e innovación', '#3FA9F5', 1),
         ('Negocios', 'negocios', 'Artículos sobre gestión empresarial', '#B6E356', 2),
         ('Transformación Digital', 'transformacion-digital', 'Artículos sobre transformación digital', '#FF6B6B', 3)
-      `;
-    }
-
-    // Servicios por defecto
-    const servExists = await sql`SELECT id FROM servicios`;
-    if (servExists.length === 0) {
-      await sql`
-        INSERT INTO servicios (titulo, slug, descripcion, descripcion_corta, categoria, orden, visible) VALUES
-        ('Licencias Microsoft', 'licencias-microsoft', 'Adquiere licencias Microsoft originales para tu empresa. Office 365, Windows, Azure y más con soporte especializado.', 'Licencias originales Microsoft', 'software', 1, true),
-        ('Antivirus y Seguridad', 'antivirus-seguridad', 'Protege tu infraestructura con soluciones de seguridad empresarial.', 'Soluciones de seguridad', 'seguridad', 2, true),
-        ('Hardware y Equipos', 'hardware-equipos', 'Equipos de computación y servidores de las mejores marcas.', 'Equipos de última generación', 'hardware', 3, true),
-        ('Desarrollo de Software', 'desarrollo-software', 'Desarrollo de aplicaciones web y móviles personalizadas.', 'Software a medida', 'software', 4, true),
-        ('Consultoría IT', 'consultoria-it', 'Asesoría especializada en tecnología para transformar digitalmente tu empresa.', 'Expertos en transformación digital', 'consultoria', 5, true),
-        ('Capacitación', 'capacitacion', 'Capacitación y certificaciones en tecnologías Microsoft.', 'Certificaciones profesionales', 'capacitacion', 6, true)
       `;
     }
 

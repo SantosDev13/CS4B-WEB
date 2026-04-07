@@ -78,9 +78,9 @@ export default function About() {
 
           {/* Columna Derecha: Grid de Imágenes Interactivo */}
           <div className="grid grid-cols-2 gap-4 md:gap-6">
-            {/* Grid Item 1 */}
+            {/* Grid Item 1 - Desarrollo de Software */}
             <motion.a
-              href="#"
+              href="/servicios/desarrollo-software"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -93,11 +93,17 @@ export default function About() {
                 alt="Equipo profesional trabajando conjuntamente"
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
               />
+              {/* Service name label - appears on hover */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                <span className="bg-accent/90 text-primary px-4 py-2 rounded-lg font-bold text-sm text-center">
+                  Desarrollo de Software
+                </span>
+              </div>
             </motion.a>
 
-            {/* Grid Item 2 - Staggered offset */}
+            {/* Grid Item 2 - Arquitectura empresarial (staggered offset) */}
             <motion.a
-              href="#"
+              href="/servicios/transformacion-digital"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -110,11 +116,17 @@ export default function About() {
                 alt="Arquitectura moderna corporativa"
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
               />
+              {/* Service name label - appears on hover */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                <span className="bg-accent/90 text-primary px-4 py-2 rounded-lg font-bold text-sm text-center">
+                  Arquitectura Empresarial
+                </span>
+              </div>
             </motion.a>
 
-            {/* Grid Item 3 - Negative margin */}
+            {/* Grid Item 3 - Hardware y equipos (negative margin) */}
             <motion.a
-              href="#"
+              href="/servicios/hardware-equipos"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -127,11 +139,17 @@ export default function About() {
                 alt="Profesional interactuando con tecnología"
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
               />
+              {/* Service name label - appears on hover */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                <span className="bg-accent/90 text-primary px-4 py-2 rounded-lg font-bold text-sm text-center">
+                  Hardware y Equipos
+                </span>
+              </div>
             </motion.a>
 
-            {/* Grid Item 4 */}
+            {/* Grid Item 4 - Docencia y Capacitación */}
             <motion.a
-              href="#"
+              href="/servicios/capacitacion"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -144,6 +162,12 @@ export default function About() {
                 alt="Acuerdo comercial"
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
               />
+              {/* Service name label - appears on hover */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                <span className="bg-accent/90 text-primary px-4 py-2 rounded-lg font-bold text-sm text-center">
+                  Docencia y Capacitación
+                </span>
+              </div>
             </motion.a>
           </div>
         </div>

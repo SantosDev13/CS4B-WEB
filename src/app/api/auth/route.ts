@@ -68,11 +68,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Configurar cookie
+    // En desarrollo: cookie de sesión (se elimina al cerrar navegador) para evitar persistencia no deseada
+    // En producción: cookie persistente por 7 días
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
     response.cookies.set('auth-token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: !isDevelopment, // Solo HTTPS en producción
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 días
+      maxAge: isDevelopment ? undefined : 60 * 60 * 24 * 7, // Sin maxAge = expira al cerrar navegador en dev
       path: '/',
     });
 
