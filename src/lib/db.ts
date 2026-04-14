@@ -76,6 +76,34 @@ export interface Configuracion {
   updated_at: Date;
 }
 
+export interface Categoria_servicio {
+  id: string;
+  nombre: string;
+  slug: string;
+  descripcion: string | null;
+  imagen: string | null;
+  link: string | null;
+  orden: number;
+  visible: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Servicio {
+  id: string;
+  titulo: string;
+  slug: string;
+  descripcion: string;
+  icon: string | null;
+  imagen: string | null;
+  categoria_servicio_id: string | null;
+  tamanho: 'small' | 'medium' | 'large';
+  orden: number;
+  visible: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
 // Funciones helper para consultas comunes
 export const db = {
   // Usuarios
@@ -295,6 +323,112 @@ export const db = {
     },
     delete: async (clave: string) => {
       return sql`DELETE FROM configuraciones WHERE clave = ${clave}`;
+    },
+  },
+
+  // Categorías de servicios (PADRE)
+  categorias_servicios: {
+    findAll: async (visibleOnly = true, limit = 20, offset = 0) => {
+      if (visibleOnly) {
+        return sql<Categoria_servicio[]>`SELECT * FROM categorias_servicios WHERE visible = true ORDER BY orden ASC LIMIT ${limit} OFFSET ${offset}`;
+      }
+      return sql<Categoria_servicio[]>`SELECT * FROM categorias_servicios ORDER BY orden ASC LIMIT ${limit} OFFSET ${offset}`;
+    },
+    findById: async (id: string) => {
+      return sql<Categoria_servicio[]>`SELECT * FROM categorias_servicios WHERE id = ${id} LIMIT 1`;
+    },
+    findBySlug: async (slug: string) => {
+      return sql<Categoria_servicio[]>`SELECT * FROM categorias_servicios WHERE slug = ${slug} LIMIT 1`;
+    },
+    count: async (visibleOnly = true) => {
+      const result = visibleOnly 
+        ? await sql<{count: number}[]>`SELECT COUNT(*) as count FROM categorias_servicios WHERE visible = true`
+        : await sql<{count: number}[]>`SELECT COUNT(*) as count FROM categorias_servicios`;
+      return result[0]?.count || 0;
+    },
+    create: async (data: { nombre: string; slug: string; descripcion?: string; imagen?: string; link?: string; orden?: number }) => {
+      return sql<Categoria_servicio[]>`INSERT INTO categorias_servicios (nombre, slug, descripcion, imagen, link, orden) VALUES (${data.nombre}, ${data.slug}, ${data.descripcion || null}, ${data.imagen || null}, ${data.link || null}, ${data.orden || 0}) RETURNING *`;
+    },
+    update: async (id: string, data: Partial<Categoria_servicio>) => {
+      const fields: string[] = [];
+      const values: unknown[] = [];
+      
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'id' && key !== 'created_at') {
+          fields.push(`${key} = $${values.length + 1}`);
+          values.push(value);
+        }
+      });
+      
+      if (fields.length === 0) return [];
+      
+      values.push(id);
+      return sql<Categoria_servicio[]>`UPDATE categorias_servicios SET ${sql(fields)} WHERE id = $${values.length} RETURNING *`;
+    },
+    delete: async (id: string) => {
+      return sql`DELETE FROM categorias_servicios WHERE id = ${id}`;
+    },
+    toggleVisibility: async (id: string) => {
+      return sql`UPDATE categorias_servicios SET visible = NOT visible WHERE id = ${id} RETURNING *`;
+    },
+  },
+
+  // Servicios
+  servicios: {
+    findAll: async (visibleOnly = true, limit = 20, offset = 0) => {
+      if (visibleOnly) {
+        return sql<Servicio[]>`SELECT * FROM servicios WHERE visible = true ORDER BY orden ASC LIMIT ${limit} OFFSET ${offset}`;
+      }
+      return sql<Servicio[]>`SELECT * FROM servicios ORDER BY orden ASC LIMIT ${limit} OFFSET ${offset}`;
+    },
+    findById: async (id: string) => {
+      return sql<Servicio[]>`SELECT * FROM servicios WHERE id = ${id} LIMIT 1`;
+    },
+    findBySlug: async (slug: string) => {
+      return sql<Servicio[]>`SELECT * FROM servicios WHERE slug = ${slug} LIMIT 1`;
+    },
+    findByCategoria: async (categoriaId: string, visibleOnly = true) => {
+      if (visibleOnly) {
+        return sql<Servicio[]>`SELECT * FROM servicios WHERE categoria_servicio_id = ${categoriaId} AND visible = true ORDER BY orden ASC`;
+      }
+      return sql<Servicio[]>`SELECT * FROM servicios WHERE categoria_servicio_id = ${categoriaId} ORDER BY orden ASC`;
+    },
+    findByCategoriaSlug: async (categoriaSlug: string, visibleOnly = true) => {
+      if (visibleOnly) {
+        return sql<Servicio[]>`SELECT s.* FROM servicios s JOIN categorias_servicios c ON s.categoria_servicio_id = c.id WHERE c.slug = ${categoriaSlug} AND s.visible = true ORDER BY s.orden ASC`;
+      }
+      return sql<Servicio[]>`SELECT s.* FROM servicios s JOIN categorias_servicios c ON s.categoria_servicio_id = c.id WHERE c.slug = ${categoriaSlug} ORDER BY s.orden ASC`;
+    },
+    count: async (visibleOnly = true) => {
+      const result = visibleOnly 
+        ? await sql<{count: number}[]>`SELECT COUNT(*) as count FROM servicios WHERE visible = true`
+        : await sql<{count: number}[]>`SELECT COUNT(*) as count FROM servicios`;
+      return result[0]?.count || 0;
+    },
+    create: async (data: { titulo: string; slug: string; descripcion: string; icon?: string; imagen?: string; categoria_servicio_id?: string; tamanho?: string; orden?: number }) => {
+      return sql<Servicio[]>`INSERT INTO servicios (titulo, slug, descripcion, icon, imagen, categoria_servicio_id, tamanho, orden) VALUES (${data.titulo}, ${data.slug}, ${data.descripcion}, ${data.icon || null}, ${data.imagen || null}, ${data.categoria_servicio_id || null}, ${data.tamanho || 'medium'}, ${data.orden || 0}) RETURNING *`;
+    },
+    update: async (id: string, data: Partial<Servicio>) => {
+      const fields: string[] = [];
+      const values: any[] = [];
+      
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'id' && key !== 'created_at') {
+          fields.push(`${key} = $${values.length + 1}`);
+          values.push(value);
+        }
+      });
+      
+      if (fields.length === 0) return [];
+      
+      values.push(id);
+      return sql<Servicio[]>`UPDATE servicios SET ${sql(fields)} WHERE id = $${values.length} RETURNING *`;
+    },
+    delete: async (id: string) => {
+      return sql`DELETE FROM servicios WHERE id = ${id}`;
+    },
+    toggleVisibility: async (id: string) => {
+      return sql`UPDATE servicios SET visible = NOT visible WHERE id = ${id} RETURNING *`;
     },
   },
 };

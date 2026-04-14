@@ -1,145 +1,68 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { db } from "@/lib/db";
+import sql from "@/lib/db";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// Datos estáticos de los servicios
-const serviciosData: Record<string, {
+interface ServicioDB {
+  id: string;
   titulo: string;
+  slug: string;
   descripcion: string;
-  descripcion_corta: string;
-  categoria: string;
-  features: string[];
-  image: string;
-}> = {
-  "transformacion-digital": {
-    titulo: "Transformación Digital & Arquitectura Empresarial",
-    descripcion: "Diseñamos e implementamos la hoja de ruta tecnológica para tu empresa, asegurando que cada inversión en tecnología impulse el crecimiento del negocio. Nuestro equipo de expertos te acompaña en cada etapa de la transformación, desde el diagnóstico inicial hasta la implementación y seguimiento de resultados.\n\nUtilizamos metodologías probadas y mejores prácticas de arquitectura empresarial para crear soluciones escalables y sostenibles que se adaptan a las necesidades específicas de tu industria y mercado.",
-    descripcion_corta: "Diseñamos e implementamos la hoja de ruta tecnológica para tu empresa",
-    categoria: "consultoria",
-    features: [
-      "Diagnóstico digital empresarial",
-      "Arquitectura de soluciones escalables",
-      "Hoja de ruta de transformación",
-      "Gestión del cambio organizacional",
-      "Estrategia de datos y analytics",
-      "Optimización de procesos",
-    ],
-    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80",
-  },
-  "licencias-microsoft": {
-    titulo: "Licencias Microsoft",
-    descripcion: "Obtén las licencias que tu empresa necesita con soporte especializado y precios competitivos. Trabajamos con todo el portfolio de Microsoft para maximizar la productividad de tu equipo.\n\nComo partner autorizado de Microsoft, garantizamos licencias originales con soporte técnico especializado y asesoría para optimizar tu inversión en tecnología.",
-    descripcion_corta: "Obtén las licencias que tu empresa necesita con soporte especializado",
-    categoria: "software",
-    features: [
-      "Microsoft 365 para empresas",
-      "Windows 10/11 Professional",
-      "Azure Cloud Services",
-      "Exchange Server",
-      "SQL Server",
-      "Soporte técnico especializado",
-    ],
-    image: "https://images.unsplash.com/photo-1633419461186-7d40a38105ec?w=1200&q=80",
-  },
-  "antivirus-seguridad": {
-    titulo: "Antivirus y Seguridad",
-    descripcion: "Protege tu infraestructura tecnológica con soluciones de seguridad empresarial de vanguardia. Mantén tus datos seguros contra amenazas cibernéticas en un mundo cada vez más conectado.\n\nNuestro equipo de seguridad implementa soluciones integral que protegen todos los puntos de tu infraestructura, desde endpoints hasta servidores y redes.",
-    descripcion_corta: "Protege tu infraestructura tecnológica con soluciones de seguridad empresarial",
-    categoria: "seguridad",
-    features: [
-      "Antivirus empresariales",
-      "Firewall y protección perimetral",
-      "Gestión de identidades",
-      "Protección contra ransomware",
-      "Monitoreo 24/7",
-      "Auditorías de seguridad",
-    ],
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80",
-  },
-  "hardware-equipos": {
-    titulo: "Hardware y Equipos",
-    descripcion: "Equipamiento tecnológico de calidad para equipar tu oficina o empresa con las mejores marcas del mercado. Desde computadoras personales hasta servidores enterprise.\n\nTe asesoramos en la selección del equipo adecuado para cada necesidad, gestionamos la adquisición e implementación, y ofrecemos soporte post-venta.",
-    descripcion_corta: "Equipamiento tecnológico de calidad de las mejores marcas",
-    categoria: "hardware",
-    features: [
-      "Computadoras y laptops",
-      "Servidores y networking",
-      "Impresoras y multifuncionales",
-      "Equipos de videoconferencia",
-      "Mantenimiento preventivo",
-      "Accesorios y periféricos",
-    ],
-    image: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=1200&q=80",
-  },
-  "desarrollo-software": {
-    titulo: "Desarrollo de Software",
-    descripcion: "Software a medida para optimizar tus procesos empresariales y impulsar tu transformación digital. Creamos soluciones que se adaptan exactamente a tus necesidades.\n\nNuestro equipo de desarrolladores utiliza tecnologías modernas y metodologías ágiles para entregar productos de alta calidad en tiempos óptimos.",
-    descripcion_corta: "Software a medida para optimizar tus procesos empresariales",
-    categoria: "software",
-    features: [
-      "Aplicaciones web",
-      "Sistemas ERP/CRM",
-      "Apps móviles (iOS/Android)",
-      "Integraciones y APIs",
-      "Automatización de procesos",
-      "Mantenimiento y soporte",
-    ],
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&q=80",
-  },
-  "consultoria-it": {
-    titulo: "Consultoría IT",
-    descripcion: "Asesoría especializada para planificar y ejecutar tu estrategia de transformación digital con resultados medibles. Te ayudamos a tomar decisiones informadas sobre tecnología.\n\nCon más de 15 años de experiencia en el mercado peruano, entendemos los desafíos específicos de las empresas locales y cómo abordarlos con soluciones tecnológicas efectivas.",
-    descripcion_corta: "Asesoría especializada para planificar tu estrategia de transformación digital",
-    categoria: "consultoria",
-    features: [
-      "Auditoría de sistemas",
-      "Planificación estratégica IT",
-      "Arquitectura de soluciones",
-      "Gestión de proyectos",
-      "Optimización de costos",
-      "Capacitación de equipos",
-    ],
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80",
-  },
-  "capacitacion": {
-    titulo: "Docencia y Capacitación",
-    descripcion: "Entrenamiento para tu equipo en las herramientas tecnológicas que usan diario para maximizar su productividad. Programas adaptados a tu industria y nivel de los participantes.\n\nNuestros programas de capacitación son prácticos y orientados a resultados, asegurando que tu equipo pueda aplicar inmediatamente lo aprendido.",
-    descripcion_corta: "Entrenamiento para maximizar la productividad de tu equipo",
-    categoria: "capacitacion",
-    features: [
-      "Microsoft 365",
-      "Herramientas de productividad",
-      "Ciberseguridad básica",
-      "Gestión de proyectos",
-      "Análisis de datos",
-      "Programación básica",
-    ],
-    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&q=80",
-  },
-};
+  icon: string | null;
+  imagen: string | null;
+  categoria_servicio_id: string | null;
+  visible: boolean;
+  categoria_nombre?: string;
+  categoria_slug?: string;
+}
 
-// Lista de slugs válidos
-const slugsValidos = Object.keys(serviciosData);
+async function getServicioBySlug(slug: string): Promise<ServicioDB | null> {
+  try {
+    const result = await sql`
+      SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug
+      FROM servicios s
+      LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id
+      WHERE s.slug = ${slug} AND s.visible = true
+      LIMIT 1
+    `;
+    
+    if (result.length === 0) return null;
+    return result[0] as ServicioDB;
+  } catch (error) {
+    console.error("Error fetching servicio:", error);
+    return null;
+  }
+}
 
-// Servicios relacionados (para mostrar en sidebar)
-const serviciosRelacionados = [
-  { slug: "licencias-microsoft", titulo: "Licencias Microsoft", descripcion_corta: "Licencias originales Microsoft" },
-  { slug: "antivirus-seguridad", titulo: "Antivirus y Seguridad", descripcion_corta: "Soluciones de seguridad" },
-  { slug: "hardware-equipos", titulo: "Hardware y Equipos", descripcion_corta: "Equipos de última generación" },
-];
+async function getServiciosRelacionados(excludeId: string, limit = 3): Promise<{slug: string, titulo: string}[]> {
+  try {
+    const result = await sql`
+      SELECT slug, titulo 
+      FROM servicios 
+      WHERE id != ${excludeId} AND visible = true 
+      ORDER BY RANDOM() 
+      LIMIT ${limit}
+    `;
+    return result.map((s: any) => ({ slug: s.slug, titulo: s.titulo }));
+  } catch (error) {
+    return [];
+  }
+}
 
 export default async function ServicioPage({ params }: Props) {
   const { slug } = await params;
-
-  // Validar que el slug existe
-  if (!slugsValidos.includes(slug)) {
+  
+  const servicio = await getServicioBySlug(slug);
+  
+  if (!servicio) {
     notFound();
   }
-
-  const servicio = serviciosData[slug];
+  
+  const serviciosRelacionados = await getServiciosRelacionados(servicio.id);
 
   return (
     <>
@@ -147,7 +70,7 @@ export default async function ServicioPage({ params }: Props) {
       <section className="relative h-[60vh] min-h-[500px] flex items-center">
         <div className="absolute inset-0">
           <img 
-            src={servicio.image} 
+            src={servicio.imagen || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80"} 
             alt={servicio.titulo} 
             className="w-full h-full object-cover"
           />
@@ -161,6 +84,14 @@ export default async function ServicioPage({ params }: Props) {
               <Link href="/" className="hover:text-white transition-colors">Inicio</Link>
               <span>/</span>
               <Link href="/servicios" className="hover:text-white transition-colors">Servicios</Link>
+              {servicio.categoria_nombre && (
+                <>
+                  <span>/</span>
+                  <Link href={`/servicios#${servicio.categoria_slug}`} className="hover:text-white transition-colors">
+                    {servicio.categoria_nombre}
+                  </Link>
+                </>
+              )}
               <span>/</span>
               <span className="text-white">{servicio.titulo}</span>
             </nav>
@@ -172,7 +103,7 @@ export default async function ServicioPage({ params }: Props) {
             {servicio.titulo}
           </h1>
           <p className="text-xl text-white/80 max-w-2xl">
-            {servicio.descripcion_corta}
+            {servicio.descripcion.substring(0, 100)}...
           </p>
         </div>
       </section>
@@ -190,26 +121,6 @@ export default async function ServicioPage({ params }: Props) {
                 <p className="text-lg leading-relaxed whitespace-pre-line">
                   {servicio.descripcion}
                 </p>
-              </div>
-
-              {/* Características */}
-              <div className="mt-12">
-                <h3 className="text-xl font-bold text-primary mb-6">
-                  ¿Qué incluye este servicio?
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {servicio.features.map((feature, index) => (
-                    <div 
-                      key={index}
-                      className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg"
-                    >
-                      <svg className="w-5 h-5 text-secondary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-text-secondary">{feature}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* ¿Por qué elegirnos? */}
@@ -264,27 +175,26 @@ export default async function ServicioPage({ params }: Props) {
                 </div>
 
                 {/* Otros servicios */}
-                <div className="mt-6">
-                  <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4">
-                    Otros servicios
-                  </h4>
-                  <div className="space-y-3">
-                    {serviciosRelacionados.filter(s => s.slug !== slug).map((srv) => (
-                      <Link
-                        key={srv.slug}
-                        href={`/servicios/${srv.slug}`}
-                        className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-accent hover:shadow-md transition-all"
-                      >
-                        <h5 className="font-semibold text-primary text-sm">
-                          {srv.titulo}
-                        </h5>
-                        <p className="text-xs text-text-secondary mt-1">
-                          {srv.descripcion_corta}
-                        </p>
-                      </Link>
-                    ))}
+                {serviciosRelacionados.length > 0 && (
+                  <div className="mt-6">
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4">
+                      Otros servicios
+                    </h4>
+                    <div className="space-y-3">
+                      {serviciosRelacionados.map((srv) => (
+                        <Link
+                          key={srv.slug}
+                          href={`/servicios/${srv.slug}`}
+                          className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-accent hover:shadow-md transition-all"
+                        >
+                          <h5 className="font-semibold text-primary text-sm">
+                            {srv.titulo}
+                          </h5>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Volver a servicios */}
                 <div className="mt-6">
@@ -327,5 +237,10 @@ export default async function ServicioPage({ params }: Props) {
 
 // Generar parámetros estáticos para SSG
 export async function generateStaticParams() {
-  return slugsValidos.map((slug) => ({ slug }));
+  try {
+    const servicios = await db.servicios.findAll(true, 100, 0);
+    return servicios.map((s) => ({ slug: s.slug }));
+  } catch (error) {
+    return [];
+  }
 }
