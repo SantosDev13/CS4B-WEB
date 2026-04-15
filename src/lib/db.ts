@@ -137,20 +137,16 @@ export const db = {
       return sql<Categoria[]>`INSERT INTO categorias (nombre, slug, descripcion, color, orden) VALUES (${data.nombre}, ${data.slug}, ${data.descripcion || null}, ${data.color || '#000000'}, ${data.orden || 0}) RETURNING *`;
     },
     update: async (id: string, data: Partial<Categoria>) => {
-      const fields: string[] = [];
-      const values: any[] = [];
+      const entries = Object.entries(data).filter(([key]) => key !== 'id' && key !== 'created_at');
       
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'id' && key !== 'created_at') {
-          fields.push(`${key} = $${values.length + 1}`);
-          values.push(value);
-        }
-      });
+      if (entries.length === 0) return [];
       
-      if (fields.length === 0) return [];
-      
+      const sets = entries.map(([key], i) => `${key} = $${i + 1}`);
+      const values = entries.map(([, value]) => value);
       values.push(id);
-      return sql<Categoria[]>`UPDATE categorias SET ${sql(fields)} WHERE id = $${values.length} RETURNING *`;
+      
+      const result = await sql.unsafe(`UPDATE categorias SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING *`, values);
+      return result as Categoria[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM categorias WHERE id = ${id}`;
@@ -350,20 +346,16 @@ export const db = {
       return sql<Categoria_servicio[]>`INSERT INTO categorias_servicios (nombre, slug, descripcion, imagen, link, orden) VALUES (${data.nombre}, ${data.slug}, ${data.descripcion || null}, ${data.imagen || null}, ${data.link || null}, ${data.orden || 0}) RETURNING *`;
     },
     update: async (id: string, data: Partial<Categoria_servicio>) => {
-      const fields: string[] = [];
-      const values: unknown[] = [];
+      const entries = Object.entries(data).filter(([key]) => key !== 'id' && key !== 'created_at');
       
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'id' && key !== 'created_at') {
-          fields.push(`${key} = $${values.length + 1}`);
-          values.push(value);
-        }
-      });
+      if (entries.length === 0) return [];
       
-      if (fields.length === 0) return [];
-      
+      const sets = entries.map(([key], i) => `${key} = $${i + 1}`);
+      const values = entries.map(([, value]) => value);
       values.push(id);
-      return sql<Categoria_servicio[]>`UPDATE categorias_servicios SET ${sql(fields)} WHERE id = $${values.length} RETURNING *`;
+      
+      const result = await sql.unsafe(`UPDATE categorias_servicios SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING *`, values);
+      return result as Categoria_servicio[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM categorias_servicios WHERE id = ${id}`;
@@ -409,20 +401,16 @@ export const db = {
       return sql<Servicio[]>`INSERT INTO servicios (titulo, slug, descripcion, icon, imagen, categoria_servicio_id, tamanho, orden) VALUES (${data.titulo}, ${data.slug}, ${data.descripcion}, ${data.icon || null}, ${data.imagen || null}, ${data.categoria_servicio_id || null}, ${data.tamanho || 'medium'}, ${data.orden || 0}) RETURNING *`;
     },
     update: async (id: string, data: Partial<Servicio>) => {
-      const fields: string[] = [];
-      const values: any[] = [];
+      const entries = Object.entries(data).filter(([key]) => key !== 'id' && key !== 'created_at');
       
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'id' && key !== 'created_at') {
-          fields.push(`${key} = $${values.length + 1}`);
-          values.push(value);
-        }
-      });
+      if (entries.length === 0) return [];
       
-      if (fields.length === 0) return [];
-      
+      const sets = entries.map(([key], i) => `${key} = $${i + 1}`);
+      const values = entries.map(([, value]) => value);
       values.push(id);
-      return sql<Servicio[]>`UPDATE servicios SET ${sql(fields)} WHERE id = $${values.length} RETURNING *`;
+      
+      const result = await sql.unsafe(`UPDATE servicios SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING *`, values);
+      return result as Servicio[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM servicios WHERE id = ${id}`;
