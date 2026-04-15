@@ -93,7 +93,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Navigation */}
           <nav className="mt-6 space-y-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+              // Exact match, or exact path match (not partial)
+              const isExactMatch = pathname === item.href;
+              const isChildPage = item.href !== '/admin' && pathname.startsWith(item.href + '/');
+              const isActive = isExactMatch || isChildPage;
               return (
                 <Link
                   key={item.href}

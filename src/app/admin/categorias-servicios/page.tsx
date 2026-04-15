@@ -290,13 +290,14 @@ export default function AdminCategoriasServiciosPage() {
                   <td className="p-4 text-center">
                     <button
                       onClick={() => handleToggleVisibility(categoria)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                      className={`p-2 rounded-full transition-colors ${
                         categoria.visible
                           ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
                           : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
                       }`}
+                      title={categoria.visible ? "Ocultar" : "Mostrar"}
                     >
-                      {categoria.visible ? "Visible" : "Oculto"}
+                      {categoria.visible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                     </button>
                   </td>
                   <td className="p-4">

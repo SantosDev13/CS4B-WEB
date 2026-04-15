@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { titulo, slug, descripcion, icon, imagen, categoria_servicio_id, tamanho, orden } = body as any;
+    const { titulo, slug, descripcion, icono, imagen, categoria, categoria_servicio_id, tamanho, orden } = body as any;
 
     if (!titulo || !slug || !descripcion) {
       return NextResponse.json(
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       titulo,
       slug,
       descripcion,
-      icon,
+      icono,
       imagen,
       categoria_servicio_id,
       tamanho: (tamanho as string) || 'medium',

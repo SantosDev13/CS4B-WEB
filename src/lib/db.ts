@@ -94,7 +94,7 @@ export interface Servicio {
   titulo: string;
   slug: string;
   descripcion: string;
-  icon: string | null;
+  icono: string | null;
   imagen: string | null;
   categoria_servicio_id: string | null;
   tamanho: 'small' | 'medium' | 'large';
@@ -397,8 +397,8 @@ export const db = {
         : await sql<{count: number}[]>`SELECT COUNT(*) as count FROM servicios`;
       return result[0]?.count || 0;
     },
-    create: async (data: { titulo: string; slug: string; descripcion: string; icon?: string; imagen?: string; categoria_servicio_id?: string; tamanho?: string; orden?: number }) => {
-      return sql<Servicio[]>`INSERT INTO servicios (titulo, slug, descripcion, icon, imagen, categoria_servicio_id, tamanho, orden) VALUES (${data.titulo}, ${data.slug}, ${data.descripcion}, ${data.icon || null}, ${data.imagen || null}, ${data.categoria_servicio_id || null}, ${data.tamanho || 'medium'}, ${data.orden || 0}) RETURNING *`;
+    create: async (data: { titulo: string; slug: string; descripcion: string; descripcion_corta?: string; icono?: string; imagen?: string; categoria?: string; categoria_servicio_id?: string; tamanho?: string; orden?: number }) => {
+      return sql<Servicio[]>`INSERT INTO servicios (titulo, slug, descripcion, descripcion_corta, icono, imagen, categoria, categoria_servicio_id, tamanho, orden, visible) VALUES (${data.titulo}, ${data.slug}, ${data.descripcion}, ${data.descripcion_corta || null}, ${data.icono || null}, ${data.imagen || null}, ${data.categoria || null}, ${data.categoria_servicio_id || null}, ${data.tamanho || 'medium'}, ${data.orden || 0}, true) RETURNING *`;
     },
     update: async (id: string, data: Partial<Servicio>) => {
       const entries = Object.entries(data).filter(([key]) => key !== 'id' && key !== 'created_at');

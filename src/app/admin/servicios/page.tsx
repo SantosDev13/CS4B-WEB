@@ -34,7 +34,7 @@ interface Servicio {
   titulo: string;
   slug: string;
   descripcion: string;
-  icon: string | null;
+  icono: string | null;
   imagen: string | null;
   categoria_servicio_id: string | null;
   tamanho: 'small' | 'medium' | 'large';
@@ -123,13 +123,16 @@ export default function AdminServiciosPage() {
       
       const method = editingServicio ? "PUT" : "POST";
 
+      const selectedCat = categorias.find(c => c.id === formData.categoria_servicio_id);
+      
       const body = {
         titulo: formData.titulo,
         slug: formData.slug,
         descripcion: formData.descripcion,
-        icon: formData.icon,
+        icono: formData.icon,
         imagen: formData.imagen || null,
         categoria_servicio_id: formData.categoria_servicio_id || null,
+        categoria: selectedCat?.nombre || null,
         tamanho: formData.tamanho,
         orden: parseInt(String(formData.orden)) || 0,
         visible: formData.visible,
@@ -166,7 +169,7 @@ export default function AdminServiciosPage() {
       titulo: servicio.titulo,
       slug: servicio.slug,
       descripcion: servicio.descripcion,
-      icon: servicio.icon || "FileKey",
+      icon: servicio.icono || "FileKey",
       imagen: servicio.imagen || "",
       categoria_servicio_id: servicio.categoria_servicio_id || "",
       tamanho: servicio.tamanho,

@@ -12,7 +12,7 @@ interface ServicioDB {
   titulo: string;
   slug: string;
   descripcion: string;
-  icon: string | null;
+  icono: string | null;
   imagen: string | null;
   categoria_servicio_id: string | null;
   visible: boolean;

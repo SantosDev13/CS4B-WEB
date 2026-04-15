@@ -43,12 +43,14 @@ export async function PUT(
       );
     }
 
-    const allowedFields = ['titulo', 'slug', 'descripcion', 'icon', 'imagen', 'categoria_servicio_id', 'tamanho', 'orden', 'visible'];
+    const allowedFields = ['titulo', 'slug', 'descripcion', 'icono', 'imagen', 'categoria_servicio_id', 'tamanho', 'orden', 'visible'];
     const updateData: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(body)) {
-      if (allowedFields.includes(key)) {
-        updateData[key] = value;
+      // Map 'icon' from frontend to 'icono' for DB
+      const dbKey = key === 'icon' ? 'icono' : key;
+      if (allowedFields.includes(key) || allowedFields.includes(dbKey)) {
+        updateData[dbKey] = value;
       }
     }
 

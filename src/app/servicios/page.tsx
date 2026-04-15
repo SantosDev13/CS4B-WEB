@@ -44,7 +44,7 @@ async function getCategoriasConServicios(): Promise<CategoriaWithServicios[]> {
             titulo: s.titulo,
             slug: s.slug,
             descripcion: s.descripcion,
-            icon: s.icon,
+            icon: s.icono,
             imagen: s.imagen,
             tamanho: s.tamanho,
           })) || [],
