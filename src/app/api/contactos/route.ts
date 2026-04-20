@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { nombre, email, telefono, empresa, servicio_interes, mensaje } = body;
+    const { nombre, email, telefono, empresa, servicio_interes, mensaje, servicios_seleccionados } = body;
 
     if (!nombre || !email || !mensaje) {
       return NextResponse.json(
@@ -74,12 +74,20 @@ export async function POST(request: NextRequest) {
                request.headers.get('x-real-ip') ||
                '0.0.0.0';
 
+    // Procesar servicios seleccionados - convertir a string JSON si existe
+    let servicioInteres = servicio_interes;
+    
+    if (servicios_seleccionados && Array.isArray(servicios_seleccionados) && servicios_seleccionados.length > 0) {
+      // Guardar como JSON: [{ id, titulo, categoria }, ...]
+      servicioInteres = JSON.stringify(servicios_seleccionados);
+    }
+
     const contacto = await db.contactos.create({
       nombre,
       email,
       telefono,
       empresa,
-      servicio_interes,
+      servicio_interes: servicioInteres,
       mensaje,
       ip,
     });

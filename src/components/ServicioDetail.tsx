@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle } from "lucide-react";
+import { useCart, CartItem } from "@/context/CartContext";
+import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle, ShoppingCart, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ServicioDetailProps {
@@ -28,6 +29,11 @@ interface ServicioDetailProps {
 
 export default function ServicioDetail({ servicio, serviciosRelacionados }: ServicioDetailProps) {
   const [currentImage, setCurrentImage] = useState(0);
+  const { addToCart, removeFromCart, isInCart } = useCart();
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  
+  const inCart = isInCart(servicio.id);
   
   // Imágenes del servicio (puede ser una o varias)
   const images = servicio.imagen 
@@ -40,6 +46,25 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
   const handleWhatsApp = () => {
     const message = `Hola! Estoy interesado en el servicio: ${servicio.titulo}`;
     window.open(`https://wa.me/51999999999?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handleCartClick = () => {
+    if (inCart) {
+      removeFromCart(servicio.id);
+      setToastMessage("Eliminado del carrito");
+    } else {
+      const item: CartItem = {
+        id: servicio.id,
+        titulo: servicio.titulo,
+        slug: servicio.slug,
+        categoria: servicio.categoria_nombre,
+        categoriaSlug: servicio.categoria_slug,
+      };
+      addToCart(item);
+      setToastMessage("Agregado al carrito");
+    }
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
   };
 
   return (
@@ -235,6 +260,27 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
               {/* CTA Buttons */}
               <div className="space-y-3">
                 <button 
+                  onClick={handleCartClick}
+                  className={`w-full flex items-center justify-center gap-2 font-semibold py-4 px-6 rounded-lg transition-colors ${
+                    inCart
+                      ? "bg-green-500 hover:bg-green-600 text-white"
+                      : "bg-secondary hover:bg-secondary/90 text-white"
+                  }`}
+                >
+                  {inCart ? (
+                    <>
+                      <Check className="w-5 h-5" />
+                      Agregado al carrito
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      Agregar al carrito
+                    </>
+                  )}
+                </button>
+                
+                <button 
                   onClick={handleWhatsApp}
                   className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg transition-colors"
                 >
@@ -242,14 +288,6 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
                   Escribir al vendedor
                 </button>
                 
-                <Link 
-                  href="/contacto"
-                  className="w-full flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/90 text-white font-semibold py-4 px-6 rounded-lg transition-colors"
-                >
-                  <Phone className="w-5 h-5" />
-                  Llamar ahora
-                </Link>
-
                 <Link 
                   href="/contacto"
                   className="w-full flex items-center justify-center gap-2 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors"
@@ -307,6 +345,31 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
           </Link>
         </div>
       </section>
+
+      {/* Toast notification */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3"
+          >
+            {inCart ? (
+              <Check className="w-5 h-5 text-green-400" />
+            ) : (
+              <ShoppingCart className="w-5 h-5 text-green-400" />
+            )}
+            <span className="text-sm font-medium">{toastMessage}</span>
+            <button
+              onClick={() => setShowToast(false)}
+              className="ml-2 hover:text-gray-300"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

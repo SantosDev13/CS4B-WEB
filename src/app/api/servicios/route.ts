@@ -7,12 +7,36 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const published = searchParams.get('published');
+    const categoria = searchParams.get('categoria');
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // Obtener servicios con su categoría padre
     let query;
-    if (published !== 'false') {
+    let params: any[] = [];
+    
+    if (categoria) {
+      // Filtrar por categoría específica
+      if (published !== 'false') {
+        query = sql`
+          SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug 
+          FROM servicios s 
+          LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id 
+          WHERE s.visible = true AND s.categoria_servicio_id = ${categoria}
+          ORDER BY s.orden ASC 
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+      } else {
+        query = sql`
+          SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug 
+          FROM servicios s 
+          LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id 
+          WHERE s.categoria_servicio_id = ${categoria}
+          ORDER BY s.orden ASC 
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+      }
+    } else if (published !== 'false') {
       query = sql`
         SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug 
         FROM servicios s 
@@ -43,7 +67,7 @@ export async function GET(request: NextRequest) {
       } : null
     }));
 
-    return NextResponse.json({ servicios: serviciosWithCategoria });
+    return NextResponse.json({ success: true, data: serviciosWithCategoria });
   } catch (error) {
     console.error('Error fetching servicios:', error);
     return NextResponse.json(

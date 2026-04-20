@@ -1,10 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, CheckCircle, AlertCircle, Loader2, ShoppingCart, X, Plus, Trash2 } from "lucide-react";
+import { useCart, CartItem } from "@/context/CartContext";
+import Link from "next/link";
+
+interface Categoria {
+  id: string;
+  nombre: string;
+  slug: string;
+}
+
+interface Servicio {
+  id: string;
+  titulo: string;
+  slug: string;
+  categoria_servicio_id: string;
+}
 
 export default function ContactoPage() {
+  const { servicios: cartServicios, removeFromCart, clearCart, addToCart } = useCart();
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
@@ -18,6 +34,44 @@ export default function ContactoPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  // Datos para selects dinámicos
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
+  const [servicioSeleccionado, setServicioSeleccionado] = useState("");
+  const [loadingServicios, setLoadingServicios] = useState(false);
+
+  // Cargar categorías al iniciar
+  useEffect(() => {
+    fetch("/api/categorias-servicios")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setCategorias(data.data);
+        }
+      })
+      .catch((err) => console.error("Error fetching categorias:", err));
+  }, []);
+
+  // Cargar servicios cuando se selecciona categoría
+  useEffect(() => {
+    if (categoriaSeleccionada) {
+      setLoadingServicios(true);
+      fetch(`/api/servicios?categoria=${categoriaSeleccionada}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.data) {
+            setServicios(data.data);
+          }
+        })
+        .catch((err) => console.error("Error fetching servicios:", err))
+        .finally(() => setLoadingServicios(false));
+    } else {
+      setServicios([]);
+      setServicioSeleccionado("");
+    }
+  }, [categoriaSeleccionada]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -27,11 +81,43 @@ export default function ContactoPage() {
     });
   };
 
+  const handleAddManual = () => {
+    if (categoriaSeleccionada && servicioSeleccionado) {
+      const categoria = categorias.find((c) => c.id === categoriaSeleccionada);
+      const servicio = servicios.find((s) => s.id === servicioSeleccionado);
+
+      if (categoria && servicio) {
+        const item: CartItem = {
+          id: servicio.id,
+          titulo: servicio.titulo,
+          slug: servicio.slug,
+          categoria: categoria.nombre,
+          categoriaSlug: categoria.slug,
+        };
+        addToCart(item);
+        setCategoriaSeleccionada("");
+        setServicioSeleccionado("");
+        setServicios([]);
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setSuccess(false);
+
+    // Preparar datos - si hay carrito, usarlo; si no, usar selección manual
+    const serviciosSeleccionados = cartServicios.length > 0
+      ? cartServicios
+      : categoriaSeleccionada && servicioSeleccionado
+        ? [{
+            id: servicioSeleccionado,
+            titulo: servicios.find((s) => s.id === servicioSeleccionado)?.titulo || "",
+            categoria: categorias.find((c) => c.id === categoriaSeleccionada)?.nombre || "",
+          }]
+        : [];
 
     try {
       const res = await fetch("/api/contactos", {
@@ -39,13 +125,17 @@ export default function ContactoPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          servicios_seleccionados: serviciosSeleccionados,
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setSuccess(true);
+        clearCart();
         setFormData({
           nombre: "",
           email: "",
@@ -64,14 +154,16 @@ export default function ContactoPage() {
     }
   };
 
+  const hasServicios = cartServicios.length > 0 || (categoriaSeleccionada && servicioSeleccionado);
+
   return (
     <div className="pt-0">
-      {/* Header con imagen de fondo */}
+      {/* Header */}
       <section className="relative h-[50vh] min-h-[400px] flex items-center">
         <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80" 
-            alt="Contacto empresarial" 
+          <img
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
+            alt="Contacto empresarial"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-primary/85" />
@@ -81,7 +173,7 @@ export default function ContactoPage() {
             Contáctanos
           </h1>
           <p className="text-xl text-white/80 max-w-2xl">
-            ¿Listo para transformar tu negocio? Escríbenos y 
+            ¿Listo para transformar tu negocio? Escríbenos y
             te respondemos en menos de 24 horas
           </p>
         </div>
@@ -91,7 +183,7 @@ export default function ContactoPage() {
       <section className="py-24 bg-white">
         <div className="container-custom">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* Contact Form - Estilo minimalista */}
+            {/* Contact Form */}
             <div>
               <h2 className="text-2xl font-bold text-primary mb-8">
                 Envíanos un mensaje
@@ -125,6 +217,114 @@ export default function ContactoPage() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Carrito de servicios o selects dinámicos */}
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-2">
+                    <ShoppingCart className="w-4 h-4 inline mr-2" />
+                    Servicio de interés
+                  </label>
+
+                  {/* SI HAY SERVICIOS EN EL CARRITO */}
+                  {cartServicios.length > 0 ? (
+                    <div className="space-y-3">
+                      {/* Lista de servicios seleccionados */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-medium text-blue-800">
+                            Servicios seleccionados ({cartServicios.length})
+                          </span>
+                          <button
+                            type="button"
+                            onClick={clearCart}
+                            className="text-sm text-blue-600 hover:text-blue-800"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {cartServicios.map((item) => (
+                            <span
+                              key={item.id}
+                              className="inline-flex items-center gap-1 bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm"
+                            >
+                              {item.categoria && (
+                                <span className="text-blue-500 text-xs">[{item.categoria}]</span>
+                              )}
+                              {item.titulo}
+                              <button
+                                type="button"
+                                onClick={() => removeFromCart(item.id)}
+                                className="ml-1 hover:text-red-500"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Opción de agregar más */}
+                      <Link
+                        href="/servicios"
+                        className="inline-flex items-center gap-2 text-sm text-secondary hover:text-secondary/80"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Agregar más servicios
+                      </Link>
+                    </div>
+                  ) : (
+                    /* SI NO HAY CARRITO - SELECTS DINÁMICOS */
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <select
+                          value={categoriaSeleccionada}
+                          onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-white"
+                        >
+                          <option value="">Selecciona una categoría</option>
+                          {categorias.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.nombre}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          value={servicioSeleccionado}
+                          onChange={(e) => setServicioSeleccionado(e.target.value)}
+                          disabled={!categoriaSeleccionada || loadingServicios}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="">
+                            {loadingServicios
+                              ? "Cargando..."
+                              : categoriaSeleccionada
+                                ? "Selecciona un servicio"
+                                : "Primero selecciona una categoría"}
+                          </option>
+                          {servicios.map((srv) => (
+                            <option key={srv.id} value={srv.id}>
+                              {srv.titulo}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Botón agregar manual */}
+                      {categoriaSeleccionada && servicioSeleccionado && (
+                        <button
+                          type="button"
+                          onClick={handleAddManual}
+                          className="inline-flex items-center gap-2 text-sm text-secondary hover:text-secondary/80"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Agregir servicio seleccionado
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="nombre" className="block text-sm font-medium text-text-secondary mb-2">
@@ -190,28 +390,6 @@ export default function ContactoPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="servicio_interes" className="block text-sm font-medium text-text-secondary mb-2">
-                    Servicio de interés
-                  </label>
-                  <select
-                    id="servicio_interes"
-                    name="servicio_interes"
-                    value={formData.servicio_interes}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-white"
-                  >
-                    <option value="">Selecciona un servicio</option>
-                    <option value="licencias">Licencias Microsoft</option>
-                    <option value="antivirus">Antivirus y Seguridad</option>
-                    <option value="hardware">Hardware y Equipos</option>
-                    <option value="desarrollo">Desarrollo de Software</option>
-                    <option value="consultoria">Consultoría IT</option>
-                    <option value="capacitacion">Capacitación</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
-
-                <div>
                   <label htmlFor="mensaje" className="block text-sm font-medium text-text-secondary mb-2">
                     Mensaje *
                   </label>
@@ -247,9 +425,8 @@ export default function ContactoPage() {
               </form>
             </div>
 
-            {/* Contact Info - Estilo BCG */}
+            {/* Contact Info */}
             <div className="space-y-8">
-              {/* Info Cards */}
               <div>
                 <h2 className="text-2xl font-bold text-primary mb-8">
                   Información de contacto

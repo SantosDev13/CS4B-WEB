@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
     const categorias = await db.categorias_servicios.findAll(published !== 'false', limit, offset);
 
-    return NextResponse.json({ categorias: categorias || [] });
+    return NextResponse.json({ success: true, data: categorias || [] });
   } catch (error) {
     console.error('Error fetching categorias_servicios:', error);
     return NextResponse.json(

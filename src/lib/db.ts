@@ -59,7 +59,7 @@ export interface Contacto {
   email: string;
   telefono: string | null;
   empresa: string | null;
-  servicio_interes: string | null;
+  servicio_interes: string | null; // JSON con servicios seleccionados
   mensaje: string;
   ip: string | null;
   leido: boolean;

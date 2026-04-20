@@ -76,11 +76,12 @@ export default function About() {
             </div>
           </motion.div>
 
+        {/* cada pagina de categoria-servicio, se linkea mediante su slug correspondiente */}
           {/* Columna Derecha: Grid de Imágenes Interactivo */}
           <div className="grid grid-cols-2 gap-4 md:gap-6">
             {/* Grid Item 1 - Desarrollo de Software */}
             <motion.a
-              href="/servicios/desarrollo-software"
+              href="/servicios/desarrollo-software" // Enlace a la página de servicios correspondiente
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -93,7 +94,7 @@ export default function About() {
                 alt="Equipo profesional trabajando conjuntamente"
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
               />
-              {/* Service name label - appears on hover */}
+              {/* Etiqueta del nombre de servicio - aparece al pasar el mouse */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
                 <span className="bg-accent/90 text-primary px-4 py-2 rounded-lg font-bold text-sm text-center">
                   Desarrollo de Software
@@ -103,7 +104,7 @@ export default function About() {
 
             {/* Grid Item 2 - Arquitectura empresarial (staggered offset) */}
             <motion.a
-              href="/servicios/transformacion-digital"
+              href="/servicios/arquitectura-empresarial"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -126,7 +127,7 @@ export default function About() {
 
             {/* Grid Item 3 - Hardware y equipos (negative margin) */}
             <motion.a
-              href="/servicios/hardware-equipos"
+              href="/servicios/hardware"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -149,7 +150,7 @@ export default function About() {
 
             {/* Grid Item 4 - Docencia y Capacitación */}
             <motion.a
-              href="/servicios/capacitacion"
+              href="/servicios/docencia-y-capacitacion"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

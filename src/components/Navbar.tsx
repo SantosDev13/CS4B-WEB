@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, LogIn, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import NavbarCart from "./NavbarCart";
 
 const navLinks = [
   { href: "/", label: "Inicio" },
@@ -128,6 +129,9 @@ export default function Navbar() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Carrito de consultas */}
+            <NavbarCart />
+            
             {isAuthenticated ? (
               <Link
                 href="/admin"
@@ -205,6 +209,11 @@ export default function Navbar() {
                 >
                   Servicios
                 </Link>
+
+                {/* Carrito en móvil */}
+                <div onClick={() => setIsMobileMenuOpen(false)}>
+                  <NavbarCart />
+                </div>
 
                 {isAuthenticated ? (
                   <Link

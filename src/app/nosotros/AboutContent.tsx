@@ -1,219 +1,245 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle, Award, Users, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Users, Award, Globe, Rocket, Target, Eye } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
-const features = [
-  {
-    icon: <Target className="w-8 h-8" />,
-    title: "Enfoque Estratégico",
-    description: "No solo implementamos tecnología, sino que entendemos tu negocio para ofrecer soluciones que generen impacto real.",
+const stats = [
+  { 
+    icon: <Rocket className="w-8 h-8" />,
+    value: "10+", 
+    label: "AÑOS DE EXPERIENCIA" 
   },
-  {
-    icon: <TrendingUp className="w-8 h-8" />,
-    title: "Resultados Medibles",
-    description: "Cada proyecto tiene KPIs definidos y métricas claras para evaluar el éxito y el retorno de inversión.",
+  { 
+    icon: <Globe className="w-8 h-8" />,
+    value: "500+", 
+    label: "CLIENTES ATENDIDOS" 
   },
-  {
-    icon: <Users className="w-8 h-8" />,
-    title: "Equipo Multidisciplinario",
-    description: "Profesionales especializados en diferentes áreas de tecnología y negocios para cubrir todas tus necesidades.",
-  },
-  {
+  { 
     icon: <Award className="w-8 h-8" />,
-    title: "Experiencia Comprobada",
-    description: "Más de 10 años helping empresas locales e internacionales en su transformación digital.",
+    value: "20+", 
+    label: "PROFESIONALES" 
   },
 ];
 
 const valores = [
-  {
-    title: "Innovación",
-    description: "Buscamos constantemente nuevas formas de resolver desafíos empresariales.",
-  },
-  {
-    title: "Integridad",
-    description: "Actuamos con transparencia y ética en cada interacción con nuestros clientes.",
-  },
-  {
-    title: "Excelencia",
-    description: "Nos esforzamos por superar expectativas en cada proyecto que ejecutamos.",
-  },
-  {
-    title: "Compromiso",
-    description: "Tu éxito es nuestro éxito. Estamos comprometidos con tus resultados.",
-  },
+  { title: "Innovación", description: "Buscamos constantemente nuevas formas de resolver desafíos empresariales." },
+  { title: "Integridad", description: "Actuamos con transparencia y ética en cada interacción." },
+  { title: "Excelencia", description: "Nos esforzamos por superar expectativas en cada proyecto." },
+  { title: "Compromiso", description: "Tu éxito es nuestro éxito. Estamos comprometidos con tus resultados." },
 ];
 
-const stats = [
-  { value: "10+", label: "Años de Experiencia" },
-  { value: "500+", label: "Clientes Atendidos" },
-  { value: "1000+", label: "Proyectos Completados" },
-  { value: "20+", label: "Profesionales" },
+// Galería de imágenes
+const galleryImages = [
+  {
+    src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+    alt: "Equipo collaborando",
+    className: "md:col-span-2 md:row-span-2",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80",
+    alt: "Oficina moderna",
+    className: "md:col-span-2",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1531973576160-7125cd663c86?w=400&q=80",
+    alt: "Reunión de equipo",
+    className: "",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1497366754035-f200968a9e5e?w=400&q=80",
+    alt: "Espacio de trabajo",
+    className: "",
+  },
 ];
 
 export default function AboutContent() {
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-24 bg-primary overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
-          }} />
-        </div>
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-3xl"
-          >
-            <span className="inline-block text-secondary font-semibold text-sm tracking-wider uppercase mb-4">
-              Sobre CS4B
-            </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
-              Consulting Strategic For Digital Business
-            </h1>
-            <p className="text-xl text-white/70 leading-relaxed">
-              Transformamos la manera en que las empresas operan y crecen en el entorno digital.
-              Nuestra misión es proporcionar soluciones integrales que permitan a las organizaciones
-              adaptarse proactivamente a los constantes cambios tecnológicos.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-primary-light">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div className="text-4xl md:text-5xl font-bold text-accent mb-2">{stat.value}</div>
-                <div className="text-white/70 text-sm">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Mission & Vision */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
-            {/* Mission */}
+    <main className="min-h-screen bg-bg-light">
+      {/* Hero Section - Blue Header */}
+      <section className="relative pt-32 pb-24 px-6 md:px-12 overflow-hidden bg-primary">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-end gap-12">
+          <div className="md:w-2/3">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
-                  <Target className="w-6 h-6 text-secondary" />
-                </div>
-                <h2 className="text-2xl font-bold text-primary">Nuestra Misión</h2>
-              </div>
-              <p className="text-text-secondary text-lg leading-relaxed">
-                Impulsamos la transformación digital de las empresas con soluciones estratégicas e innovadoras, 
-                optimizando procesos, desarrollando talento y generando valor sostenible para nuestros clientes. 
-                Nuestro compromiso es su competitividad y éxito a largo plazo.
+              <span className="inline-block px-3 py-1 mb-6 text-xs font-bold tracking-widest uppercase bg-white/10 text-white rounded-lg">
+                Nuestra Historia
+              </span>
+              <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tighter mb-6 leading-[1.1]">
+                Definiendo el <br/>
+                <span className="text-white">Futuro Digital.</span>
+              </h1>
+              <p className="text-xl text-white/70 max-w-2xl leading-relaxed">
+                En CS4B, no solo implementamos tecnología; transformamos negocios.
+                Nuestra filosofía combina honestidad estratégica con fluidez tecnológica moderna.
               </p>
             </motion.div>
+          </div>
 
-            {/* Vision */}
+          <div className="md:w-1/3 flex justify-end">
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="w-full aspect-square bg-white rounded-xl overflow-hidden shadow-sm"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-accent" />
-                </div>
-                <h2 className="text-2xl font-bold text-primary">Nuestra Visión</h2>
-              </div>
-              <p className="text-text-secondary text-lg leading-relaxed">
-                Ser la consultora líder en transformación digital en Perú y Latinoamérica, 
-                reconocida por impulsar resultados tangibles, innovación sostenible y excelencia, 
-                ayudando a las empresas a alcanzar su máximo potencial en un entorno competitivo.
-              </p>
+              <img 
+                src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80"
+                alt="Oficina CS4B"
+                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+              />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-24 bg-bg-light">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <span className="inline-block text-secondary font-semibold text-sm tracking-wider uppercase mb-4">
-              ¿Por qué elegirnos?
-            </span>
-            <h2 className="text-4xl font-bold text-primary mb-6">
-              Nuestra Propuesta de Valor
-            </h2>
-            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Combinamos experiencia técnica con conocimiento de negocio para entregar
-              soluciones que realmente impulsan el crecimiento de tu empresa.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center text-white mb-6">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-primary mb-3">{feature.title}</h3>
-                <p className="text-text-secondary">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
+      {/* Stats Section - Blue Background */}
+      <section className="bg-primary-light py-16 px-6 md:px-12">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="flex flex-col items-start"
+            >
+              <div className="text-white mb-4">{stat.icon}</div>
+              <div className="text-5xl font-extrabold text-white mb-2">{stat.value}</div>
+              <div className="text-xs font-bold tracking-[0.2em] uppercase text-white/70">{stat.label}</div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Mission & Vision Section */}
+      <section className="py-24 px-6 md:px-12 bg-bg-light">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-white p-12 rounded-xl relative overflow-hidden shadow-lg"
+          >
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+            <div className="flex items-center gap-3 mb-6">
+              <Target className="w-8 h-8 text-primary" />
+              <h3 className="text-3xl font-bold text-primary">Nuestra Misión</h3>
+            </div>
+            <p className="text-lg text-text-secondary leading-relaxed italic">
+              "Impulsar la transformación digital de las empresas con soluciones estratégicas e innovadoras,
+              optimizando procesos, desarrollando talento y generando valor sostenible.
+              Nuestro compromiso es su competitividad y éxito a largo plazo."
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-white p-12 rounded-xl shadow-lg"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <Eye className="w-8 h-8 text-primary" />
+              <h3 className="text-3xl font-bold text-primary">Nuestra Visión</h3>
+            </div>
+            <p className="text-lg text-text-secondary leading-relaxed">
+              "Ser la consultora líder en transformación digital en Perú y Latinoamérica,
+              reconocida por impulsar resultados tangibles, innovación sostenible y excelencia,
+              ajudando a las empresas a alcanzar su máximo potencial en un entorno competitivo."
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Leadership Spotlight - CEO + Video */}
+      <section className="py-24 px-6 md:px-12 bg-white">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center"
+          >
+            {/* CEO Portrait */}
+            <div className="md:col-span-5">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="relative group"
+              >
+                <div className="absolute -inset-4 bg-primary/5 rounded-xl transition-all duration-500 group-hover:bg-primary/10"></div>
+                <img 
+                  alt="Raul - CEO" 
+                  className="relative rounded-xl w-full h-[600px] object-cover shadow-sm"
+                  src="/raul.jpg"
+                />
+                <div className="mt-8">
+                  <h4 className="text-3xl font-bold text-primary">Raul</h4>
+                  <p className="text-primary font-bold tracking-widest uppercase text-xs mt-2">Fundador & CEO</p>
+                  <p className="mt-6 text-text-secondary leading-relaxed">
+                    Raul lidera CS4B con una visión para la transformación digital.
+                    Con más de 15 años de experiencia en tecnología empresarial,
+                    ha encabezado proyectos de transformación digital para las empresas más importantes del país.
+                  </p>
+                  {/* Logros del CEO */}
+                  <div className="mt-6 p-4 bg-primary/5 rounded-xl border-l-4 border-primary">
+                    <p className="text-sm text-text-secondary leading-relaxed">
+                      Nuestro CEO fue uno de los tres finalistas en la categoría 
+                      <span className="font-bold"> «Arquitecto Empresarial»</span> en el año 2023, 
+                      organizada por el podcast <span className="font-semibold">«Hablemos de Arquitectura Empresarial»</span>. 
+                      Una experiencia increíble haber sido reconocido como finalista en esta prestigioso ceremonia. 🏆✨
+                    </p>
+                    <p className="text-sm text-text-muted mt-3">
+                      Agradecimiento especial a <span className="font-semibold">Israel Tavares Martínez</span> & <span className="font-semibold">Carlos Adán Moctezuma Figueroa</span> de México
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Video Section */}
+            <div className="md:col-span-7">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden shadow-lg"
+              >
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src="https://www.youtube.com/embed/M0G_psFPuDk?start=7"
+                  title="Video de nuestro CEO"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-24 px-6 md:px-12 bg-bg-light">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <span className="inline-block text-secondary font-semibold text-sm tracking-wider uppercase mb-4">
+            <span className="inline-block text-primary font-semibold text-sm tracking-wider uppercase mb-4">
               Nuestra Cultura
             </span>
-            <h2 className="text-4xl font-bold text-primary mb-6">
+            <h2 className="text-4xl font-bold text-primary">
               Valores que Nos Definen
             </h2>
           </motion.div>
@@ -226,13 +252,48 @@ export default function AboutContent() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
+                className="bg-white rounded-xl p-6 shadow-md text-center"
               >
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Award className="w-8 h-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-3">{valor.title}</h3>
-                <p className="text-text-secondary">{valor.description}</p>
+                <h3 className="text-xl font-bold text-primary mb-2">{valor.title}</h3>
+                <p className="text-text-secondary text-sm">{valor.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Gallery - Bento Style */}
+      <section className="py-24 px-6 md:px-12 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+            <div className="md:w-1/2">
+              <h2 className="text-5xl font-extrabold text-primary tracking-tighter mb-4">
+                Conoce CS4B
+              </h2>
+              <p className="text-text-secondary max-w-md">
+                Nuestro workspace es un ecosistema diseñado para impulsar la colaboración y la excelencia tecnológica.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-[800px]">
+            {galleryImages.map((img, index) => (
+              <motion.div
+                key={img.alt}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className={`bg-gray-100 rounded-xl overflow-hidden ${img.className || 'md:col-span-1'}`}
+              >
+                <img 
+                  alt={img.alt} 
+                  className="w-full h-full object-cover"
+                  src={img.src}
+                />
               </motion.div>
             ))}
           </div>
@@ -240,25 +301,24 @@ export default function AboutContent() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-primary">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-24 px-6 md:px-12 bg-primary">
+        <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              ¿Listo para transformar tu empresa?
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tighter mb-6 leading-tight">
+              ¿Listo para transformar <br/>tu empresa?
             </h2>
-            <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
               Conversemos sobre cómo podemos ayudarte a alcanzar tus objetivos de transformación digital.
             </p>
             <Link
               href="/contacto"
-              className="inline-flex items-center gap-3 bg-accent text-primary px-8 py-4 rounded-xl font-bold text-lg hover:bg-accent/90 transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center gap-3 bg-white text-primary px-10 py-4 rounded-xl text-lg font-bold hover:bg-secondary hover:text-white transition-colors"
             >
-              Contáctanos
+              Iniciar Conversación
               <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
