@@ -27,11 +27,11 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { href: "/admin", label: "Panel de Administración", icon: <LayoutDashboard className="w-5 h-5" /> },
-  { href: "/admin/servicios", label: "Servicios", icon: <Briefcase className="w-5 h-5" /> },
   { href: "/admin/categorias-servicios", label: "Categorías Servicios", icon: <Folder className="w-5 h-5" /> },
+  { href: "/admin/servicios", label: "Servicios", icon: <Briefcase className="w-5 h-5" /> },
+  { href: "/admin/categorias", label: "Categorías Blog", icon: <Shield className="w-5 h-5" /> },
   { href: "/admin/posts", label: "Publicaciones", icon: <FileText className="w-5 h-5" /> },
   { href: "/admin/contactos", label: "Contactos", icon: <MessageSquare className="w-5 h-5" /> },
-  { href: "/admin/categorias", label: "Categorías Blog", icon: <Shield className="w-5 h-5" /> },
   { href: "/admin/configuracion", label: "Configuración", icon: <Settings className="w-5 h-5" /> },
 ];
 

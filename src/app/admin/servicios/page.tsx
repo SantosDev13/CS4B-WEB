@@ -313,7 +313,7 @@ export default function AdminServiciosPage() {
               </tr>
             ) : (
               filteredServicios.map((servicio) => {
-                const IconComponent = getIcono(servicio.icon || 'LayoutGrid');
+                const IconComponent = getIcono(servicio.icono || 'LayoutGrid');
                 return (
                   <tr
                     key={servicio.id}

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import sql from "@/lib/db";
 import ServicioDetailClient from "@/components/ServicioDetail";
+import CategoriaServiciosPage from "@/components/CategoriaServicios";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -13,11 +14,11 @@ interface ServicioDB {
   titulo: string;
   slug: string;
   descripcion: string;
-  descripcion_corta: string | null;
-  icono: string | null;
-  imagen: string | null;
-  categoria: string | null;
-  categoria_servicio_id: string | null;
+  descripcion_corta?: string | null;
+  icono?: string | null;
+  imagen?: string | null;
+  categoria?: string | null;
+  categoria_servicio_id?: string | null;
   visible: boolean;
   categoria_nombre?: string;
   categoria_slug?: string;
@@ -25,6 +26,62 @@ interface ServicioDB {
   categoria_imagen?: string;
 }
 
+interface CategoriaWithServicios {
+  id: string;
+  nombre: string;
+  slug: string;
+  descripcion: string | null;
+  imagen: string | null;
+  link: string | null;
+  visible: boolean;
+  servicios: {
+    id: string;
+    titulo: string;
+    slug: string;
+    descripcion: string;
+    descripcion_corta: string | null;
+    icono: string | null;
+    imagen: string | null;
+    tamanho: string;
+  }[];
+}
+
+// Buscar categoría por slug
+async function getCategoriaBySlug(slug: string): Promise<CategoriaWithServicios | null> {
+  try {
+    const categorias = await sql<CategoriaWithServicios[]>`
+      SELECT * FROM categorias_servicios WHERE slug = ${slug} AND visible = true LIMIT 1
+    `;
+    
+    if (categorias.length === 0) return null;
+    
+    const categoria = categorias[0];
+    
+    // Obtener servicios de esta categoría
+    const servicios = await sql<any[]>`
+      SELECT * FROM servicios WHERE categoria_servicio_id = ${categoria.id} AND visible = true ORDER BY orden ASC
+    `;
+    
+    return {
+      ...categoria,
+      servicios: servicios.map((s: any) => ({
+        id: s.id,
+        titulo: s.titulo,
+        slug: s.slug,
+        descripcion: s.descripcion,
+        descripcion_corta: s.descripcion_corta,
+        icono: s.icono,
+        imagen: s.imagen,
+        tamanho: s.tamanho,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching categoria:", error);
+    return null;
+  }
+}
+
+// Buscar servicio por slug
 async function getServicioBySlug(slug: string): Promise<ServicioDB | null> {
   try {
     const result = await sql`
@@ -61,6 +118,15 @@ async function getServiciosRelacionados(excludeId: string, limit = 3): Promise<{
 export default async function ServicioPage({ params }: Props) {
   const { slug } = await params;
   
+  // Primero buscar si es una categoría
+  const categoria = await getCategoriaBySlug(slug);
+  
+  if (categoria) {
+    // Es una categoría - mostrar página de categoría
+    return <CategoriaServiciosPage categoria={categoria} />;
+  }
+  
+  // No es categoría, buscar si es un servicio
   const servicio = await getServicioBySlug(slug);
   
   if (!servicio) {
@@ -69,9 +135,23 @@ export default async function ServicioPage({ params }: Props) {
   
   const serviciosRelacionados = await getServiciosRelacionados(servicio.id);
 
+  // Transformar para el componente cliente - hacer todos los campos opcionales con undefined
+  const servicioTransformado = {
+    ...servicio,
+    descripcion_corta: servicio.descripcion_corta ?? undefined,
+    icono: servicio.icono ?? undefined,
+    imagen: servicio.imagen ?? undefined,
+    categoria: servicio.categoria ?? undefined,
+    categoria_servicio_id: servicio.categoria_servicio_id ?? undefined,
+    categoria_nombre: servicio.categoria_nombre ?? undefined,
+    categoria_slug: servicio.categoria_slug ?? undefined,
+    categoria_descripcion: servicio.categoria_descripcion ?? undefined,
+    categoria_imagen: servicio.categoria_imagen ?? undefined,
+  };
+
   return (
     <ServicioDetailClient 
-      servicio={servicio} 
+      servicio={servicioTransformado} 
       serviciosRelacionados={serviciosRelacionados} 
     />
   );

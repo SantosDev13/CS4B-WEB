@@ -146,7 +146,7 @@ export const db = {
       values.push(id);
       
       const result = await sql.unsafe(`UPDATE categorias SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING *`, values);
-      return result as Categoria[];
+      return result as unknown as Categoria[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM categorias WHERE id = ${id}`;
@@ -355,7 +355,7 @@ export const db = {
       values.push(id);
       
       const result = await sql.unsafe(`UPDATE categorias_servicios SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING *`, values);
-      return result as Categoria_servicio[];
+      return result as unknown as Categoria_servicio[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM categorias_servicios WHERE id = ${id}`;
@@ -410,7 +410,7 @@ export const db = {
       values.push(id);
       
       const result = await sql.unsafe(`UPDATE servicios SET ${sets.join(', ')} WHERE id = $${values.length} RETURNING *`, values);
-      return result as Servicio[];
+      return result as unknown as Servicio[];
     },
     delete: async (id: string) => {
       return sql`DELETE FROM servicios WHERE id = ${id}`;

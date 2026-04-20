@@ -181,19 +181,19 @@ if (categorias.length === 0) {
                 Categorías
               </h2>
               <ul className="space-y-1">
-                {categorias.map((cat) => (
-                  <li key={cat.id}>
-                    <Link
-                      href={`#cat-${cat.slug}`}
-                      className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-bg-light transition-colors text-text-secondary hover:text-primary"
-                    >
-                      <span className="text-sm">{cat.nombre}</span>
-                      <span className="text-xs bg-bg-light px-2 py-0.5 rounded-full">
-                        {cat.servicios.length}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+{categorias.map((cat) => (
+                    <li key={cat.id}>
+                      <Link
+                        href={`/servicios/${cat.slug}`}
+                        className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-bg-light transition-colors text-text-secondary hover:text-primary"
+                      >
+                        <span className="text-sm">{cat.nombre}</span>
+                        <span className="text-xs bg-bg-light px-2 py-0.5 rounded-full">
+                          {cat.servicios.length}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
               </ul>
             </div>
           </aside>
@@ -214,22 +214,17 @@ if (categorias.length === 0) {
                 id={`cat-${categoria.slug}`}
                 className="mb-12"
               >
-                {/* Título de categoría */}
+                {/* Título de categoría con enlace a página individual */}
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-primary flex items-center gap-3">
+                  <Link 
+                    href={`/servicios/${categoria.slug}`}
+                    className="text-2xl font-bold text-primary flex items-center gap-3 hover:text-secondary transition-colors"
+                  >
                     {categoria.nombre}
                     <span className="text-sm font-normal text-text-muted bg-white px-3 py-1 rounded-full border">
                       {categoria.servicios.length} servicios
                     </span>
-                  </h2>
-                  {categoria.link && (
-                    <Link 
-                      href={categoria.link}
-                      className="text-sm text-secondary hover:underline"
-                    >
-                      Ver todos →
-                    </Link>
-                  )}
+                  </Link>
                 </div>
 
                 {/* Grid de servicios */}

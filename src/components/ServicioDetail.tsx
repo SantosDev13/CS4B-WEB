@@ -12,11 +12,11 @@ interface ServicioDetailProps {
     titulo: string;
     slug: string;
     descripcion: string;
-    descripcion_corta?: string;
-    icono: string | null;
-    imagen: string | null;
-    categoria?: string;
-    categoria_servicio_id?: string;
+    descripcion_corta?: string | null;
+    icono?: string | null;
+    imagen?: string | null;
+    categoria?: string | null;
+    categoria_servicio_id?: string | null;
     visible: boolean;
     categoria_nombre?: string;
     categoria_slug?: string;

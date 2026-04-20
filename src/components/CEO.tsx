@@ -33,12 +33,12 @@ const teamMembers: TeamMember[] = [
     image: "/ivan.jpg"
   },
   {
-    name: "Carlos Mendoza",
-    role: "Director de Tecnología - CS4B",
-    description: "Líder en soluciones tecnológicas avanzadas con experiencia en infraestructura cloud y ciberseguridad. Apoya a las empresas en su transformación digital con estrategias tecnológicas de vanguardia.",
-    credentials: ["AWS Solutions Architect", "Azure Administrator", "CISSP", "ISO 27001"],
-    linkedin: "https://www.linkedin.com/",
-    image: "/raul.jpg" // Usando placeholder
+    name: "Luis Carhuachin",
+    role: "FullStack Developer",
+    description: "Desarrollador FullStack con sólida base en Java y Spring Boot, especializado en la creación de arquitecturas eficientes. Experto en Infraestructura MCP y diseño de sistemas multi-agente para automatización avanzada.",
+    credentials: ["AWS", "Azure Fundamentals", "Scrum Foundation"],
+    linkedin: "https://www.linkedin.com/in/luiscarhuachin/",
+    image: "/luis.jpeg"
   }
 ];
 
