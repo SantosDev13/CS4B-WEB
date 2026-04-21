@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// MODELOS DEL PROYECTO CS4B-WEB
+// ============================================
+
+// ============================================
+// USUARIOS (Admin/Editores)
+// ============================================
+model Usuario {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  password     String
+  nombre       String
+  rol          String    @default("editor") // admin | editor
+  avatar       String?
+  ultimo_login DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  // Relaciones
+  posts Post[]
+
+  @@map("usuarios")
+}
+
+// ============================================
+// CATEGORÍAS DE POSTS (Del Blog)
+// ============================================
+model CategoriaPost {
+  id          String    @id @default(uuid())
+  nombre      String
+  slug        String    @unique
+  descripcion String?
+  color       String    @default("#000000")
+  orden       Int       @default(0)
+  created_at  DateTime  @default(now())
+
+  // Relaciones
+  posts Post[]
+
+  @@map("categorias_posts")
+}
+
+// ============================================
+// POSTS (Artículos del Blog)
+// ============================================
+model Post {
+  id               String    @id @default(uuid())
+  titulo           String
+  slug             String    @unique
+  contenido        String
+  excerpt          String?   @db.VarChar(500)
+  imagen_destacada String?   @db.VarChar(500)
+  etiquetas        String[]  @default([])
+  vistas           Int       @default(0)
+  publicado        Boolean   @default(false)
+  fecha_publicacion DateTime?
+  meta_title       String?   @db.VarChar(200)
+  meta_description String?   @db.VarChar(300)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  // Claves foráneas
+  categoria_post_id String?
+  autor_id          String?
+
+  // Relaciones
+  categoriaPost CategoriaPost? @relation(fields: [categoria_post_id], references: [id])
+  autor        Usuario?       @relation(fields: [autor_id], references: [id])
+
+  @@map("posts")
+}
+
+// ============================================
+// CONFIGURACIONES (Settings del sitio)
+// ============================================
+model Configuracion {
+  clave        String   @id
+  valor        String
+  descripcion String?
+  updated_at   DateTime @updatedAt
+
+  @@map("configuraciones")
+}
+
+// ============================================
+// CONTACTOS (Mensajes del formulario)
+// ============================================
+model Contacto {
+  id              String    @id @default(uuid())
+  nombre          String
+  email           String
+  telefono        String?
+  empresa         String?
+  servicio_interes String?  @db.Text // JSON con servicios seleccionados
+  mensaje         String
+  ip              String?
+  leido           Boolean   @default(false)
+  respondido      Boolean   @default(false)
+  respuesta       String?
+  created_at      DateTime  @default(now())
+
+  @@map("contactos")
+}
+
+// ============================================
+// CATEGORÍAS DE SERVICIOS (Padre - para servicios)
+// ============================================
+model Categoria_servicio {
+  id          String    @id @default(uuid())
+  nombre      String
+  slug        String    @unique
+  descripcion String?
+  imagen      String?
+  link        String?
+  orden       Int       @default(0)
+  visible     Boolean   @default(true)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  // Relaciones
+  servicios Servicio[]
+
+  @@map("categorias_servicios")
+}
+
+// ============================================
+// SERVICIOS (Hijos de categorías)
+// ============================================
+model Servicio {
+  id                   String    @id @default(uuid())
+  titulo               String
+  slug                 String    @unique
+  descripcion          String    @db.Text
+  descripcion_corta    String?
+  icono                String?
+  imagen               String?
+  tamanho              String    @default("medium") // small | medium | large
+  orden                Int       @default(0)
+  visible              Boolean   @default(true)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  // Clave foránea a categoría padre
+  categoria_servicio_id String?
+
+  // Relaciones
+  categoria Categoria_servicio? @relation(fields: [categoria_servicio_id], references: [id])
+
+  @@map("servicios")
+}

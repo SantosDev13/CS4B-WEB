@@ -1,34 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
-import { categoriaServicioUpdateSchema } from '@/lib/validations';
+import { categoriaPostUpdateSchema } from '@/lib/validations';
 
-// GET - Obtener categoría de servicio por ID o slug
+// GET - Obtener categoría de post por ID (público)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-
-    // Buscar por ID o slug
-    let categoria = await prisma.categoria_servicio.findUnique({ where: { id } });
-    if (!categoria) {
-      categoria = await prisma.categoria_servicio.findUnique({ where: { slug: id } });
-    }
+    const categoria = await prisma.categoriaPost.findUnique({ where: { id } });
 
     if (!categoria) {
-      return NextResponse.json({ error: 'Categoría de servicio no encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Categoría no encontrada' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data: categoria });
+    return NextResponse.json(categoria);
   } catch (error) {
-    console.error('Error fetching categoria_servicio:', error);
-    return NextResponse.json({ error: 'Error al obtener categoría de servicio' }, { status: 500 });
+    console.error('Error al obtener categoría:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
 
-// PUT - Actualizar categoría de servicio (solo admin)
+// PUT - Actualizar categoría de post (solo admin)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -42,27 +37,26 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    // Validar con Zod
-    const result = categoriaServicioUpdateSchema.safeParse(body);
+    const result = categoriaPostUpdateSchema.safeParse(body);
 
     if (!result.success) {
       const errores = result.error.errors.map(e => e.message).join(', ');
       return NextResponse.json({ error: errores }, { status: 400 });
     }
 
-    const categoria = await prisma.categoria_servicio.update({
+    const updated = await prisma.categoriaPost.update({
       where: { id },
       data: result.data,
     });
 
-    return NextResponse.json({ success: true, data: categoria });
+    return NextResponse.json({ success: true, data: updated });
   } catch (error) {
-    console.error('Error updating categoria_servicio:', error);
-    return NextResponse.json({ error: 'Error al actualizar categoría de servicio' }, { status: 500 });
+    console.error('Error al actualizar categoría:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
 
-// DELETE - Eliminar categoría de servicio (solo admin)
+// DELETE - Eliminar categoría de post (solo admin)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -74,11 +68,11 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.categoria_servicio.delete({ where: { id } });
+    await prisma.categoriaPost.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting categoria_servicio:', error);
-    return NextResponse.json({ error: 'Error al eliminar categoría de servicio' }, { status: 500 });
+    console.error('Error al eliminar categoría:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

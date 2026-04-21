@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { db } from "@/lib/db";
+import prisma from "@/lib/prisma";
 
 // Tipos
 interface Post {
@@ -30,37 +30,32 @@ interface Categoria {
 // Función para obtener posts
 async function getPosts() {
   try {
-    const posts = await db.posts.findAll(true, 20, 0);
+    const posts = await prisma.post.findMany({
+      where: { publicado: true },
+      include: {
+        categoria: { select: { nombre: true, slug: true, color: true } },
+      },
+      orderBy: { fecha_publicacion: 'desc' },
+      take: 20,
+    });
     
-    // Obtener categoría para cada post
-    const postsWithCategoria = await Promise.all(
-      posts.map(async (post) => {
-        let categoria = null;
-        if (post.categoria_id) {
-          const categorias = await db.categorias.findById(post.categoria_id);
-          if (categorias[0]) {
-            categoria = {
-              nombre: categorias[0].nombre,
-              slug: categorias[0].slug,
-              color: categorias[0].color,
-            };
-          }
-        }
-        return { ...post, categoria };
-      })
-    );
-    
-    return postsWithCategoria;
+    return posts.map((post: any) => ({
+      ...post,
+      categoria: post.categoria,
+    }));
   } catch (error) {
     console.error("Error fetching posts:", error);
     return [];
   }
 }
 
-// Función para obtener categorías
+// Función para obtener todas las categorías
 async function getCategorias() {
   try {
-    return await db.categorias.findAll();
+    const categorias = await prisma.categoria.findMany({
+      orderBy: { orden: 'asc' },
+    });
+    return categorias;
   } catch (error) {
     console.error("Error fetching categorias:", error);
     return [];
@@ -71,151 +66,139 @@ export default async function BlogPage() {
   const posts = await getPosts();
   const categorias = await getCategorias();
 
-  const formatDate = (date: Date | string | null) => {
-    if (!date) return "";
-    const d = new Date(date);
-    return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
-  };
-
   return (
-    <div className="pt-0">
-      {/* Header con imagen de fondo - combinado con navbar */}
-      <section className="relative h-[60vh] min-h-[500px] flex flex-col justify-end">
+    <div className="min-h-screen bg-bg-light pt-0">
+      {/* Header */}
+      <section className="relative bg-primary py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1920&q=80" 
-            alt="Blog de tecnología" 
+          <img
+            src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1920&q=80"
+            alt="Blog"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-primary/85" />
         </div>
-        <div className="relative container-custom pb-12">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+        <div className="container-custom relative z-10">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             Blog
           </h1>
-          <p className="text-xl text-white/80 max-w-2xl">
-            Noticias, consejos y tendencias sobre tecnología y 
-            transformación digital para empresas peruanas
+          <p className="text-lg md:text-xl text-white/70 max-w-2xl">
+            Noticias, articulos y consejos sobre tecnologia y negocio
           </p>
         </div>
       </section>
 
-      {/* Categories - Minimal style */}
-      <section className="bg-white border-b border-gray-100">
-        <div className="container-custom py-6">
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/blog"
-              className="px-5 py-2 rounded-full text-sm font-medium transition-colors bg-primary text-white"
-            >
-              Todos
-            </Link>
-            {categorias.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/blog?categoria=${cat.slug}`}
-                className="px-5 py-2 rounded-full text-sm font-medium transition-colors bg-bg-light text-text-secondary hover:bg-primary hover:text-white"
-              >
-                {cat.nombre}
-              </Link>
-            ))}
-          </div>
+      {/* Breadcrumb */}
+      <div className="bg-white border-b">
+        <div className="container-custom py-3">
+          <nav className="flex items-center gap-2 text-sm text-text-muted">
+            <Link href="/" className="hover:text-primary">Inicio</Link>
+            <span className="text-text-secondary">Blog</span>
+          </nav>
         </div>
-      </section>
+      </div>
 
-      {/* Posts Grid - Estilo BCG: cards con imágenes grandes */}
-      <section className="py-24 bg-white">
-        <div className="container-custom">
-          {posts.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-xl text-gray-500">No hay publicaciones disponibles</p>
-              <p className="text-gray-400 mt-2">Pronto we'll have new content</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {posts.map((post) => (
-                <article key={post.id} className="group">
-                  <Link href={`/blog/${post.slug}`}>
-                    <div className="relative aspect-[16/10] rounded-xl overflow-hidden mb-4">
-                      <img 
-                        src={post.imagen_destacada || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80"}
-                        alt={post.titulo}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {post.categoria && (
-                        <div className="absolute top-4 left-4">
-                          <span 
-                            className="text-xs font-medium text-white px-3 py-1 rounded-full"
-                            style={{ backgroundColor: post.categoria.color }}
-                          >
-                            {post.categoria.nombre}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <span className="text-sm text-text-secondary">
-                        {formatDate(post.fecha_publicacion)}
-                      </span>
-                      <h2 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors">
-                        {post.titulo}
-                      </h2>
-                      <p className="text-text-secondary line-clamp-2">
-                        {post.excerpt || post.contenido.substring(0, 150) + "..."}
-                      </p>
-                    </div>
-                  </Link>
-                </article>
-              ))}
-            </div>
-          )}
-
-          {/* Pagination - Simple */}
-          {posts.length > 0 && (
-            <div className="flex justify-center mt-16">
-              <div className="flex gap-2">
-                <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button className="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center">
-                  1
-                </button>
-                <button className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-text-secondary hover:bg-primary hover:text-white hover:border-primary transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+      <div className="container-custom py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Main Content */}
+          <main className="flex-1">
+            {posts.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-lg text-text-secondary">
+                  No hay posts publicados aun.
+                </p>
               </div>
-            </div>
-          )}
-        </div>
-      </section>
+            ) : (
+              <div className="grid gap-8">
+                {posts.map((post: any) => (
+                  <article key={post.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-shadow">
+                    {post.imagen_destacada && (
+                      <div className="aspect-video">
+                        <img
+                          src={post.imagen_destacada}
+                          alt={post.titulo}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6">
+                      {post.categoria && (
+                        <span 
+                          className="inline-block px-3 py-1 rounded-full text-xs font-medium mb-3"
+                          style={{ backgroundColor: post.categoria.color + '20', color: post.categoria.color }}
+                        >
+                          {post.categoria.nombre}
+                        </span>
+                      )}
+                      <h2 className="text-xl font-bold text-primary mb-2 hover:text-secondary transition-colors">
+                        <Link href={`/blog/${post.slug}`}>
+                          {post.titulo}
+                        </Link>
+                      </h2>
+                      <p className="text-text-secondary mb-4 line-clamp-2">
+                        {post.excerpt || post.contenido?.substring(0, 150) + '...'}
+                      </p>
+                      <div className="flex items-center justify-between text-sm text-text-muted">
+                        <span>
+                          {post.fecha_publicacion 
+                            ? new Date(post.fecha_publicacion).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })
+                            : new Date(post.created_at).toLocaleDateString('es-PE')}
+                        </span>
+                        <Link href={`/blog/${post.slug}`} className="text-secondary hover:underline">
+                          Leer más
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </main>
 
-      {/* Newsletter CTA */}
-      <section className="py-24 bg-primary">
+          {/* Sidebar */}
+          <aside className="lg:w-80">
+            <div className="bg-white rounded-xl border p-6 sticky top-24">
+              <h3 className="font-semibold text-primary mb-4">Categorias</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link 
+                    href="/blog"
+                    className="block px-3 py-2 rounded-lg hover:bg-bg-light transition-colors text-text-secondary hover:text-primary"
+                  >
+                    Todos
+                  </Link>
+                </li>
+                {categorias.map((categoria: any) => (
+                  <li key={categoria.id}>
+                    <Link 
+                      href={`/blog?categoria=${categoria.slug}`}
+                      className="block px-3 py-2 rounded-lg hover:bg-bg-light transition-colors text-text-secondary hover:text-primary"
+                    >
+                      {categoria.nombre}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      {/* Footer CTA */}
+      <section className="bg-primary py-16">
         <div className="container-custom text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Suscríbete a nuestro newsletter
+          <h2 className="text-3xl font-bold text-white mb-6">
+            ¿Quieres escribir en nuestro blog?
           </h2>
-          <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">
-            Recibe las últimas noticias y consejos sobre tecnología 
-            directamente en tu correo.
+          <p className="text-white/70 mb-8 max-w-xl mx-auto">
+            Comparte tus conocimientos y experiencias con nuestra comunidad.
           </p>
-          <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Tu correo electrónico"
-              className="flex-1 px-5 py-4 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-accent"
-            />
-            <button 
-              type="submit" 
-              className="px-8 py-4 rounded-lg bg-accent text-primary font-semibold hover:bg-accent/90 transition-colors whitespace-nowrap"
-            >
-              Suscribirse
-            </button>
-          </form>
+          <Link 
+            href="/contacto"
+            className="inline-flex items-center justify-center bg-accent text-primary font-semibold px-8 py-4 rounded-lg hover:bg-accent/90 transition-all hover:scale-105"
+          >
+            Contáctanos
+          </Link>
         </div>
       </section>
     </div>

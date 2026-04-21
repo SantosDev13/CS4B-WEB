@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
-import sql from "@/lib/db";
+import prisma from "@/lib/prisma";
 import ServicioDetailClient from "@/components/ServicioDetail";
 import CategoriaServiciosPage from "@/components/CategoriaServicios";
 
@@ -49,22 +47,21 @@ interface CategoriaWithServicios {
 // Buscar categoría por slug
 async function getCategoriaBySlug(slug: string): Promise<CategoriaWithServicios | null> {
   try {
-    const categorias = await sql<CategoriaWithServicios[]>`
-      SELECT * FROM categorias_servicios WHERE slug = ${slug} AND visible = true LIMIT 1
-    `;
+    const categoria = await prisma.categoria_servicio.findUnique({
+      where: { slug, visible: true },
+    });
     
-    if (categorias.length === 0) return null;
-    
-    const categoria = categorias[0];
+    if (!categoria) return null;
     
     // Obtener servicios de esta categoría
-    const servicios = await sql<any[]>`
-      SELECT * FROM servicios WHERE categoria_servicio_id = ${categoria.id} AND visible = true ORDER BY orden ASC
-    `;
+    const servicios = await prisma.servicio.findMany({
+      where: { categoria_servicio_id: categoria.id, visible: true },
+      orderBy: { orden: 'asc' },
+    });
     
     return {
       ...categoria,
-      servicios: servicios.map((s: any) => ({
+      servicios: servicios.map((s) => ({
         id: s.id,
         titulo: s.titulo,
         slug: s.slug,
@@ -84,16 +81,30 @@ async function getCategoriaBySlug(slug: string): Promise<CategoriaWithServicios 
 // Buscar servicio por slug
 async function getServicioBySlug(slug: string): Promise<ServicioDB | null> {
   try {
-    const result = await sql`
-      SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug, cs.descripcion as categoria_descripcion, cs.imagen as categoria_imagen
-      FROM servicios s
-      LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id
-      WHERE s.slug = ${slug} AND s.visible = true
-      LIMIT 1
-    `;
+    const servicio = await prisma.servicio.findUnique({
+      where: { slug, visible: true },
+      include: {
+        categoria: { select: { nombre: true, slug: true, descripcion: true, imagen: true } },
+      },
+    });
     
-    if (result.length === 0) return null;
-    return result[0] as ServicioDB;
+    if (!servicio) return null;
+    
+    return {
+      id: servicio.id,
+      titulo: servicio.titulo,
+      slug: servicio.slug,
+      descripcion: servicio.descripcion,
+      descripcion_corta: servicio.descripcion_corta,
+      icono: servicio.icono,
+      imagen: servicio.imagen,
+      visible: servicio.visible,
+      categoria_servicio_id: servicio.categoria_servicio_id,
+      categoria_nombre: servicio.categoria?.nombre || undefined,
+      categoria_slug: servicio.categoria?.slug || undefined,
+      categoria_descripcion: servicio.categoria?.descripcion || undefined,
+      categoria_imagen: servicio.categoria?.imagen || undefined,
+    };
   } catch (error) {
     console.error("Error fetching servicio:", error);
     return null;
@@ -102,14 +113,13 @@ async function getServicioBySlug(slug: string): Promise<ServicioDB | null> {
 
 async function getServiciosRelacionados(excludeId: string, limit = 3): Promise<{slug: string, titulo: string}[]> {
   try {
-    const result = await sql`
-      SELECT slug, titulo 
-      FROM servicios 
-      WHERE id != ${excludeId} AND visible = true 
-      ORDER BY RANDOM() 
-      LIMIT ${limit}
-    `;
-    return result.map((s: any) => ({ slug: s.slug, titulo: s.titulo }));
+    const servicios = await prisma.servicio.findMany({
+      where: { id: { not: excludeId }, visible: true },
+      select: { slug: true, titulo: true },
+      take: limit,
+      orderBy: { orden: 'asc' },
+    });
+    return servicios.map((s) => ({ slug: s.slug, titulo: s.titulo }));
   } catch (error) {
     return [];
   }
@@ -122,7 +132,6 @@ export default async function ServicioPage({ params }: Props) {
   const categoria = await getCategoriaBySlug(slug);
   
   if (categoria) {
-    // Es una categoría - mostrar página de categoría
     return <CategoriaServiciosPage categoria={categoria} />;
   }
   
@@ -135,7 +144,6 @@ export default async function ServicioPage({ params }: Props) {
   
   const serviciosRelacionados = await getServiciosRelacionados(servicio.id);
 
-  // Transformar para el componente cliente - hacer todos los campos opcionales con undefined
   const servicioTransformado = {
     ...servicio,
     descripcion_corta: servicio.descripcion_corta ?? undefined,
@@ -143,10 +151,6 @@ export default async function ServicioPage({ params }: Props) {
     imagen: servicio.imagen ?? undefined,
     categoria: servicio.categoria ?? undefined,
     categoria_servicio_id: servicio.categoria_servicio_id ?? undefined,
-    categoria_nombre: servicio.categoria_nombre ?? undefined,
-    categoria_slug: servicio.categoria_slug ?? undefined,
-    categoria_descripcion: servicio.categoria_descripcion ?? undefined,
-    categoria_imagen: servicio.categoria_imagen ?? undefined,
   };
 
   return (
@@ -156,6 +160,3 @@ export default async function ServicioPage({ params }: Props) {
     />
   );
 }
-
-// Removed generateStaticParams for dev mode
-// Can add later for production if needed

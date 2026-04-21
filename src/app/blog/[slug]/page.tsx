@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
+import prisma from "@/lib/prisma";
 import type { Metadata } from "next";
 
 interface Props {
@@ -12,8 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   
   try {
-    const posts = await db.posts.findBySlug(slug);
-    const post = posts[0];
+    const post = await prisma.post.findUnique({ where: { slug } });
     
     if (!post) {
       return { title: "Post no encontrado | CS4B" };
@@ -31,41 +30,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // Función para obtener un post por slug
 async function getPost(slug: string) {
   try {
-    const posts = await db.posts.findBySlug(slug);
-    const post = posts[0];
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      include: {
+        categoria: { select: { id: true, nombre: true, slug: true, color: true } },
+        autor: { select: { nombre: true, avatar: true } },
+      },
+    });
     
     if (!post) return null;
     
-    // Obtener categoría
-    let categoria = null;
-    if (post.categoria_id) {
-      const categorias = await db.categorias.findById(post.categoria_id);
-      if (categorias[0]) {
-        categoria = {
-          id: categorias[0].id,
-          nombre: categorias[0].nombre,
-          slug: categorias[0].slug,
-          color: categorias[0].color,
-        };
-      }
-    }
-    
-    // Obtener autor
-    let autor = null;
-    if (post.autor_id) {
-      const autores = await db.usuarios.findById(post.autor_id);
-      if (autores[0]) {
-        autor = {
-          nombre: autores[0].nombre,
-          avatar: autores[0].avatar,
-        };
-      }
-    }
-    
     // Incrementar vistas
-    await db.posts.incrementViews(post.id);
+    await prisma.post.update({
+      where: { id: post.id },
+      data: { vistas: { increment: 1 } },
+    });
     
-    return { ...post, categoria, autor };
+    return {
+      ...post,
+      categoria: post.categoria,
+      autor: post.autor,
+    };
   } catch (error) {
     console.error("Error fetching post:", error);
     return null;
@@ -75,8 +60,16 @@ async function getPost(slug: string) {
 // Función para obtener posts relacionados
 async function getRelatedPosts(categoriaId: string, currentSlug: string) {
   try {
-    const posts = await db.posts.findByCategoria(categoriaId, 3, 0);
-    return posts.filter(p => p.slug !== currentSlug).slice(0, 3);
+    const posts = await prisma.post.findMany({
+      where: { 
+        categoria_id: categoriaId,
+        slug: { not: currentSlug },
+        publicado: true,
+      },
+      take: 3,
+      orderBy: { fecha_publicacion: 'desc' },
+    });
+    return posts;
   } catch (error) {
     return [];
   }
@@ -108,7 +101,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <div className="pt-0">
-      {/* Header con imagen de fondo - combinado con navbar */}
+      {/* Header con imagen de fondo */}
       <section className="relative h-[50vh] min-h-[400px] flex flex-col justify-end">
         <div className="absolute inset-0">
           <img 
@@ -184,7 +177,7 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </section>
 
-      {/* Featured Image - Estilo quote */}
+      {/* Featured Image */}
       <section className="bg-gray-50">
         <div className="container-custom py-12">
           <div className="max-w-5xl mx-auto">
@@ -196,7 +189,6 @@ export default async function BlogPostPage({ params }: Props) {
               />
             </div>
 
-            {/* Excerpt como quote */}
             {post.excerpt && (
               <blockquote className="border-l-4 border-primary pl-6 py-2 my-8">
                 <p className="text-xl md:text-2xl text-gray-700 font-medium italic">
@@ -212,7 +204,6 @@ export default async function BlogPostPage({ params }: Props) {
       <section className="bg-white">
         <div className="container-custom py-12">
           <div className="max-w-3xl mx-auto">
-            {/* Contenido */}
             <div 
               className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: post.contenido }}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
-import { db } from "@/lib/db";
+import prisma from "@/lib/prisma";
 
 // GET - Obtener usuario actual (requiere auth)
 export async function GET(request: NextRequest) {
@@ -15,8 +15,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener datos completos del usuario
-    const usuarios = await db.usuarios.findById(authUser.id);
-    const usuario = usuarios[0];
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: authUser.id },
+      select: {
+        id: true,
+        email: true,
+        nombre: true,
+        rol: true,
+        avatar: true,
+      },
+    });
 
     if (!usuario) {
       return NextResponse.json(
@@ -25,15 +33,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      user: {
-        id: usuario.id,
-        email: usuario.email,
-        nombre: usuario.nombre,
-        rol: usuario.rol,
-        avatar: usuario.avatar,
-      },
-    });
+    return NextResponse.json({ user: usuario });
   } catch (error) {
     console.error("Error al obtener usuario:", error);
     return NextResponse.json(

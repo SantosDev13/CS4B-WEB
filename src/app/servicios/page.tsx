@@ -1,5 +1,4 @@
-import { db } from "@/lib/db";
-import sql from "@/lib/db";
+import prisma from "@/lib/prisma";
 import ServiciosPageClient from "@/components/ServiciosPageClient";
 import { Suspense } from "react";
 
@@ -23,9 +22,16 @@ interface CategoriaWithServicios {
   }[];
 }
 
-async function getCategoriasConServicios(): Promise<CategoriaWithServicios[]> {
+async function getCategoriasConServicios() {
   try {
-    const categorias = await db.categorias_servicios.findAll(true);
+    // Usar Prisma - import directo
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const categorias = await prisma.categoria_servicio.findMany({
+      where: { visible: true },
+      orderBy: { orden: 'asc' },
+    });
 
     if (!categorias || categorias.length === 0) {
       return [];
@@ -35,10 +41,14 @@ async function getCategoriasConServicios(): Promise<CategoriaWithServicios[]> {
 
     for (const cat of categorias) {
       try {
-        const servicios = await db.servicios.findByCategoria(cat.id, true);
+        const servicios = await prisma.servicio.findMany({
+          where: { categoria_servicio_id: cat.id, visible: true },
+          orderBy: { orden: 'asc' },
+        });
+        
         categoriasWithServicios.push({
           ...cat,
-          servicios: servicios?.map((s: any) => ({
+          servicios: servicios.map((s) => ({
             id: s.id,
             titulo: s.titulo,
             slug: s.slug,
@@ -47,7 +57,7 @@ async function getCategoriasConServicios(): Promise<CategoriaWithServicios[]> {
             icono: s.icono,
             imagen: s.imagen,
             tamanho: s.tamanho,
-          })) || [],
+          })),
         });
       } catch (err) {
         console.error(`Error fetching servicios for categoria ${cat.id}:`, err);
@@ -74,16 +84,21 @@ export default async function ServiciosPage() {
     console.error("Error loading categorias:", error);
   }
 
+  // Obtener todos los servicios para el listado general
   let allServicios: any[] = [];
   try {
-    const result = await sql`
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const result = await prisma.$queryRaw`
       SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug
       FROM servicios s
       LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id
       WHERE s.visible = true
       ORDER BY s.orden ASC
     `;
-    allServicios = result.map((s: any) => ({
+    
+    allServicios = (result as any[]).map((s) => ({
       ...s,
       categoria_nombre: s.categoria_nombre,
       categoria_slug: s.categoria_slug,

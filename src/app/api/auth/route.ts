@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { db } from '@/lib/db';
+import prisma from '@/lib/prisma';
+import { loginSchema } from '@/lib/validations';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cs4b-secret-key-change-in-production';
 
@@ -9,38 +10,36 @@ const JWT_SECRET = process.env.JWT_SECRET || 'cs4b-secret-key-change-in-producti
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email y contraseña son requeridos' },
-        { status: 400 }
-      );
+    
+    // Validar con Zod
+    const result = loginSchema.safeParse(body);
+    
+    if (!result.success) {
+      const errores = result.error.errors.map(e => e.message).join(', ');
+      return NextResponse.json({ error: errores }, { status: 400 });
     }
 
+    const { email, password } = result.data;
+
     // Buscar usuario
-    const usuarios = await db.usuarios.findByEmail(email);
-    const usuario = usuarios[0];
+    const usuario = await prisma.usuario.findUnique({ where: { email } });
 
     if (!usuario) {
-      return NextResponse.json(
-        { error: 'Credenciales inválidas' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
     }
 
     // Verificar contraseña
     const passwordValida = await bcrypt.compare(password, usuario.password);
 
     if (!passwordValida) {
-      return NextResponse.json(
-        { error: 'Credenciales inválidas' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
     }
 
     // Actualizar último login
-    await db.usuarios.updateLastLogin(usuario.id);
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: { ultimo_login: new Date() },
+    });
 
     // Generar token JWT
     const token = jwt.sign(
@@ -68,25 +67,20 @@ export async function POST(request: NextRequest) {
     });
 
     // Configurar cookie
-    // En desarrollo: cookie de sesión (se elimina al cerrar navegador) para evitar persistencia no deseada
-    // En producción: cookie persistente por 7 días
     const isDevelopment = process.env.NODE_ENV === 'development';
     
     response.cookies.set('auth-token', token, {
       httpOnly: true,
-      secure: !isDevelopment, // Solo HTTPS en producción
+      secure: !isDevelopment,
       sameSite: 'lax',
-      maxAge: isDevelopment ? undefined : 60 * 60 * 24 * 7, // Sin maxAge = expira al cerrar navegador en dev
+      maxAge: isDevelopment ? undefined : 60 * 60 * 24 * 7,
       path: '/',
     });
 
     return response;
   } catch (error) {
     console.error('Error en login:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
 

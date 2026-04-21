@@ -1,119 +1,92 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import prisma from '@/lib/prisma';
+import { getAuthUser } from '@/lib/auth';
+import { servicioSchema } from '@/lib/validations';
 
-import sql from '@/lib/db';
-
+// GET - Obtener servicios
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const published = searchParams.get('published');
+    const publishedOnly = searchParams.get('published') !== 'false';
     const categoria = searchParams.get('categoria');
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Obtener servicios con su categoría padre
-    let query;
-    let params: any[] = [];
-    
-    if (categoria) {
-      // Filtrar por categoría específica
-      if (published !== 'false') {
-        query = sql`
-          SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug 
-          FROM servicios s 
-          LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id 
-          WHERE s.visible = true AND s.categoria_servicio_id = ${categoria}
-          ORDER BY s.orden ASC 
-          LIMIT ${limit} OFFSET ${offset}
-        `;
-      } else {
-        query = sql`
-          SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug 
-          FROM servicios s 
-          LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id 
-          WHERE s.categoria_servicio_id = ${categoria}
-          ORDER BY s.orden ASC 
-          LIMIT ${limit} OFFSET ${offset}
-        `;
-      }
-    } else if (published !== 'false') {
-      query = sql`
-        SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug 
-        FROM servicios s 
-        LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id 
-        WHERE s.visible = true 
-        ORDER BY s.orden ASC 
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    } else {
-      query = sql`
-        SELECT s.*, cs.nombre as categoria_nombre, cs.slug as categoria_slug 
-        FROM servicios s 
-        LEFT JOIN categorias_servicios cs ON s.categoria_servicio_id = cs.id 
-        ORDER BY s.orden ASC 
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    }
+    const where: any = {};
+    if (publishedOnly) where.visible = true;
+    if (categoria) where.categoria_servicio_id = categoria;
 
-    const servicios = await query;
+    const servicios = await prisma.servicio.findMany({
+      where,
+      include: {
+        categoria: { select: { id: true, nombre: true, slug: true } },
+      },
+      orderBy: { orden: 'asc' },
+      skip: offset,
+      take: limit,
+    });
 
-    // Transformar resultados para agregar la categoría como objeto
-    const serviciosWithCategoria = servicios.map((s: any) => ({
+    const serviciosTransformados = servicios.map((s: any) => ({
       ...s,
-      categoria_servicio: s.categoria_servicio_id ? {
-        id: s.categoria_servicio_id,
-        nombre: s.categoria_nombre,
-        slug: s.categoria_slug
-      } : null
+      categoria_nombre: s.categoria?.nombre,
+      categoria_slug: s.categoria?.slug,
+      categoria_servicio: s.categoria ? {
+        id: s.categoria.id,
+        nombre: s.categoria.nombre,
+        slug: s.categoria.slug,
+      } : null,
     }));
 
-    return NextResponse.json({ success: true, data: serviciosWithCategoria });
+    return NextResponse.json({ success: true, data: serviciosTransformados });
   } catch (error) {
     console.error('Error fetching servicios:', error);
-    return NextResponse.json(
-      { error: 'Error al obtener servicios' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al obtener servicios' }, { status: 500 });
   }
 }
 
+// POST - Crear servicio (solo admin)
 export async function POST(request: NextRequest) {
   try {
+    const authUser = await getAuthUser(request);
+    if (!authUser || authUser.rol !== 'admin') {
+      return NextResponse.json({ error: 'Solo administradores pueden crear servicios' }, { status: 403 });
+    }
+
     const body = await request.json();
-    const { titulo, slug, descripcion, icono, imagen, categoria, categoria_servicio_id, tamanho, orden } = body as any;
-
-    if (!titulo || !slug || !descripcion) {
-      return NextResponse.json(
-        { error: 'Título, slug y descripción son requeridos' },
-        { status: 400 }
-      );
+    
+    // Validar con Zod
+    const result = servicioSchema.safeParse(body);
+    
+    if (!result.success) {
+      const errores = result.error.errors.map(e => e.message).join(', ');
+      return NextResponse.json({ error: errores }, { status: 400 });
     }
 
-    const existingSlug = await db.servicios.findBySlug(slug);
-    if (existingSlug.length > 0) {
-      return NextResponse.json(
-        { error: 'Ya existe un servicio con ese slug' },
-        { status: 400 }
-      );
+    const { titulo, slug, descripcion, descripcion_corta, icono, imagen, categoria_servicio_id, tamanho, orden } = result.data;
+
+    // Verificar slug único
+    const existing = await prisma.servicio.findUnique({ where: { slug } });
+    if (existing) {
+      return NextResponse.json({ error: 'Ya existe un servicio con ese slug' }, { status: 400 });
     }
 
-    const servicio = await db.servicios.create({
-      titulo,
-      slug,
-      descripcion,
-      icono,
-      imagen,
-      categoria_servicio_id,
-      tamanho: (tamanho as string) || 'medium',
-      orden: (orden as number) || 0,
+    const servicio = await prisma.servicio.create({
+      data: {
+        titulo,
+        slug,
+        descripcion,
+        descripcion_corta,
+        icono,
+        imagen,
+        categoria_servicio_id: categoria_servicio_id || null,
+        tamanho: tamanho || 'medium',
+        orden: orden || 0,
+      },
     });
 
-    return NextResponse.json({ servicio: servicio[0] }, { status: 201 });
+    return NextResponse.json({ success: true, data: servicio }, { status: 201 });
   } catch (error) {
     console.error('Error creating servicio:', error);
-    return NextResponse.json(
-      { error: 'Error al crear servicio' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al crear servicio' }, { status: 500 });
   }
 }

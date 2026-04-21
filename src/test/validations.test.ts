@@ -1,0 +1,146 @@
+import { describe, it, expect } from 'vitest';
+import { loginSchema, contactoSchema, categoriaSchema, postSchema, servicioSchema } from '@/lib/validations';
+
+describe('loginSchema', () => {
+  it('should validate correct login data', () => {
+    const result = loginSchema.safeParse({ email: 'test@example.com', password: 'password123' });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject invalid email', () => {
+    const result = loginSchema.safeParse({ email: 'invalid', password: 'password123' });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject missing password', () => {
+    const result = loginSchema.safeParse({ email: 'test@example.com' });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('contactoSchema', () => {
+  it('should validate correct contacto data', () => {
+    const result = contactoSchema.safeParse({
+      nombre: 'Juan Pérez',
+      email: 'juan@example.com',
+      mensaje: 'Estoy interesado en sus servicios de consultoría.',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject short nombre', () => {
+    const result = contactoSchema.safeParse({
+      nombre: 'J',
+      email: 'juan@example.com',
+      mensaje: 'Estoy interesado en sus servicios.',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject short mensaje', () => {
+    const result = contactoSchema.safeParse({
+      nombre: 'Juan',
+      email: 'juan@example.com',
+      mensaje: 'Hola',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('should accept optional fields', () => {
+    const result = contactoSchema.safeParse({
+      nombre: 'Juan Pérez',
+      email: 'juan@example.com',
+      telefono: '+51 999 999 999',
+      empresa: 'Mi Empresa',
+      mensaje: 'Quiero información sobre servicios.',
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('categoriaSchema', () => {
+  it('should validate correct categoria', () => {
+    const result = categoriaSchema.safeParse({
+      nombre: 'Diseño Web',
+      slug: 'diseno-web',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject invalid slug format', () => {
+    const result = categoriaSchema.safeParse({
+      nombre: 'Diseño',
+      slug: 'Diseño Web',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('should accept optional color', () => {
+    const result = categoriaSchema.safeParse({
+      nombre: 'Test',
+      slug: 'test',
+      color: '#FF0000',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject invalid color format', () => {
+    const result = categoriaSchema.safeParse({
+      nombre: 'Test',
+      slug: 'test',
+      color: 'red',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('postSchema', () => {
+  it('should validate correct post', () => {
+    const result = postSchema.safeParse({
+      titulo: 'Cómo mejorar tu SEO',
+      slug: 'como-mejorar-tu-seo',
+      contenido: 'Este es un artículo completo sobre estrategia SEO...'.repeat(5),
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject short contenido', () => {
+    const result = postSchema.safeParse({
+      titulo: 'Test',
+      slug: 'test',
+      contenido: 'Short',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('servicioSchema', () => {
+  it('should validate correct servicio', () => {
+    const result = servicioSchema.safeParse({
+      titulo: 'Desarrollo Web',
+      slug: 'desarrollo-web',
+      descripcion: 'Servicio de desarrollo web profesional con las últimas tecnologías.',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject invalid tamanho', () => {
+    const result = servicioSchema.safeParse({
+      titulo: 'Test',
+      slug: 'test',
+      descripcion: 'Descripción completa del servicio'.repeat(2),
+      tamanho: 'invalid',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('should accept valid tamanho values', () => {
+    const result = servicioSchema.safeParse({
+      titulo: 'Test',
+      slug: 'test',
+      descripcion: 'Descripción completa del servicio'.repeat(2),
+      tamanho: 'small',
+    });
+    expect(result.success).toBe(true);
+  });
+});

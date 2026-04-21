@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
+import { postUpdateSchema } from '@/lib/validations';
 
 // GET - Obtener post por slug (público)
 export async function GET(
@@ -9,48 +10,33 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    const posts = await db.posts.findBySlug(slug);
-    const post = posts[0];
+
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      include: {
+        categoriaPost: { select: { id: true, nombre: true, slug: true, color: true } },
+        autor: { select: { id: true, nombre: true, avatar: true } },
+      },
+    });
 
     if (!post) {
-      return NextResponse.json(
-        { error: 'Post no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Post no encontrado' }, { status: 404 });
     }
 
     // Incrementar vistas
-    await db.posts.incrementViews(post.id);
-
-    // Obtener categoría y autor
-    let categoria = null;
-    let autor = null;
-
-    if (post.categoria_id) {
-      const categorias = await db.categorias.findById(post.categoria_id);
-      categoria = categorias[0];
-    }
-
-    if (post.autor_id) {
-      const autores = await db.usuarios.findById(post.autor_id);
-      autor = autores[0] ? {
-        id: autores[0].id,
-        nombre: autores[0].nombre,
-        avatar: autores[0].avatar,
-      } : null;
-    }
+    await prisma.post.update({
+      where: { id: post.id },
+      data: { vistas: { increment: 1 } },
+    });
 
     return NextResponse.json({
       ...post,
-      categoria,
-      autor,
+      categoriaPost: post.categoriaPost,
+      autor: post.autor,
     });
   } catch (error) {
     console.error('Error al obtener post:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
 
@@ -62,46 +48,42 @@ export async function PUT(
   try {
     const authUser = await getAuthUser(request);
     if (!authUser) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     const { slug } = await params;
-    const posts = await db.posts.findBySlug(slug);
-    const post = posts[0];
+    const post = await prisma.post.findUnique({ where: { slug } });
 
     if (!post) {
-      return NextResponse.json(
-        { error: 'Post no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Post no encontrado' }, { status: 404 });
     }
 
     const body = await request.json();
-    const { titulo, contenido, excerpt, imagen_destacada, categoria_id, etiquetas, publicado, fecha_publicacion, meta_title, meta_description } = body;
 
-    const updated = await db.posts.update(post.id, {
-      titulo: titulo || post.titulo,
-      contenido: contenido || post.contenido,
-      excerpt: excerpt !== undefined ? excerpt : post.excerpt,
-      imagen_destacada: imagen_destacada !== undefined ? imagen_destacada : post.imagen_destacada,
-      categoria_id: categoria_id !== undefined ? categoria_id : post.categoria_id,
-      etiquetas: etiquetas !== undefined ? etiquetas : post.etiquetas,
-      publicado: publicado !== undefined ? publicado : post.publicado,
-      fecha_publicacion: publicado ? (fecha_publicacion || new Date()) : (publicado === false ? null : post.fecha_publicacion),
-      meta_title: meta_title !== undefined ? meta_title : post.meta_title,
-      meta_description: meta_description !== undefined ? meta_description : post.meta_description,
+    // Validar con Zod
+    const result = postUpdateSchema.safeParse(body);
+
+    if (!result.success) {
+      const errores = result.error.errors.map(e => e.message).join(', ');
+      return NextResponse.json({ error: errores }, { status: 400 });
+    }
+
+    const updateData: any = { ...result.data };
+
+    // Manejar fecha_publicacion
+    if (updateData.fecha_publicacion) {
+      updateData.fecha_publicacion = new Date(updateData.fecha_publicacion);
+    }
+
+    const updated = await prisma.post.update({
+      where: { id: post.id },
+      data: updateData,
     });
 
-    return NextResponse.json(updated[0]);
+    return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     console.error('Error al actualizar post:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
 
@@ -112,39 +94,22 @@ export async function DELETE(
 ) {
   try {
     const authUser = await getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json(
-        { error: 'No autorizado' },
-        { status: 401 }
-      );
-    }
-
-    if (authUser.rol !== 'admin') {
-      return NextResponse.json(
-        { error: 'Solo administradores pueden eliminar posts' },
-        { status: 403 }
-      );
+    if (!authUser || authUser.rol !== 'admin') {
+      return NextResponse.json({ error: 'Solo administradores pueden eliminar posts' }, { status: 403 });
     }
 
     const { slug } = await params;
-    const posts = await db.posts.findBySlug(slug);
-    const post = posts[0];
+    const post = await prisma.post.findUnique({ where: { slug } });
 
     if (!post) {
-      return NextResponse.json(
-        { error: 'Post no encontrado' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Post no encontrado' }, { status: 404 });
     }
 
-    await db.posts.delete(post.id);
+    await prisma.post.delete({ where: { id: post.id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error al eliminar post:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
