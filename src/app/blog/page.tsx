@@ -33,7 +33,7 @@ async function getPosts() {
     const posts = await prisma.post.findMany({
       where: { publicado: true },
       include: {
-        categoria: { select: { nombre: true, slug: true, color: true } },
+        categoriaPost: { select: { nombre: true, slug: true, color: true } },
       },
       orderBy: { fecha_publicacion: 'desc' },
       take: 20,
@@ -41,7 +41,7 @@ async function getPosts() {
     
     return posts.map((post: any) => ({
       ...post,
-      categoria: post.categoria,
+      categoria: post.categoriaPost,
     }));
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -52,7 +52,7 @@ async function getPosts() {
 // Función para obtener todas las categorías
 async function getCategorias() {
   try {
-    const categorias = await prisma.categoria.findMany({
+    const categorias = await prisma.categoriaPost.findMany({
       orderBy: { orden: 'asc' },
     });
     return categorias;

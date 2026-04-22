@@ -60,11 +60,11 @@ export default function AdminCategoriasPage() {
 
   const fetchCategorias = async () => {
     try {
-      const res = await fetch("/api/categorias", {
+      const res = await fetch("/api/categorias_posts", {
         credentials: "include",
       });
       const data = await res.json();
-      setCategorias(data);
+      setCategorias(Array.isArray(data.data) ? data.data : []);
     } catch (err) {
       console.error("Error fetching categorias:", err);
     } finally {
@@ -79,8 +79,8 @@ export default function AdminCategoriasPage() {
 
     try {
       const url = editingCategoria
-        ? `/api/categorias/${editingCategoria.id}`
-        : "/api/categorias";
+        ? `/api/categorias_posts/${editingCategoria.id}`
+        : "/api/categorias_posts";
 
       const method = editingCategoria ? "PUT" : "POST";
 
@@ -133,7 +133,7 @@ export default function AdminCategoriasPage() {
     if (!confirm(`¿Estás seguro de eliminar la categoría "${categoria.nombre}"?`)) return;
 
     try {
-      const res = await fetch(`/api/categorias/${categoria.id}`, {
+      const res = await fetch(`/api/categorias_posts/${categoria.id}`, {
         method: "DELETE",
         credentials: "include",
       });

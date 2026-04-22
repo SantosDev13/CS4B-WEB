@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, CheckCircle, AlertCircle, Loader2, ShoppingCart, X, Plus, Trash2 } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, Loader2, MessageSquare, X, Plus, Trash2 } from "lucide-react";
 import { useCart, CartItem } from "@/context/CartContext";
 import Link from "next/link";
 
@@ -220,7 +220,7 @@ export default function ContactoPage() {
                 {/* Carrito de servicios o selects dinámicos */}
                 <div>
                   <label className="block text-sm font-medium text-text-secondary mb-2">
-                    <ShoppingCart className="w-4 h-4 inline mr-2" />
+                    <MessageSquare className="w-4 h-4 inline mr-2" />
                     Servicio de interés
                   </label>
 

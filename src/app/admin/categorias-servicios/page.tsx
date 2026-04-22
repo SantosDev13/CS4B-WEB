@@ -63,7 +63,7 @@ export default function AdminCategoriasServiciosPage() {
         console.error("API error:", data.error);
         setCategorias([]);
       } else {
-        setCategorias(Array.isArray(data.categorias) ? data.categorias : []);
+        setCategorias(Array.isArray(data.data) ? data.data : []);
       }
     } catch (err) {
       console.error("Error fetching categorias_servicios:", err);

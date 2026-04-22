@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { loginSchema, contactoSchema, categoriaSchema, postSchema, servicioSchema } from '@/lib/validations';
+import { loginSchema, contactoSchema, categoriaPostSchema, postSchema, servicioSchema } from '@/lib/validations';
 
 describe('loginSchema', () => {
   it('should validate correct login data', () => {
@@ -58,9 +58,9 @@ describe('contactoSchema', () => {
   });
 });
 
-describe('categoriaSchema', () => {
+describe('categoriaPostSchema', () => {
   it('should validate correct categoria', () => {
-    const result = categoriaSchema.safeParse({
+    const result = categoriaPostSchema.safeParse({
       nombre: 'Diseño Web',
       slug: 'diseno-web',
     });
@@ -68,7 +68,7 @@ describe('categoriaSchema', () => {
   });
 
   it('should reject invalid slug format', () => {
-    const result = categoriaSchema.safeParse({
+    const result = categoriaPostSchema.safeParse({
       nombre: 'Diseño',
       slug: 'Diseño Web',
     });
@@ -76,7 +76,7 @@ describe('categoriaSchema', () => {
   });
 
   it('should accept optional color', () => {
-    const result = categoriaSchema.safeParse({
+    const result = categoriaPostSchema.safeParse({
       nombre: 'Test',
       slug: 'test',
       color: '#FF0000',
@@ -85,7 +85,7 @@ describe('categoriaSchema', () => {
   });
 
   it('should reject invalid color format', () => {
-    const result = categoriaSchema.safeParse({
+    const result = categoriaPostSchema.safeParse({
       nombre: 'Test',
       slug: 'test',
       color: 'red',

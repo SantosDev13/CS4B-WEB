@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useCart, CartItem } from "@/context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Check, X, Plus } from "lucide-react";
+import { MessageSquare, Check, X, Plus } from "lucide-react";
 
 interface ServicioCardProps {
   servicio: {
@@ -34,7 +34,7 @@ export default function ServicioCard({ servicio, categoriaNombre }: ServicioCard
 
     if (inCart) {
       removeFromCart(servicio.id);
-      setToastMessage("Eliminado del carrito");
+      setToastMessage("Eliminado del formulario");
     } else {
       const item: CartItem = {
         id: servicio.id,
@@ -44,7 +44,7 @@ export default function ServicioCard({ servicio, categoriaNombre }: ServicioCard
         categoriaSlug: servicio.categoria_slug,
       };
       addToCart(item);
-      setToastMessage("Agregado al carrito");
+      setToastMessage("Agregado al formulario");
     }
 
     setShowToast(true);
@@ -126,7 +126,7 @@ export default function ServicioCard({ servicio, categoriaNombre }: ServicioCard
             {inCart ? (
               <Check className="w-5 h-5 text-green-400" />
             ) : (
-              <ShoppingCart className="w-5 h-5 text-green-400" />
+              <MessageSquare className="w-5 h-5 text-green-400" />
             )}
             <span className="text-sm font-medium">{toastMessage}</span>
             <button

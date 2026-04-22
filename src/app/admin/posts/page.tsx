@@ -82,14 +82,14 @@ export default function AdminPostsPage() {
     try {
       const [postsRes, catsRes] = await Promise.all([
         fetch("/api/posts?published=false", { credentials: "include" }),
-        fetch("/api/categorias", { credentials: "include" }),
+        fetch("/api/categorias_posts", { credentials: "include" }),
       ]);
       
       const postsData = await postsRes.json();
       const catsData = await catsRes.json();
       
-      setPosts(postsData.posts || postsData);
-      setCategorias(catsData);
+      setPosts(Array.isArray(postsData.data) ? postsData.data : []);
+      setCategorias(Array.isArray(catsData.data) ? catsData.data : []);
     } catch (err) {
       console.error("Error fetching data:", err);
     } finally {

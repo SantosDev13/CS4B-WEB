@@ -33,7 +33,7 @@ async function getPost(slug: string) {
     const post = await prisma.post.findUnique({
       where: { slug },
       include: {
-        categoria: { select: { id: true, nombre: true, slug: true, color: true } },
+        categoriaPost: { select: { id: true, nombre: true, slug: true, color: true } },
         autor: { select: { nombre: true, avatar: true } },
       },
     });
@@ -48,7 +48,7 @@ async function getPost(slug: string) {
     
     return {
       ...post,
-      categoria: post.categoria,
+      categoria: post.categoriaPost,
       autor: post.autor,
     };
   } catch (error) {
@@ -62,7 +62,7 @@ async function getRelatedPosts(categoriaId: string, currentSlug: string) {
   try {
     const posts = await prisma.post.findMany({
       where: { 
-        categoria_id: categoriaId,
+        categoria_post_id: categoriaId,
         slug: { not: currentSlug },
         publicado: true,
       },
@@ -83,7 +83,7 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
   
-  const relatedPosts = post.categoria_id ? await getRelatedPosts(post.categoria_id, slug) : [];
+  const relatedPosts = post.categoria_post_id ? await getRelatedPosts(post.categoria_post_id, slug) : [];
   
   const formatDate = (date: Date | string | null) => {
     if (!date) return "";

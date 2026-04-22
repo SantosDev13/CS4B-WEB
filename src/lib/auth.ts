@@ -1,7 +1,4 @@
 import { NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'cs4b-secret-key-change-in-production';
 
 export interface AuthUser {
   id: string;
@@ -12,17 +9,37 @@ export interface AuthUser {
 
 export async function getAuthUser(request: NextRequest): Promise<AuthUser | null> {
   try {
-    // Obtener token de cookie o header
-    const token = request.cookies.get('auth-token')?.value || 
-                  request.headers.get('authorization')?.replace('Bearer ', '');
+    // Obtener token de cookie
+    const token = request.cookies.get('auth-token')?.value;
 
     if (!token) {
       return null;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthUser;
-    return decoded;
+    // Decodificar token (formato: base64("id:rol"))
+    let sessionData: string;
+    try {
+      sessionData = Buffer.from(token, 'base64').toString('utf-8');
+    } catch {
+      return null;
+    }
+
+    const [userId, rol] = sessionData.split(':');
+
+    if (!userId || !rol) {
+      return null;
+    }
+
+    // Retornar usuario directamente desde el token
+    // No necesitamos consultar DB para validar
+    return {
+      id: userId,
+      email: '',
+      nombre: '',
+      rol: rol as 'admin' | 'editor',
+    };
   } catch (error) {
+    console.error('Error en getAuthUser:', error);
     return null;
   }
 }

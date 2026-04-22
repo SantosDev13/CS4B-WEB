@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from "@/context/CartContext";
-import { ShoppingCart } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -12,9 +12,9 @@ export default function NavbarCart() {
     <Link
       href="/contacto"
       className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-      title="Carrito de consultas"
+      title="Consultas"
     >
-      <ShoppingCart className="w-5 h-5 text-white" />
+      <MessageSquare className="w-5 h-5 text-white" />
       
       {/* Badge con animación */}
       <AnimatePresence mode="wait">

@@ -1,22 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-// GET - Obtener usuario actual (requiere auth)
+// GET - Obtener usuario actual (requiere cookie de auth)
 export async function GET(request: NextRequest) {
   try {
-    const authUser = await getAuthUser(request);
+    // Obtener el token (contiene el userId en base64)
+    const sessionData = request.cookies.get('auth-token')?.value;
 
-    if (!authUser) {
+    if (!sessionData) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
       );
     }
 
-    // Obtener datos completos del usuario
+    // Decodificar el userId del base64
+    let userId: string;
+    try {
+      userId = Buffer.from(sessionData, 'base64').toString('utf-8');
+    } catch {
+      return NextResponse.json(
+        { error: "Sesión inválida" },
+        { status: 401 }
+      );
+    }
+
+    // Buscar usuario por ID
     const usuario = await prisma.usuario.findUnique({
-      where: { id: authUser.id },
+      where: { id: userId },
       select: {
         id: true,
         email: true,

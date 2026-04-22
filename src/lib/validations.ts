@@ -39,10 +39,10 @@ export type ContactoUpdateInput = z.infer<typeof contactoUpdateSchema>;
  // CATEGORÍAS DE POSTS (Blog)
  // --------------------------------------------
  export const categoriaPostSchema = z.object({
-   nombre: z.string().min(2, 'El nombre es requerido'),
-   slug: z.string().min(2, 'El slug es requerido').regex(/^[a-z0-9-]+$/, 'El slug debe tener solo letras minúsculas, números y guiones'),
+   nombre: z.string().min(1, 'El nombre es requerido'),
+   slug: z.string().min(1, 'El slug es requerido'),
    descripcion: z.string().optional(),
-   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color inválido').optional(),
+   color: z.string().optional(),
    orden: z.number().int().optional(),
  });
 
@@ -55,11 +55,11 @@ export type ContactoUpdateInput = z.infer<typeof contactoUpdateSchema>;
  // CATEGORÍAS DE SERVICIOS
  // --------------------------------------------
  export const categoriaServicioSchema = z.object({
-   nombre: z.string().min(2, 'El nombre es requerido'),
-   slug: z.string().min(2, 'El slug es requerido').regex(/^[a-z0-9-]+$/, 'El slug debe tener solo letras minúsculas, números y guiones'),
+   nombre: z.string().min(1, 'El nombre es requerido'),
+   slug: z.string().min(1, 'El slug es requerido'),
    descripcion: z.string().optional(),
-   imagen: z.string().url('URL de imagen inválida').optional().or(z.literal('')),
-   link: z.string().url('URL inválida').optional().or(z.literal('')),
+   imagen: z.string().optional(),
+   link: z.string().optional(),
    orden: z.number().int().optional(),
    visible: z.boolean().optional(),
  });
@@ -74,7 +74,7 @@ export type ContactoUpdateInput = z.infer<typeof contactoUpdateSchema>;
 // --------------------------------------------
 export const postSchema = z.object({
   titulo: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
-  slug: z.string().min(3, 'El slug debe tener al menos 3 caracteres').regex(/^[a-z0-9-]+$/, 'El slug debe tener solo letras minúsculas, números y guiones'),
+  slug: z.string().min(3, 'El slug debe tener al menos 3 caracteres').regex(/^[a-z0-9-]+$/, 'El slug debe tener solo letras min��sculas, números y guiones'),
   contenido: z.string().min(50, 'El contenido debe tener al menos 50 caracteres'),
   excerpt: z.string().max(500, 'El excerpt debe tener máximo 500 caracteres').optional(),
   imagen_destacada: z.string().url('URL de imagen inválida').optional().or(z.literal('')),
@@ -116,9 +116,9 @@ export type ServicioUpdateInput = z.infer<typeof servicioUpdateSchema>;
  // CONFIGURACIONES
  // --------------------------------------------
  export const configuracionSchema = z.object({
-   clave: z.string().min(1, 'La clave es requerida'),
-   valor: z.string().min(1, 'El valor es requerido'),
-   descripcion: z.string().optional(),
+  clave: z.string().min(1, 'La clave es requerida'),
+  valor: z.string().min(1, 'El valor es requerido'),
+  descripcion: z.string().optional(),
  });
 
  export const configuracionUpdateSchema = configuracionSchema.partial();

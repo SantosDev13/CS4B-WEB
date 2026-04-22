@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
 import { loginSchema } from '@/lib/validations';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'cs4b-secret-key-change-in-production';
 
 // POST - Login
 export async function POST(request: NextRequest) {
@@ -28,30 +24,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
     }
 
-    // Verificar contraseña
-    const passwordValida = await bcrypt.compare(password, usuario.password);
-
-    if (!passwordValida) {
+    // Verificar contraseña (sin hash - comparación directa)
+    if (password !== usuario.password) {
       return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
     }
 
-    // Actualizar último login
-    await prisma.usuario.update({
-      where: { id: usuario.id },
-      data: { ultimo_login: new Date() },
-    });
-
-    // Generar token JWT
-    const token = jwt.sign(
-      { 
-        id: usuario.id, 
-        email: usuario.email, 
-        nombre: usuario.nombre,
-        rol: usuario.rol 
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Crear cookie simple con userId:yrol (base64 encoded)
+    const sessionData = Buffer.from(`${usuario.id}:${usuario.rol}`).toString('base64');
 
     // Crear respuesta con cookie
     const response = NextResponse.json({
@@ -63,17 +42,16 @@ export async function POST(request: NextRequest) {
         rol: usuario.rol,
         avatar: usuario.avatar,
       },
-      token
     });
 
-    // Configurar cookie
+    // Configurar cookie (30 días)
     const isDevelopment = process.env.NODE_ENV === 'development';
     
-    response.cookies.set('auth-token', token, {
+    response.cookies.set('auth-token', sessionData, {
       httpOnly: true,
       secure: !isDevelopment,
       sameSite: 'lax',
-      maxAge: isDevelopment ? undefined : 60 * 60 * 24 * 7,
+      maxAge: isDevelopment ? undefined : 60 * 60 * 24 * 30,
       path: '/',
     });
 

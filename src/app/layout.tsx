@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -30,13 +31,15 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col">
         <AuthProvider>
-          <CartProvider>
-            <Navbar />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </CartProvider>
+          <Suspense fallback={<div className="min-h-screen" />}>
+            <CartProvider>
+              <Navbar />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </CartProvider>
+          </Suspense>
         </AuthProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, Eye, EyeOff, AlertCircle, LogOut, User, Shield } from "lucide-react";
@@ -12,18 +12,24 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { login, logout, isAuthenticated, user, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  // Evitar hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Si ya está autenticado, redirigir al admin directamente
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if (mounted && !authLoading && isAuthenticated) {
       router.push("/admin");
     }
-  }, [authLoading, isAuthenticated, router]);
+  }, [mounted, authLoading, isAuthenticated, router]);
 
-  // Mostrar loading mientras se verifica la sesión
-  if (authLoading) {
+  // Mostrar loading mientras se verifica la sesión O antes de mount
+  if (!mounted || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
@@ -31,7 +37,7 @@ export default function LoginPage() {
     );
   }
 
-  // Si ya está autenticado, no mostrar el formulario (la redirección cubrirá esto)
+  // Si ya está autenticado, no mostrar el formulario
   if (isAuthenticated) {
     return null;
   }

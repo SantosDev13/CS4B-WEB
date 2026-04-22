@@ -24,9 +24,6 @@ model Usuario {
   nombre       String
   rol          String    @default("editor") // admin | editor
   avatar       String?
-  ultimo_login DateTime?
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
 
   // Relaciones
   posts Post[]

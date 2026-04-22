@@ -100,8 +100,8 @@ export default function AdminServiciosPage() {
       const servData = await servRes.json();
       const catData = await catRes.json();
       
-      setServicios(Array.isArray(servData.servicios) ? servData.servicios : []);
-      setCategorias(Array.isArray(catData.categorias) ? catData.categorias : []);
+      setServicios(Array.isArray(servData.data) ? servData.data : []);
+      setCategorias(Array.isArray(catData.data) ? catData.data : []);
     } catch (err) {
       console.error("Error fetching servicios:", err);
       setServicios([]);

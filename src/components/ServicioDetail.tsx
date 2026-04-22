@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart, CartItem } from "@/context/CartContext";
-import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle, ShoppingCart, X, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle, MessageSquare, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ServicioDetailProps {
@@ -270,12 +270,12 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
                   {inCart ? (
                     <>
                       <Check className="w-5 h-5" />
-                      Agregado al carrito
+                      Agregado al formulario
                     </>
                   ) : (
                     <>
-                      <ShoppingCart className="w-5 h-5" />
-                      Agregar al carrito
+                      <MessageSquare className="w-5 h-5" />
+                      Agregar al formulario 
                     </>
                   )}
                 </button>
@@ -358,7 +358,7 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
             {inCart ? (
               <Check className="w-5 h-5 text-green-400" />
             ) : (
-              <ShoppingCart className="w-5 h-5 text-green-400" />
+              <MessageSquare className="w-5 h-5 text-green-400" />
             )}
             <span className="text-sm font-medium">{toastMessage}</span>
             <button
