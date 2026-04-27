@@ -11,18 +11,18 @@ interface RateLimitEntry {
   resetAt: number;
 }
 
-// Configuración por defecto
-const DEFAULT_LIMIT = 5; // 5 intentos
-const DEFAULT_WINDOW_MS = 15 * 60 * 1000; // 15 minutos
+// Configuración por defecto - exportada para tests
+export const DEFAULT_LIMIT = 5; // 5 intentos
+export const DEFAULT_WINDOW_MS = 15 * 60 * 1000; // 15 minutos
 
-// Almacén en memoria (se resetea cuando reinicia el servidor)
-const rateLimitStore = new Map<string, RateLimitEntry>();
+// Almacén en memoria - exportado para tests
+export const rateLimitStore = new Map<string, RateLimitEntry>();
 
 /**
  * Generar ключ para rate limiting
  * Usa IP + endpoint como ключ
  */
-function getRateLimitKey(request: NextRequest, endpoint: string): string {
+export function getRateLimitKey(request: NextRequest, endpoint: string): string {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() 
     || request.headers.get('x-real-ip') 
     || 'unknown';
@@ -32,7 +32,7 @@ function getRateLimitKey(request: NextRequest, endpoint: string): string {
 /**
  * Verificar si excedió el límite
  */
-function checkRateLimit(key: string, limit: number = DEFAULT_LIMIT, windowMs: number = DEFAULT_WINDOW_MS): { allowed: boolean; remaining: number; resetAt: number } {
+export function checkRateLimit(key: string, limit: number = DEFAULT_LIMIT, windowMs: number = DEFAULT_WINDOW_MS): { allowed: boolean; remaining: number; resetAt: number } {
   const now = Date.now();
   const entry = rateLimitStore.get(key);
 
