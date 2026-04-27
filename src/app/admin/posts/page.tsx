@@ -17,6 +17,7 @@ import {
   User
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { slugify } from "@/lib/utils";
 
 interface Post {
   id: string;
@@ -217,20 +218,11 @@ export default function AdminPostsPage() {
     });
   };
 
-  const generateSlug = (titulo: string) => {
-    return titulo
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  };
-
   const handleTituloChange = (titulo: string) => {
     setFormData({
       ...formData,
       titulo,
-      slug: editingPost ? formData.slug : generateSlug(titulo),
+      slug: editingPost ? formData.slug : slugify(titulo),
     });
   };
 

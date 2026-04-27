@@ -14,6 +14,7 @@ import {
   Folder,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { slugify } from "@/lib/utils";
 
 interface Categoria {
   id: string;
@@ -159,20 +160,11 @@ export default function AdminCategoriasPage() {
     });
   };
 
-  const generateSlug = (nombre: string) => {
-    return nombre
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  };
-
   const handleNombreChange = (nombre: string) => {
     setFormData({
       ...formData,
       nombre,
-      slug: editingCategoria ? formData.slug : generateSlug(nombre),
+      slug: editingCategoria ? formData.slug : slugify(nombre),
     });
   };
 

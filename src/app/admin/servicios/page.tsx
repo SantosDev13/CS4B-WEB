@@ -22,6 +22,7 @@ import {
   LayoutGrid
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { slugify } from "@/lib/utils";
 
 interface Categoria_servicio {
   id: string;
@@ -224,20 +225,11 @@ export default function AdminServiciosPage() {
     });
   };
 
-  const generateSlug = (titulo: string) => {
-    return titulo
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  };
-
   const handleTituloChange = (titulo: string) => {
     setFormData({
       ...formData,
       titulo,
-      slug: editingServicio ? formData.slug : generateSlug(titulo),
+      slug: editingServicio ? formData.slug : slugify(titulo),
     });
   };
 
