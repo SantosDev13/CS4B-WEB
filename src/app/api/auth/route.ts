@@ -1,10 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { loginSchema } from '@/lib/validations';
+import { comparePassword, createToken } from '@/lib/auth';
+import { checkAuthRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 
 // POST - Login
 export async function POST(request: NextRequest) {
   try {
+    // Verificar rate limit antes de todo
+    const { allowed, remaining, resetAt } = await checkAuthRateLimit(request);
+    
+    if (!allowed) {
+      const response = NextResponse.json(
+        { error: 'Demasiados intentos. Intenta de nuevo más tarde' },
+        { status: 429 }
+      );
+      // Agregar headers de rate limit
+      Object.entries(getRateLimitHeaders(remaining, resetAt)).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
+    }
+
     const body = await request.json();
     
     // Validar con Zod
@@ -12,7 +29,11 @@ export async function POST(request: NextRequest) {
     
     if (!result.success) {
       const errores = result.error.errors.map(e => e.message).join(', ');
-      return NextResponse.json({ error: errores }, { status: 400 });
+      const response = NextResponse.json({ error: errores }, { status: 400 });
+      Object.entries(getRateLimitHeaders(remaining, resetAt)).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
     }
 
     const { email, password } = result.data;
@@ -21,16 +42,30 @@ export async function POST(request: NextRequest) {
     const usuario = await prisma.usuario.findUnique({ where: { email } });
 
     if (!usuario) {
-      return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
+      const response = NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
+      Object.entries(getRateLimitHeaders(remaining, resetAt)).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
     }
 
-    // Verificar contraseña (sin hash - comparación directa)
-    if (password !== usuario.password) {
-      return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
+    // Verificar contraseña con bcrypt
+    const isValidPassword = await comparePassword(password, usuario.password);
+    if (!isValidPassword) {
+      const response = NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
+      Object.entries(getRateLimitHeaders(remaining, resetAt)).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
     }
 
-    // Crear cookie simple con userId:yrol (base64 encoded)
-    const sessionData = Buffer.from(`${usuario.id}:${usuario.rol}`).toString('base64');
+    // Crear JWT token
+    const token = createToken({
+      id: usuario.id,
+      email: usuario.email,
+      nombre: usuario.nombre,
+      rol: usuario.rol,
+    });
 
     // Crear respuesta con cookie
     const response = NextResponse.json({
@@ -44,14 +79,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Configurar cookie (30 días)
+    // Agregar headers de rate limit
+    Object.entries(getRateLimitHeaders(remaining, resetAt)).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+
+    // Configurar cookie con JWT
     const isDevelopment = process.env.NODE_ENV === 'development';
     
-    response.cookies.set('auth-token', sessionData, {
+    response.cookies.set('auth-token', token, {
       httpOnly: true,
       secure: !isDevelopment,
       sameSite: 'lax',
-      maxAge: isDevelopment ? undefined : 60 * 60 * 24 * 30,
+      maxAge: 60 * 60 * 24 * 1, // 1 día
       path: '/',
     });
 

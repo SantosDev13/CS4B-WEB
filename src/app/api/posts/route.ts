@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import { postSchema } from '@/lib/validations';
+import type { Prisma } from '@prisma/client';
 
 // GET - Obtener posts (público)
 export async function GET(request: NextRequest) {
@@ -12,8 +13,8 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
     const categoria = searchParams.get('categoria');
 
-    // Construir where
-    const where: any = {};
+    // Construir where con tipos correctos
+    const where: Prisma.PostWhereInput = {};
     if (publishedOnly) {
       where.publicado = true;
       where.OR = [

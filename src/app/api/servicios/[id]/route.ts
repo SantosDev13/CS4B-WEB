@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
+import type { Prisma } from '@prisma/client';
 
 // GET - Obtener servicio por ID
 export async function GET(
@@ -40,12 +41,12 @@ export async function PUT(
     const body = await request.json();
 
     const allowedFields = ['titulo', 'slug', 'descripcion', 'descripcion_corta', 'icono', 'imagen', 'categoria_servicio_id', 'tamanho', 'orden', 'visible'];
-    const updateData: any = {};
+    const updateData: Prisma.ServicioUpdateInput = {};
 
     for (const [key, value] of Object.entries(body)) {
       const dbKey = key === 'icon' ? 'icono' : key;
       if (allowedFields.includes(dbKey)) {
-        updateData[dbKey] = value;
+        (updateData as Record<string, unknown>)[dbKey] = value;
       }
     }
 

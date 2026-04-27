@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "CS4B | Consulting Strategic for Digital Business",
@@ -30,17 +31,19 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col">
-        <AuthProvider>
-          <Suspense fallback={<div className="min-h-screen" />}>
-            <CartProvider>
-              <Navbar />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </CartProvider>
-          </Suspense>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <Suspense fallback={<div className="min-h-screen" />}>
+              <CartProvider>
+                <Navbar />
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </CartProvider>
+            </Suspense>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

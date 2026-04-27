@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import { contactoSchema, serviciosSeleccionadosSchema } from '@/lib/validations';
+import type { Prisma } from '@prisma/client';
 
 // GET - Obtener contactos (solo admin/editor)
 export async function GET(request: NextRequest) {
@@ -17,8 +18,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Construir filtros
-    const where: any = {};
+    // Construir filtros con tipos correctos
+    const where: Prisma.ContactoWhereInput = {};
     
     if (search) {
       where.OR = [

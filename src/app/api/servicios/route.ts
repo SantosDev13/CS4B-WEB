@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import { servicioSchema } from '@/lib/validations';
+import type { Prisma } from '@prisma/client';
 
 // GET - Obtener servicios
 export async function GET(request: NextRequest) {
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    const where: any = {};
+    const where: Prisma.ServicioWhereInput = {};
     if (publishedOnly) where.visible = true;
     if (categoria) where.categoria_servicio_id = categoria;
 
@@ -26,7 +27,8 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
-    const serviciosTransformados = servicios.map((s: any) => ({
+    // Transformar respuesta para incluir campos calculados
+    const serviciosTransformados = servicios.map((s) => ({
       ...s,
       categoria_nombre: s.categoria?.nombre,
       categoria_slug: s.categoria?.slug,

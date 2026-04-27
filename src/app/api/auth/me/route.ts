@@ -1,33 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-// GET - Obtener usuario actual (requiere cookie de auth)
+// GET - Obtener usuario actual (requiere cookie de auth con JWT válido)
 export async function GET(request: NextRequest) {
   try {
-    // Obtener el token (contiene el userId en base64)
-    const sessionData = request.cookies.get('auth-token')?.value;
+    const token = request.cookies.get('auth-token')?.value;
 
-    if (!sessionData) {
+    if (!token) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
       );
     }
 
-    // Decodificar el userId del base64
-    let userId: string;
-    try {
-      userId = Buffer.from(sessionData, 'base64').toString('utf-8');
-    } catch {
-      return NextResponse.json(
-        { error: "Sesión inválida" },
+    // Verificar JWT token
+    const decoded = verifyToken(token);
+    
+    if (!decoded) {
+      // Token inválido o expirado - limpiar cookie
+      const response = NextResponse.json(
+        { error: "Sesión expirada" },
         { status: 401 }
       );
+      response.cookies.set('auth-token', '', { maxAge: 0, path: '/' });
+      return response;
     }
 
-    // Buscar usuario por ID
+    // Buscar usuario en DB para obtener datos actualizados
     const usuario = await prisma.usuario.findUnique({
-      where: { id: userId },
+      where: { id: decoded.id },
       select: {
         id: true,
         email: true,

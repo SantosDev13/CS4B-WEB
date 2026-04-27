@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import { postUpdateSchema } from '@/lib/validations';
+import type { Prisma } from '@prisma/client';
 
 // GET - Obtener post por slug (público)
 export async function GET(
@@ -68,11 +69,11 @@ export async function PUT(
       return NextResponse.json({ error: errores }, { status: 400 });
     }
 
-    const updateData: any = { ...result.data };
+    const updateData: Prisma.PostUpdateInput = { ...result.data };
 
     // Manejar fecha_publicacion
     if (updateData.fecha_publicacion) {
-      updateData.fecha_publicacion = new Date(updateData.fecha_publicacion);
+      updateData.fecha_publicacion = new Date(updateData.fecha_publicacion as string) as any;
     }
 
     const updated = await prisma.post.update({
