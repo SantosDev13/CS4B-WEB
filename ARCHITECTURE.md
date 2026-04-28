@@ -28,29 +28,43 @@
 
 ```
 CS4B-WEB/
-├── prisma/
-│   └── schema.prisma       # Database models
 ├── src/
-│   ├── app/               # Next.js App Router
+│   ├── app/                 # Next.js App Router (pages & routes)
 │   │   ├── api/           # API routes
-│   │   ├── admin/         # Admin dashboard pages
-│   │   ├── blog/          # Blog pages
-│   │   ├── servicios/    # Services pages
-│   │   └── *.tsx         # Pages: home, contacto, login, nosotros
-│   ├── components/        # Reusable components
-│   │   ├── ui/            # Base UI library
-│   │   └── *.tsx         # Feature components
-│   ├── context/          # React Context (Cart)
-│   ├── lib/              # Utilities and config
-│   │   ├── prisma.ts      # Prisma client
-│   │   ├── auth.ts       # JWT authentication
-│   │   ├── validations.ts # Zod schemas
-│   │   └── utils.ts       # Utility functions
-│   └── test/             # Test files
-├── .env.example          # Environment template
-├── vitest.config.ts     # Test configuration
-└── tailwind.config.ts    # Design tokens
+│   │   ├── admin/        # Admin dashboard pages
+│   │   ├── blog/        # Blog pages
+│   │   ├── servicios/   # Services pages
+│   │   └── *.tsx       # Pages: home, contacto, login, nosotros
+│   │
+│   ├── components/       # Reusable components
+│   │   ├── ui/         # Base UI library (Button, Input, Card, etc.)
+│   │   ├── admin/      # Admin-specific components (AdminNavbar)
+│   │   └── public/    # Public-facing components (Hero, Footer, etc.)
+│   │
+│   ├── composables/    # React Context + Hooks (useAuth, useCart)
+│   ├── services/      # API client (serviciosApi, postsApi, contactosApi)
+│   ├── constants/    # Global constants (APP, STORAGE_KEYS, API_ENDPOINTS)
+│   └── lib/         # Utilities (prisma, auth, validations, utils)
+│
+├── tests/             # Test files (outside src/)
+├── prisma/
+│   └── schema.prisma # Database models
+├── vitest.config.ts   # Test configuration
+└── tailwind.config.ts # Design tokens
 ```
+
+### Structure Principles
+
+| Folder | Purpose | Rule |
+|--------|---------|------|
+| `app/` | **Routes** - defines URLs | Each subfolder = URL path |
+| `components/ui/` | **Reusable** - used anywhere | Generic, no business logic |
+| `components/admin/` | **Admin** - dashboard only | AdminNamespace |
+| `components/public/` | **Public** - pages only | PageNamespace |
+| `composables/` | **State** - React patterns | Context + Hook |
+| `services/` | **API** - server calls | apiFetch + typed clients |
+| `constants/` | **Config** - magic values | Single source of truth |
+| `lib/` | **Utils** - pure functions | No side effects |
 
 ---
 
@@ -162,10 +176,16 @@ Defined in `tailwind.config.ts`:
 ## Testing
 
 ### Test Files
-- `src/test/utils.test.ts` - Utility functions
-- `src/test/validations.test.ts` - Zod schemas
-- `src/test/Button.test.tsx` - Button component
-- `src/test/Input.test.tsx` - Input component
+Located in `tests/` (root folder):
+
+| File | Description |
+|------|-------------|
+| `utils.test.ts` | Utility functions |
+| `validations.test.ts` | Zod schemas |
+| `auth.test.ts` | Authentication utilities |
+| `rate-limit.test.ts` | Rate limiting |
+| `Button.test.tsx` | Button component |
+| `Input.test.tsx` | Input component |
 
 ### Commands
 ```bash
@@ -221,6 +241,9 @@ npm run test:run  # Run tests
 
 | Date | Change |
 |------|--------|
+| 2026-04 | Refactored project structure (composables, services, constants) |
+| 2026-04 | Organized components by domain (admin, public, ui) |
+| 2026-04 | Moved tests outside src/ |
 | 2026-04 | Added Zod validation to all API routes |
 | 2026-04 | Created UI component library |
 | 2026-04 | Set up Vitest testing |

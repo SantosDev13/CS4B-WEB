@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import ServicioCard from "@/components/ServicioCard";
+import ServicioCard from "@/components/public/ServicioCard";
 import { Search, Filter, ChevronRight } from "lucide-react";
 
 interface CategoriaWithServicios {

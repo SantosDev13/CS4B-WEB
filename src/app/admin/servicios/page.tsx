@@ -21,7 +21,7 @@ import {
   Image,
   LayoutGrid
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/composables";
 import { slugify } from "@/lib/utils";
 
 interface Categoria_servicio {

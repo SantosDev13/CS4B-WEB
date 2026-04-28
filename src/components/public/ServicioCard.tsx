@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useCart, CartItem } from "@/context/CartContext";
+import { useCart, type CartItem } from "@/composables";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Check, X, Plus } from "lucide-react";
 

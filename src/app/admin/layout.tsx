@@ -16,8 +16,8 @@ import {
   Briefcase,
   Folder
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import AdminNavbar from "@/components/AdminNavbar";
+import { useAuth } from "@/composables";
+import AdminNavbar from "@/components/admin/AdminNavbar";
 
 interface NavItem {
   href: string;

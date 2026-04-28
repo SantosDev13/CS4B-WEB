@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { AuthProvider } from "@/context/AuthContext";
-import { CartProvider } from "@/context/CartContext";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import Navbar from "@/components/public/Navbar";
+import Footer from "@/components/public/Footer";
+import ErrorBoundary from "@/components/public/ErrorBoundary";
+import { AuthProvider, CartProvider } from "@/composables";
 
 export const metadata: Metadata = {
   title: "CS4B | Consulting Strategic for Digital Business",

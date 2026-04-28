@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import ServicioDetailClient from "@/components/ServicioDetail";
-import CategoriaServiciosPage from "@/components/CategoriaServicios";
+import ServicioDetailClient from "@/components/public/ServicioDetail";
+import CategoriaServiciosPage from "@/components/public/CategoriaServicios";
 
 interface Props {
   params: Promise<{ slug: string }>;

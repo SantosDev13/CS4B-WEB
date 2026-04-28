@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart, CartItem } from "@/context/CartContext";
+import { useCart, type CartItem } from "@/composables";
 import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle, MessageSquare, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

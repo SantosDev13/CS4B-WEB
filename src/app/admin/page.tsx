@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Calendar, Clock, Lock, Shield, Edit3, Save, X } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/composables";
 
 export default function AdminPage() {
   const { user } = useAuth();

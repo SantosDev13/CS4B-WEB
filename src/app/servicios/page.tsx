@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import ServiciosPageClient from "@/components/ServiciosPageClient";
+import ServiciosPageClient from "@/components/public/ServiciosPageClient";
 import { Suspense } from "react";
 
 interface CategoriaWithServicios {

@@ -19,7 +19,7 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/composables";
 
 interface Contacto {
   id: string;

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2, MessageSquare, X, Plus, Trash2 } from "lucide-react";
-import { useCart, CartItem } from "@/context/CartContext";
+import { useCart, type CartItem } from "@/composables";
 import Link from "next/link";
 
 interface Categoria {

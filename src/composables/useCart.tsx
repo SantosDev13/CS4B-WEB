@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { STORAGE_KEYS } from "@/constants";
 
 export interface CartItem {
   id: string;
@@ -21,7 +22,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_STORAGE_KEY = "cs4b_cart";
+const CART_STORAGE_KEY = STORAGE_KEYS.cart;
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [servicios, setServicios] = useState<CartItem[]>([]);

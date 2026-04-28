@@ -10,7 +10,7 @@ import {
   Shield,
   Settings
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/composables";
 
 interface NavItem {
   href: string;
