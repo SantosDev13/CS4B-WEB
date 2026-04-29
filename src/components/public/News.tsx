@@ -12,7 +12,7 @@ interface Post {
   contenido: string;
   excerpt: string | null;
   imagen_destacada: string | null;
-  categoria_id: string | null;
+  categoria_post_id: string | null;
   categoria?: {
     nombre: string;
     slug: string;
@@ -54,13 +54,23 @@ export default function News() {
   const fetchPosts = async () => {
     try {
       const res = await fetch("/api/posts?published=true&limit=3");
-      const data = await res.json();
+      const json = await res.json();
       
-      if (data.posts) {
-        setPosts(data.posts);
-      } else if (Array.isArray(data)) {
-        setPosts(data);
+      // La API devuelve { success: true, data: [...], total, limit, offset }
+      let postsList = [];
+      if (Array.isArray(json.data)) {
+        postsList = json.data;
+      } else if (Array.isArray(json)) {
+        postsList = json;
       }
+      
+      // Transformar categoriaPost -> categoria
+      const posts = postsList.map((post: any) => ({
+        ...post,
+        categoria: post.categoriaPost || null,
+      }));
+      
+      setPosts(posts);
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
