@@ -26,7 +26,7 @@ interface Post {
   contenido: string;
   excerpt: string | null;
   imagen_destacada: string | null;
-  categoria_id: string | null;
+  categoria_post_id: string | null;
   autor_id: string | null;
   etiquetas: string[];
   vistas: number;
@@ -67,7 +67,7 @@ export default function AdminPostsPage() {
     contenido: "",
     excerpt: "",
     imagen_destacada: "",
-    categoria_id: "",
+    categoria_post_id: "",
     etiquetas: "",
     publicado: false,
     fecha_publicacion: "",
@@ -89,7 +89,13 @@ export default function AdminPostsPage() {
       const postsData = await postsRes.json();
       const catsData = await catsRes.json();
       
-      setPosts(Array.isArray(postsData.data) ? postsData.data : []);
+      // Transformar categoriaPost -> categoria para consistencia con el frontend
+      const posts = (postsData.data || []).map((post: any) => ({
+        ...post,
+        categoria: post.categoriaPost || null,
+      }));
+      
+      setPosts(posts);
       setCategorias(Array.isArray(catsData.data) ? catsData.data : []);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -126,7 +132,7 @@ export default function AdminPostsPage() {
         contenido: formData.contenido,
         excerpt: formData.excerpt || null,
         imagen_destacada: formData.imagen_destacada || null,
-        categoria_id: formData.categoria_id || null,
+        categoria_post_id: formData.categoria_post_id || null,
         etiquetas: etiquetasArray,
         publicado: formData.publicado,
         fecha_publicacion: formData.publicado ? (formData.fecha_publicacion || new Date().toISOString()) : null,
@@ -165,7 +171,7 @@ export default function AdminPostsPage() {
       contenido: post.contenido,
       excerpt: post.excerpt || "",
       imagen_destacada: post.imagen_destacada || "",
-      categoria_id: post.categoria_id || "",
+      categoria_post_id: post.categoria_post_id || "",
       etiquetas: post.etiquetas?.join(", ") || "",
       publicado: post.publicado,
       fecha_publicacion: post.fecha_publicacion?.split("T")[0] || "",
@@ -211,7 +217,7 @@ export default function AdminPostsPage() {
       contenido: "",
       excerpt: "",
       imagen_destacada: "",
-      categoria_id: "",
+      categoria_post_id: "",
       etiquetas: "",
       publicado: false,
       fecha_publicacion: "",
@@ -437,8 +443,8 @@ export default function AdminPostsPage() {
                       Categoría
                     </label>
                     <select
-                      value={formData.categoria_id}
-                      onChange={(e) => setFormData({ ...formData, categoria_id: e.target.value })}
+                      value={formData.categoria_post_id}
+                      onChange={(e) => setFormData({ ...formData, categoria_post_id: e.target.value })}
                       className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
                     >
                       <option value="">Sin categoría</option>

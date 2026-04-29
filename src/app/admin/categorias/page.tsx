@@ -64,8 +64,16 @@ export default function AdminCategoriasPage() {
       const res = await fetch("/api/categorias_posts", {
         credentials: "include",
       });
-      const data = await res.json();
-      setCategorias(Array.isArray(data.data) ? data.data : []);
+      const json = await res.json();
+      
+      let cats = [];
+      if (Array.isArray(json.data)) {
+        cats = json.data;
+      } else if (Array.isArray(json)) {
+        cats = json;
+      }
+      
+      setCategorias(cats);
     } catch (err) {
       console.error("Error fetching categorias:", err);
     } finally {

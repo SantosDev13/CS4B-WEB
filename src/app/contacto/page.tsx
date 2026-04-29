@@ -468,7 +468,7 @@ export default function ContactoPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-primary mb-1">Teléfono</h3>
-                      <p className="text-text-secondary">+51 999 999 999</p>
+                      <p className="text-text-secondary">+51 988 227 755</p>
                     </div>
                   </div>
 
@@ -507,7 +507,7 @@ export default function ContactoPage() {
                   </div>
                 </div>
                 <a
-                  href="https://wa.me/51999999999"
+                  href="https://wa.me/51988227755"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center w-full bg-[#25D366] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#20BD5A] transition-colors"

@@ -55,7 +55,7 @@ export default function AdminContactosPage() {
   const fetchContactos = useCallback(async (search: string = "", status: string = "todos") => {
     setLoading(true);
     try {
-      // Build query params
+      // Construir parámetros de consulta
       const params = new URLSearchParams();
       if (search) params.set("search", search);
       if (status !== "todos") params.set("status", status);
@@ -78,7 +78,7 @@ export default function AdminContactosPage() {
     }
   }, []);
 
-  // Fetch when filters change (debounced)
+  // Obtener datos cuando cambian los filtros (con debounce)
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchContactos(searchTerm, filterStatus);

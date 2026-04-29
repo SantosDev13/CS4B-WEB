@@ -20,7 +20,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, mounted } = useAuth();
 
   // Efecto para scroll
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function Navbar() {
             {/* Carrito de consultas */}
             <NavbarCart />
             
-            {isAuthenticated ? (
+            {mounted && isAuthenticated ? (
               <Link
                 href="/admin"
                 className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg hover:bg-accent/90 transition-all hover:scale-105 flex items-center gap-2"
@@ -215,7 +215,7 @@ export default function Navbar() {
                   <NavbarCart />
                 </div>
 
-                {isAuthenticated ? (
+                {mounted && isAuthenticated ? (
                   <Link
                     href="/admin"
                     className="text-sm font-semibold text-primary bg-accent px-5 py-2.5 rounded-lg text-center mt-2"
