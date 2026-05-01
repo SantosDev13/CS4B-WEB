@@ -49,18 +49,15 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+{/* Logo */}
+          <Link href="/" className="flex items-center">
             <Image
-              src="/logo_cs4b.png"
+              src="/logo sin fondo.png"
               alt="CS4B Logo"
-              width={40}
-              height={40}
-              className="rounded-lg"
+              width={180}
+              height={80}
+              className="h-auto w-auto"
             />
-            <span className="text-2xl font-bold tracking-tight text-white">
-              CS<span className="text-accent">4</span>B
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
