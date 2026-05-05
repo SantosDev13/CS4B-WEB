@@ -84,3 +84,4 @@ docs/
 ehthumbs.db
 Thumbs.db
 /src/generated/prisma
+.env
