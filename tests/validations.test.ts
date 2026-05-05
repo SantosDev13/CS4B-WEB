@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { loginSchema, contactoSchema, categoriaPostSchema, postSchema, servicioSchema } from '@/lib/validations';
+import { loginSchema, contactoSchema, categoriaPostSchema, postSchema, productoSchema } from '@/lib/validations';
 
 describe('loginSchema', () => {
   it('should validate correct login data', () => {
@@ -107,31 +107,31 @@ describe('postSchema', () => {
   });
 });
 
-describe('servicioSchema', () => {
-  it('should validate correct servicio', () => {
-    const result = servicioSchema.safeParse({
+describe('productoSchema', () => {
+  it('should validate correct producto', () => {
+    const result = productoSchema.safeParse({
       titulo: 'Desarrollo Web',
       slug: 'desarrollo-web',
-      descripcion: 'Servicio de desarrollo web profesional con las últimas tecnologías.',
+      descripcion: 'Producto de desarrollo web profesional con las últimas tecnologías.',
     });
     expect(result.success).toBe(true);
   });
 
   it('should reject invalid tamanho', () => {
-    const result = servicioSchema.safeParse({
+    const result = productoSchema.safeParse({
       titulo: 'Test',
       slug: 'test',
-      descripcion: 'Descripción completa del servicio'.repeat(2),
+      descripcion: 'Descripción completa del producto'.repeat(2),
       tamanho: 'invalid',
     });
     expect(result.success).toBe(false);
   });
 
   it('should accept valid tamanho values', () => {
-    const result = servicioSchema.safeParse({
+    const result = productoSchema.safeParse({
       titulo: 'Test',
       slug: 'test',
-      descripcion: 'Descripción completa del servicio'.repeat(2),
+      descripcion: 'Descripción completa del producto'.repeat(2),
       tamanho: 'small',
     });
     expect(result.success).toBe(true);

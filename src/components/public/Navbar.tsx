@@ -86,16 +86,16 @@ export default function Navbar() {
               );
             })}
             
-            {/* Botón Servicios - simple link a página de servicios */}
+            {/* Botón Productos - simple link a página de productos */}
             <Link
-              href="/servicios"
+              href="/productos"
               className="relative text-sm font-medium transition-colors duration-200 group"
             >
-              <span className={pathname === "/servicios" || pathname?.startsWith("/servicios") ? "text-white" : "text-white/70 hover:text-white"}>
-                Servicios
+              <span className={pathname === "/productos" || pathname?.startsWith("/productos") ? "text-white" : "text-white/70 hover:text-white"}>
+                Productos
               </span>
               <span className={`absolute left-0 -bottom-1 h-0.5 bg-accent transition-all duration-300 ${
-                pathname === "/servicios" || pathname?.startsWith("/servicios") ? "w-full" : "w-0 group-hover:w-full"
+                pathname === "/productos" || pathname?.startsWith("/productos") ? "w-full" : "w-0 group-hover:w-full"
               }`} />
             </Link>
             

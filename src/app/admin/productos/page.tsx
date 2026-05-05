@@ -24,25 +24,25 @@ import {
 import { useAuth } from "@/composables";
 import { slugify } from "@/lib/utils";
 
-interface Categoria_servicio {
+interface Categoria_producto {
   id: string;
   nombre: string;
   slug: string;
 }
 
-interface Servicio {
+interface Producto {
   id: string;
   titulo: string;
   slug: string;
   descripcion: string;
   icono: string | null;
   imagen: string | null;
-  categoria_servicio_id: string | null;
+  categoria_producto_id: string | null;
   tamanho: 'small' | 'medium' | 'large';
   orden: number;
   visible: boolean;
   created_at: string;
-  categoria_servicio?: Categoria_servicio;
+  categoria_producto?: Categoria_producto;
 }
 
 const ICONOS = [
@@ -62,21 +62,21 @@ const TAMANOS = [
   { value: 'large', label: 'Grande (2x2)' },
 ];
 
-export default function AdminServiciosPage() {
+export default function AdminProductosPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const [servicios, setServicios] = useState<Servicio[]>([]);
-  const [categorias, setCategorias] = useState<Categoria_servicio[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [categorias, setCategorias] = useState<Categoria_producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [editingServicio, setEditingServicio] = useState<Servicio | null>(null);
+  const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
   const [formData, setFormData] = useState({
     titulo: "",
     slug: "",
     descripcion: "",
     icon: "FileKey",
     imagen: "",
-    categoria_servicio_id: "",
+    categoria_producto_id: "",
     tamanho: "medium",
     orden: 0,
     visible: true,
@@ -90,22 +90,22 @@ export default function AdminServiciosPage() {
 
   const fetchData = async () => {
     try {
-      const [servRes, catRes] = await Promise.all([
-        fetch("/api/servicios?published=false", { 
+      const [prodRes, catRes] = await Promise.all([
+        fetch("/api/productos?published=false", { 
           credentials: "include" 
         }),
-        fetch("/api/categorias-servicios?published=false", { 
+        fetch("/api/categorias-productos?published=false", { 
           credentials: "include" 
         }),
       ]);
-      const servData = await servRes.json();
+      const prodData = await prodRes.json();
       const catData = await catRes.json();
       
-      setServicios(Array.isArray(servData.data) ? servData.data : []);
+      setProductos(Array.isArray(prodData.data) ? prodData.data : []);
       setCategorias(Array.isArray(catData.data) ? catData.data : []);
     } catch (err) {
-      console.error("Error fetching servicios:", err);
-      setServicios([]);
+      console.error("Error fetching productos:", err);
+      setProductos([]);
       setCategorias([]);
     } finally {
       setLoading(false);
@@ -118,13 +118,13 @@ export default function AdminServiciosPage() {
     setError("");
 
     try {
-      const url = editingServicio 
-        ? `/api/servicios/${editingServicio.id}`
-        : "/api/servicios";
+      const url = editingProducto 
+        ? `/api/productos/${editingProducto.id}`
+        : "/api/productos";
       
-      const method = editingServicio ? "PUT" : "POST";
+      const method = editingProducto ? "PUT" : "POST";
 
-      const selectedCat = categorias.find(c => c.id === formData.categoria_servicio_id);
+      const selectedCat = categorias.find(c => c.id === formData.categoria_producto_id);
       
       const body = {
         titulo: formData.titulo,
@@ -132,7 +132,7 @@ export default function AdminServiciosPage() {
         descripcion: formData.descripcion,
         icono: formData.icon,
         imagen: formData.imagen || null,
-        categoria_servicio_id: formData.categoria_servicio_id || null,
+        categoria_producto_id: formData.categoria_producto_id || null,
         categoria: selectedCat?.nombre || null,
         tamanho: formData.tamanho,
         orden: parseInt(String(formData.orden)) || 0,
@@ -154,7 +154,7 @@ export default function AdminServiciosPage() {
       }
 
       setShowModal(false);
-      setEditingServicio(null);
+      setEditingProducto(null);
       resetForm();
       fetchData();
     } catch (err) {
@@ -164,27 +164,27 @@ export default function AdminServiciosPage() {
     }
   };
 
-  const handleEdit = (servicio: Servicio) => {
-    setEditingServicio(servicio);
+  const handleEdit = (producto: Producto) => {
+    setEditingProducto(producto);
     setFormData({
-      titulo: servicio.titulo,
-      slug: servicio.slug,
-      descripcion: servicio.descripcion,
-      icon: servicio.icono || "FileKey",
-      imagen: servicio.imagen || "",
-      categoria_servicio_id: servicio.categoria_servicio_id || "",
-      tamanho: servicio.tamanho,
-      orden: servicio.orden,
-      visible: servicio.visible,
+      titulo: producto.titulo,
+      slug: producto.slug,
+      descripcion: producto.descripcion,
+      icon: producto.icono || "FileKey",
+      imagen: producto.imagen || "",
+      categoria_producto_id: producto.categoria_producto_id || "",
+      tamanho: producto.tamanho,
+      orden: producto.orden,
+      visible: producto.visible,
     });
     setShowModal(true);
   };
 
-  const handleDelete = async (servicio: Servicio) => {
-    if (!confirm(`¿Estás seguro de eliminar "${servicio.titulo}"?`)) return;
+  const handleDelete = async (producto: Producto) => {
+    if (!confirm(`¿Estás seguro de eliminar "${producto.titulo}"?`)) return;
 
     try {
-      const res = await fetch(`/api/servicios/${servicio.id}`, {
+      const res = await fetch(`/api/productos/${producto.id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -193,16 +193,16 @@ export default function AdminServiciosPage() {
         fetchData();
       }
     } catch (err) {
-      console.error("Error deleting servicio:", err);
+      console.error("Error deleting producto:", err);
     }
   };
 
-  const handleToggleVisibility = async (servicio: Servicio) => {
+  const handleToggleVisibility = async (producto: Producto) => {
     try {
-      await fetch(`/api/servicios/${servicio.id}`, {
+      await fetch(`/api/productos/${producto.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visible: !servicio.visible }),
+        body: JSON.stringify({ visible: !producto.visible }),
         credentials: "include",
       });
       fetchData();
@@ -218,7 +218,7 @@ export default function AdminServiciosPage() {
       descripcion: "",
       icon: "FileKey",
       imagen: "",
-      categoria_servicio_id: "",
+      categoria_producto_id: "",
       tamanho: "medium",
       orden: 0,
       visible: true,
@@ -229,11 +229,11 @@ export default function AdminServiciosPage() {
     setFormData({
       ...formData,
       titulo,
-      slug: editingServicio ? formData.slug : slugify(titulo),
+      slug: editingProducto ? formData.slug : slugify(titulo),
     });
   };
 
-  const filteredServicios = servicios.filter((s) =>
+  const filteredProductos = productos.filter((s) =>
     s.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -255,19 +255,19 @@ export default function AdminServiciosPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Servicios</h1>
-          <p className="text-slate-400">Gestiona los servicios del sitio</p>
+          <h1 className="text-2xl font-bold text-white">Productos</h1>
+          <p className="text-slate-400">Gestiona los productos del sitio</p>
         </div>
         <button
           onClick={() => {
             resetForm();
-            setEditingServicio(null);
+            setEditingProducto(null);
             setShowModal(true);
           }}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all"
         >
           <Plus className="w-5 h-5" />
-          Nuevo Servicio
+          Nuevo Producto
         </button>
       </div>
 
@@ -276,7 +276,7 @@ export default function AdminServiciosPage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Buscar servicios..."
+          placeholder="Buscar productos..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"
@@ -297,18 +297,18 @@ export default function AdminServiciosPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredServicios.length === 0 ? (
+            {filteredProductos.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-slate-500">
-                  No hay servicios disponibles
+                  No hay productos disponibles
                 </td>
               </tr>
             ) : (
-              filteredServicios.map((servicio) => {
-                const IconComponent = getIcono(servicio.icono || 'LayoutGrid');
+              filteredProductos.map((producto) => {
+                const IconComponent = getIcono(producto.icono || 'LayoutGrid');
                 return (
                   <tr
-                    key={servicio.id}
+                    key={producto.id}
                     className="border-b border-slate-700/30 hover:bg-slate-800/30"
                   >
                     <td className="p-4">
@@ -318,42 +318,42 @@ export default function AdminServiciosPage() {
                     </td>
                     <td className="p-4">
                       <div>
-                        <p className="text-white font-medium">{servicio.titulo}</p>
-                        <p className="text-slate-500 text-sm">{servicio.slug}</p>
+                        <p className="text-white font-medium">{producto.titulo}</p>
+                        <p className="text-slate-500 text-sm">{producto.slug}</p>
                       </div>
                     </td>
                     <td className="p-4">
                       <span className="text-slate-300 capitalize">
-                        {servicio.categoria_servicio?.nombre || 'Sin categoría'}
+                        {producto.categoria_producto?.nombre || 'Sin categoría'}
                       </span>
                     </td>
                     <td className="p-4 text-center">
                       <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-700 text-slate-300 capitalize">
-                        {servicio.tamanho}
+                        {producto.tamanho}
                       </span>
                     </td>
                     <td className="p-4 text-center">
                       <button
-                        onClick={() => handleToggleVisibility(servicio)}
+                        onClick={() => handleToggleVisibility(producto)}
                         className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                          servicio.visible
+                          producto.visible
                             ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
                             : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
                         }`}
                       >
-                        {servicio.visible ? "Visible" : "Oculto"}
+                        {producto.visible ? "Visible" : "Oculto"}
                       </button>
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => handleEdit(servicio)}
+                          onClick={() => handleEdit(producto)}
                           className="p-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors"
                         >
                           <Edit3 className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleDelete(servicio)}
+                          onClick={() => handleDelete(producto)}
                           className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                         >
                           <Trash2 className="w-5 h-5" />
@@ -384,7 +384,7 @@ export default function AdminServiciosPage() {
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">
-                  {editingServicio ? "Editar Servicio" : "Nuevo Servicio"}
+                  {editingProducto ? "Editar Producto" : "Nuevo Producto"}
                 </h2>
                 <button
                   onClick={() => setShowModal(false)}
@@ -411,7 +411,7 @@ export default function AdminServiciosPage() {
                     onChange={(e) => handleTituloChange(e.target.value)}
                     required
                     className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
-                    placeholder="Nombre del servicio"
+                    placeholder="Nombre del producto"
                   />
                 </div>
 
@@ -426,17 +426,17 @@ export default function AdminServiciosPage() {
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                       required
                       className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
-                      placeholder="servicio-slug"
+                      placeholder="producto-slug"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Categoría de Servicio
+                      Categoría de Producto
                     </label>
                     <select
-                      value={formData.categoria_servicio_id}
-                      onChange={(e) => setFormData({ ...formData, categoria_servicio_id: e.target.value })}
+                      value={formData.categoria_producto_id}
+                      onChange={(e) => setFormData({ ...formData, categoria_producto_id: e.target.value })}
                       className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
                     >
                       <option value="">Sin categoría</option>
@@ -508,7 +508,7 @@ export default function AdminServiciosPage() {
                     required
                     rows={3}
                     className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50 resize-none"
-                    placeholder="Descripción del servicio"
+                    placeholder="Descripción del producto"
                   />
                 </div>
 

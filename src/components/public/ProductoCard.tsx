@@ -4,10 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useCart, type CartItem } from "@/composables";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Check, X, Plus } from "lucide-react";
+import { ShoppingCart, Check, X, Plus } from "lucide-react";
 
-interface ServicioCardProps {
-  servicio: {
+interface ProductoCardProps {
+  producto: {
     id: string;
     titulo: string;
     slug: string;
@@ -22,29 +22,29 @@ interface ServicioCardProps {
   categoriaNombre?: string;
 }
 
-export default function ServicioCard({ servicio, categoriaNombre }: ServicioCardProps) {
+export default function ProductoCard({ producto, categoriaNombre }: ProductoCardProps) {
   const { addToCart, removeFromCart, isInCart } = useCart();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const inCart = isInCart(servicio.id);
+  const inCart = isInCart(producto.id);
 
   const handleCartClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (inCart) {
-      removeFromCart(servicio.id);
-      setToastMessage("Eliminado del formulario");
+      removeFromCart(producto.id);
+      setToastMessage("Eliminado del carrito");
     } else {
       const item: CartItem = {
-        id: servicio.id,
-        titulo: servicio.titulo,
-        slug: servicio.slug,
-        categoria: servicio.categoria_nombre || categoriaNombre,
-        categoriaSlug: servicio.categoria_slug,
+        id: producto.id,
+        titulo: producto.titulo,
+        slug: producto.slug,
+        categoria: producto.categoria_nombre || categoriaNombre,
+        categoriaSlug: producto.categoria_slug,
       };
       addToCart(item);
-      setToastMessage("Agregado al formulario");
+      setToastMessage("Agregado al carrito");
     }
 
     setShowToast(true);
@@ -54,21 +54,21 @@ export default function ServicioCard({ servicio, categoriaNombre }: ServicioCard
   return (
     <>
       <Link
-        href={`/servicios/${servicio.slug}`}
+        href={`/productos/${producto.slug}`}
         className="group bg-white rounded-xl border hover:shadow-lg transition-all duration-300 overflow-hidden relative"
       >
-        {/* Imagen del servicio */}
+        {/* Imagen del producto */}
         <div className="aspect-[16/10] bg-gradient-to-br from-primary to-primary-light relative overflow-hidden">
-          {servicio.imagen ? (
+          {producto.imagen ? (
             <img
-              src={servicio.imagen}
-              alt={servicio.titulo}
+              src={producto.imagen}
+              alt={producto.titulo}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <span className="text-white/30 text-5xl font-bold">
-                {servicio.titulo.charAt(0)}
+                {producto.titulo.charAt(0)}
               </span>
             </div>
           )}
@@ -96,16 +96,16 @@ export default function ServicioCard({ servicio, categoriaNombre }: ServicioCard
         {/* Contenido del card */}
         <div className="p-4">
           <h3 className="font-semibold text-primary mb-2 group-hover:text-secondary transition-colors line-clamp-1">
-            {servicio.titulo}
+            {producto.titulo}
           </h3>
           <p className="text-sm text-text-secondary line-clamp-2">
-            {servicio.descripcion_corta || servicio.descripcion?.substring(0, 100) + "..."}
+            {producto.descripcion_corta || producto.descripcion?.substring(0, 100) + "..."}
           </p>
 
           {/* Footer del card */}
           <div className="mt-4 pt-3 border-t flex items-center justify-between">
             <span className="text-xs text-text-muted">
-              {servicio.categoria_nombre || categoriaNombre || "Servicio"}
+              {producto.categoria_nombre || categoriaNombre || "Producto"}
             </span>
             <span className="text-xs text-secondary font-medium">
               Ver más →
@@ -126,7 +126,7 @@ export default function ServicioCard({ servicio, categoriaNombre }: ServicioCard
             {inCart ? (
               <Check className="w-5 h-5 text-green-400" />
             ) : (
-              <MessageSquare className="w-5 h-5 text-green-400" />
+              <ShoppingCart className="w-5 h-5 text-green-400" />
             )}
             <span className="text-sm font-medium">{toastMessage}</span>
             <button

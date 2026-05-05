@@ -11,14 +11,13 @@ import {
   EyeOff,
   X,
   Save,
-  ExternalLink,
   Image,
   Link
 } from "lucide-react";
 import { useAuth } from "@/composables";
 import { slugify } from "@/lib/utils";
 
-interface Categoria_servicio {
+interface Categoria_producto {
   id: string;
   nombre: string;
   slug: string;
@@ -30,19 +29,18 @@ interface Categoria_servicio {
   created_at: string;
 }
 
-export default function AdminCategoriasServiciosPage() {
+export default function AdminCategoriasProductosPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const [categorias, setCategorias] = useState<Categoria_servicio[]>([]);
+  const [categorias, setCategorias] = useState<Categoria_producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [editingCategoria, setEditingCategoria] = useState<Categoria_servicio | null>(null);
+  const [editingCategoria, setEditingCategoria] = useState<Categoria_producto | null>(null);
   const [formData, setFormData] = useState({
     nombre: "",
     slug: "",
     descripcion: "",
     imagen: "",
-    link: "",
     orden: 0,
     visible: true,
   });
@@ -55,7 +53,7 @@ export default function AdminCategoriasServiciosPage() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/categorias-servicios?published=false", { 
+      const res = await fetch("/api/categorias-productos?published=false", { 
         credentials: "include" 
       });
       const data = await res.json();
@@ -81,8 +79,8 @@ export default function AdminCategoriasServiciosPage() {
 
     try {
       const url = editingCategoria 
-        ? `/api/categorias-servicios/${editingCategoria.id}`
-        : "/api/categorias-servicios";
+        ? `/api/categorias-productos/${editingCategoria.id}`
+        : "/api/categorias-productos";
       
       const method = editingCategoria ? "PUT" : "POST";
 
@@ -91,7 +89,6 @@ export default function AdminCategoriasServiciosPage() {
         slug: formData.slug,
         descripcion: formData.descripcion || null,
         imagen: formData.imagen || null,
-        link: formData.link || null,
         orden: parseInt(String(formData.orden)) || 0,
         visible: formData.visible,
       };
@@ -121,25 +118,24 @@ export default function AdminCategoriasServiciosPage() {
     }
   };
 
-  const handleEdit = (categoria: Categoria_servicio) => {
+  const handleEdit = (categoria: Categoria_producto) => {
     setEditingCategoria(categoria);
     setFormData({
       nombre: categoria.nombre,
       slug: categoria.slug,
       descripcion: categoria.descripcion || "",
       imagen: categoria.imagen || "",
-      link: categoria.link || "",
       orden: categoria.orden,
       visible: categoria.visible,
     });
     setShowModal(true);
   };
 
-  const handleDelete = async (categoria: Categoria_servicio) => {
+  const handleDelete = async (categoria: Categoria_producto) => {
     if (!confirm(`¿Estás seguro de eliminar "${categoria.nombre}"?`)) return;
 
     try {
-      const res = await fetch(`/api/categorias-servicios/${categoria.id}`, {
+      const res = await fetch(`/api/categorias-productos/${categoria.id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -152,9 +148,9 @@ export default function AdminCategoriasServiciosPage() {
     }
   };
 
-  const handleToggleVisibility = async (categoria: Categoria_servicio) => {
+  const handleToggleVisibility = async (categoria: Categoria_producto) => {
     try {
-      await fetch(`/api/categorias-servicios/${categoria.id}`, {
+      await fetch(`/api/categorias-productos/${categoria.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ visible: !categoria.visible }),
@@ -172,7 +168,6 @@ export default function AdminCategoriasServiciosPage() {
       slug: "",
       descripcion: "",
       imagen: "",
-      link: "",
       orden: 0,
       visible: true,
     });
@@ -294,16 +289,6 @@ export default function AdminCategoriasServiciosPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-2">
-                      {categoria.link && (
-                        <a
-                          href={categoria.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors"
-                        >
-                          <ExternalLink className="w-5 h-5" />
-                        </a>
-                      )}
                       <button
                         onClick={() => handleEdit(categoria)}
                         className="p-2 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors"
@@ -415,19 +400,6 @@ export default function AdminCategoriasServiciosPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Link (URL)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.link}
-                      onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
-                      placeholder="/servicios#categoria"
-                    />
-                  </div>
-
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
                       Orden

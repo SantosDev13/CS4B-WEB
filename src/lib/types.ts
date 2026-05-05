@@ -87,15 +87,15 @@ export interface PostUpdateInput {
 }
 
 // --------------------------------------------
-// SERVICIO
+// PRODUCTO
 // --------------------------------------------
-export interface CategoriaServicioBasic {
+export interface CategoriaProductoBasic {
   id: string;
   nombre: string;
   slug: string;
 }
 
-export interface ServicioWithRelations {
+export interface ProductoWithRelations {
   id: string;
   titulo: string;
   slug: string;
@@ -108,20 +108,20 @@ export interface ServicioWithRelations {
   visible: boolean;
   created_at: string;
   updated_at: string;
-  categoria_servicio_id: string | null;
+  categoria_producto_id: string | null;
   categoria_nombre?: string;
   categoria_slug?: string;
-  categoria: CategoriaServicioBasic | null;
+  categoria: CategoriaProductoBasic | null;
 }
 
-export interface ServicioCreateInput {
+export interface ProductoCreateInput {
   titulo: string;
   slug: string;
   descripcion: string;
   descripcion_corta?: string;
   icono?: string;
   imagen?: string;
-  categoria_servicio_id?: string;
+  categoria_producto_id?: string;
   tamanho?: 'small' | 'medium' | 'large';
   orden?: number;
   visible?: boolean;
@@ -152,9 +152,9 @@ export interface ContactoUpdateInput {
 }
 
 // --------------------------------------------
-// CATEGORÍA SERVICIO
+// CATEGORÍA PRODUCTO
 // --------------------------------------------
-export interface Categoria_servicio {
+export interface Categoria_producto {
   id: string;
   nombre: string;
   slug: string;

@@ -20,10 +20,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { href: "/admin", label: "Panel de Administración", icon: <LayoutDashboard className="w-4 h-4" /> },
-  { href: "/admin/servicios", label: "Servicios", icon: <Package className="w-4 h-4" /> },
+  { href: "/admin/productos", label: "Productos", icon: <Package className="w-4 h-4" /> },
   { href: "/admin/posts", label: "Publicaciones", icon: <FileText className="w-4 h-4" /> },
   { href: "/admin/contactos", label: "Contactos", icon: <MessageSquare className="w-4 h-4" /> },
-  { href: "/admin/categorias", label: "Categorías", icon: <Shield className="w-4 h-4" /> },
+  { href: "/admin/categorias-productos", label: "Categorías Productos", icon: <Shield className="w-4 h-4" /> },
   { href: "/admin/configuracion", label: "Configuración", icon: <Settings className="w-4 h-4" /> },
 ];
 

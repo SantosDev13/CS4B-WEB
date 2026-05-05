@@ -7,8 +7,8 @@ import { useCart, type CartItem } from "@/composables";
 import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle, MessageSquare, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface ServicioDetailProps {
-  servicio: {
+interface ProductoDetailProps {
+  producto: {
     id: string;
     titulo: string;
     slug: string;
@@ -17,48 +17,48 @@ interface ServicioDetailProps {
     icono?: string | null;
     imagen?: string | null;
     categoria?: string | null;
-    categoria_servicio_id?: string | null;
+    categoria_producto_id?: string | null;
     visible: boolean;
     categoria_nombre?: string;
     categoria_slug?: string;
     categoria_descripcion?: string;
     categoria_imagen?: string;
   };
-  serviciosRelacionados: { slug: string; titulo: string }[];
+  productosRelacionados: { slug: string; titulo: string }[];
 }
 
-export default function ServicioDetail({ servicio, serviciosRelacionados }: ServicioDetailProps) {
+export default function ProductoDetail({ producto, productosRelacionados }: ProductoDetailProps) {
   const [currentImage, setCurrentImage] = useState(0);
   const { addToCart, removeFromCart, isInCart } = useCart();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   
-  const inCart = isInCart(servicio.id);
+  const inCart = isInCart(producto.id);
   
-  // Imágenes del servicio (puede ser una o varias)
-  const images = servicio.imagen 
-    ? [servicio.imagen] 
+  // Imágenes del producto (puede ser una o varias)
+  const images = producto.imagen 
+    ? [producto.imagen] 
     : ["https://images.unsplash.com/photo-1633419461186-7d40a38105ec?w=800&q=80"];
 
   const nextImage = () => setCurrentImage((prev) => (prev + 1) % images.length);
   const prevImage = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
 
   const handleWhatsApp = () => {
-    const message = `Hola! Estoy interesado en el servicio: ${servicio.titulo}`;
+    const message = `Hola! Estoy interesado en el producto: ${producto.titulo}`;
     window.open(`https://wa.me/51999999999?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleCartClick = () => {
     if (inCart) {
-      removeFromCart(servicio.id);
+      removeFromCart(producto.id);
       setToastMessage("Eliminado del carrito");
     } else {
       const item: CartItem = {
-        id: servicio.id,
-        titulo: servicio.titulo,
-        slug: servicio.slug,
-        categoria: servicio.categoria_nombre,
-        categoriaSlug: servicio.categoria_slug,
+        id: producto.id,
+        titulo: producto.titulo,
+        slug: producto.slug,
+        categoria: producto.categoria_nombre,
+        categoriaSlug: producto.categoria_slug,
       };
       addToCart(item);
       setToastMessage("Agregado al carrito");
@@ -70,20 +70,20 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
   return (
     <div className="min-h-screen bg-bg-light">
       {/* Header con info de la categoría - más alto y por detrás del navbar */}
-      {servicio.categoria_nombre && (
+      {producto.categoria_nombre && (
         <section className="relative bg-primary overflow-hidden -mt-14 pt-14">
           {/* Imagen de fondo de la categoría - usar la de la categoría */}
           <div className="absolute inset-0">
-            {servicio.categoria_imagen ? (
+            {producto.categoria_imagen ? (
               <img 
-                src={servicio.categoria_imagen}
-                alt={servicio.categoria_nombre}
+                src={producto.categoria_imagen}
+                alt={producto.categoria_nombre}
                 className="w-full h-full object-cover"
               />
             ) : (
               <img 
                 src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80" 
-                alt={servicio.categoria_nombre}
+                alt={producto.categoria_nombre}
                 className="w-full h-full object-cover"
               />
             )}
@@ -94,34 +94,34 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
           <div className="container-custom relative z-10 py-24 md:py-32">
             {/* Título de la categoría */}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">
-              {servicio.categoria_nombre}
+              {producto.categoria_nombre}
             </h1>
             
             {/* Descripción de la categoría - usar la real de la tabla o fallback */}
             <p className="text-white/70 text-lg max-w-2xl">
-              {servicio.categoria_descripcion || `Explora nuestra categoría de ${servicio.categoria_nombre?.toLowerCase()} y encuentra la solución perfecta para tu empresa.`}
+              {producto.categoria_descripcion || `Explora nuestra categoría de ${producto.categoria_nombre?.toLowerCase()} y encuentra la solución perfecta para tu empresa.`}
             </p>
           </div>
         </section>
       )}
 
       {/* Breadcrumb - siempre debajo del header */}
-      <div className={`bg-white border-b ${servicio.categoria_nombre ? '' : 'pt-14'}`}>
+      <div className={`bg-white border-b ${producto.categoria_nombre ? '' : 'pt-14'}`}>
         <div className="container-custom py-3">
           <nav className="flex items-center gap-2 text-sm text-text-muted">
             <Link href="/" className="hover:text-primary">Inicio</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/servicios" className="hover:text-primary">Servicios</Link>
-            {servicio.categoria_nombre && (
+            <Link href="/productos" className="hover:text-primary">Productos</Link>
+            {producto.categoria_nombre && (
               <>
                 <ChevronRight className="w-4 h-4" />
-                <Link href={`/servicios#cat-${servicio.categoria_slug}`} className="hover:text-primary">
-                  {servicio.categoria_nombre}
+                <Link href={`/productos#cat-${producto.categoria_slug}`} className="hover:text-primary">
+                  {producto.categoria_nombre}
                 </Link>
               </>
             )}
             <ChevronRight className="w-4 h-4" />
-            <span className="text-text-secondary truncate max-w-[200px]">{servicio.titulo}</span>
+            <span className="text-text-secondary truncate max-w-[200px]">{producto.titulo}</span>
           </nav>
         </div>
       </div>
@@ -138,7 +138,7 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
                   <motion.img
                     key={currentImage}
                     src={images[currentImage]}
-                    alt={servicio.titulo}
+                    alt={producto.titulo}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -196,7 +196,7 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
                 Descripción
               </h2>
               <div className="text-text-secondary leading-relaxed whitespace-pre-line">
-                {servicio.descripcion}
+                {producto.descripcion}
               </div>
             </div>
           </div>
@@ -205,23 +205,23 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl border p-6 sticky top-24">
               {/* Category badge */}
-              {servicio.categoria_nombre && (
+              {producto.categoria_nombre && (
                 <div className="mb-3">
                   <span className="inline-block bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">
-                    {servicio.categoria_nombre}
+                    {producto.categoria_nombre}
                   </span>
                 </div>
               )}
 
               {/* Title */}
               <h1 className="text-2xl font-bold text-primary mb-4">
-                {servicio.titulo}
+                {producto.titulo}
               </h1>
 
               {/* Short description */}
-              {servicio.descripcion_corta && (
+              {producto.descripcion_corta && (
                 <p className="text-text-secondary mb-6">
-                  {servicio.descripcion_corta}
+                  {producto.descripcion_corta}
                 </p>
               )}
 
@@ -232,13 +232,13 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
                   Incluye
                 </h3>
                 <ul className="space-y-2">
-                  {servicio.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).slice(0, 5).map((feature, i) => (
+                  {producto.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).slice(0, 5).map((feature, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
                       <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                       <span>{feature.replace(/^[•\-]\s*/, '')}</span>
                     </li>
                   ))}
-                  {servicio.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).length === 0 && (
+                  {producto.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).length === 0 && (
                     <>
                       <li className="flex items-start gap-2 text-sm text-text-secondary">
                         <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -298,18 +298,18 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
               </div>
             </div>
 
-            {/* Related Services */}
-            {serviciosRelacionados.length > 0 && (
+            {/* Related Products */}
+            {productosRelacionados.length > 0 && (
               <div className="bg-white rounded-xl border p-4 mt-4">
-                <h3 className="font-semibold text-primary mb-3">Otros servicios</h3>
+                <h3 className="font-semibold text-primary mb-3">Otros productos</h3>
                 <div className="space-y-2">
-                  {serviciosRelacionados.map((srv) => (
+                  {productosRelacionados.map((prod) => (
                     <Link
-                      key={srv.slug}
-                      href={`/servicios/${srv.slug}`}
+                      key={prod.slug}
+                      href={`/productos/${prod.slug}`}
                       className="block p-3 border rounded-lg hover:border-secondary hover:bg-secondary/5 transition-colors"
                     >
-                      <span className="text-sm text-primary">{srv.titulo}</span>
+                      <span className="text-sm text-primary">{prod.titulo}</span>
                     </Link>
                   ))}
                 </div>
@@ -318,11 +318,11 @@ export default function ServicioDetail({ servicio, serviciosRelacionados }: Serv
 
             {/* Back to list */}
             <Link 
-              href="/servicios"
+              href="/productos"
               className="flex items-center gap-2 text-text-muted hover:text-primary mt-4 p-3"
             >
               <ChevronLeft className="w-4 h-4" />
-              <span className="text-sm">Volver a servicios</span>
+              <span className="text-sm">Volver a productos</span>
             </Link>
           </div>
         </div>

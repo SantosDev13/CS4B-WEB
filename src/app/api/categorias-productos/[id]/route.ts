@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
-import { categoriaServicioUpdateSchema } from '@/lib/validations';
+import { categoriaProductoUpdateSchema } from '@/lib/validations';
 
-// GET - Obtener categoría de servicio por ID o slug
+// GET - Obtener categoría de producto por ID o slug
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -12,23 +12,23 @@ export async function GET(
     const { id } = await params;
 
     // Buscar por ID o slug
-    let categoria = await prisma.categoria_servicio.findUnique({ where: { id } });
+    let categoria = await prisma.categoria_producto.findUnique({ where: { id } });
     if (!categoria) {
-      categoria = await prisma.categoria_servicio.findUnique({ where: { slug: id } });
+      categoria = await prisma.categoria_producto.findUnique({ where: { slug: id } });
     }
 
     if (!categoria) {
-      return NextResponse.json({ error: 'Categoría de servicio no encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Categoría de producto no encontrada' }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, data: categoria });
   } catch (error) {
-    console.error('Error fetching categoria_servicio:', error);
-    return NextResponse.json({ error: 'Error al obtener categoría de servicio' }, { status: 500 });
+    console.error('Error fetching categoria_producto:', error);
+    return NextResponse.json({ error: 'Error al obtener categoría de producto' }, { status: 500 });
   }
 }
 
-// PUT - Actualizar categoría de servicio (solo admin)
+// PUT - Actualizar categoría de producto (solo admin)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -43,26 +43,26 @@ export async function PUT(
     const body = await request.json();
 
     // Validar con Zod
-    const result = categoriaServicioUpdateSchema.safeParse(body);
+    const result = categoriaProductoUpdateSchema.safeParse(body);
 
     if (!result.success) {
       const errores = result.error.errors.map(e => e.message).join(', ');
       return NextResponse.json({ error: errores }, { status: 400 });
     }
 
-    const categoria = await prisma.categoria_servicio.update({
+    const categoria = await prisma.categoria_producto.update({
       where: { id },
       data: result.data,
     });
 
     return NextResponse.json({ success: true, data: categoria });
   } catch (error) {
-    console.error('Error updating categoria_servicio:', error);
-    return NextResponse.json({ error: 'Error al actualizar categoría de servicio' }, { status: 500 });
+    console.error('Error updating categoria_producto:', error);
+    return NextResponse.json({ error: 'Error al actualizar categoría de producto' }, { status: 500 });
   }
 }
 
-// DELETE - Eliminar categoría de servicio (solo admin)
+// DELETE - Eliminar categoría de producto (solo admin)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -74,11 +74,11 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.categoria_servicio.delete({ where: { id } });
+    await prisma.categoria_producto.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting categoria_servicio:', error);
-    return NextResponse.json({ error: 'Error al eliminar categoría de servicio' }, { status: 500 });
+    console.error('Error deleting categoria_producto:', error);
+    return NextResponse.json({ error: 'Error al eliminar categoría de producto' }, { status: 500 });
   }
 }

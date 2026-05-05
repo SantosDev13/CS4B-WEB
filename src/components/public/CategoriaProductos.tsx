@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronRight, Check, Phone, Mail, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-interface CategoriaWithServicios {
+interface CategoriaWithProductos {
   id: string;
   nombre: string;
   slug: string;
@@ -13,7 +13,7 @@ interface CategoriaWithServicios {
   imagen: string | null;
   link: string | null;
   visible: boolean;
-  servicios: {
+  productos: {
     id: string;
     titulo: string;
     slug: string;
@@ -25,17 +25,15 @@ interface CategoriaWithServicios {
   }[];
 }
 
-interface CategoriaServiciosPageProps {
-  categoria: CategoriaWithServicios;
+interface CategoriaProductosPageProps {
+  categoria: CategoriaWithProductos;
 }
 
-export default function CategoriaServiciosPage({ categoria }: CategoriaServiciosPageProps) {
-  const handleWhatsApp = (servicioTitulo?: string) => {
-    const message = servicioTitulo 
-      ? `Hola! Estoy interesa
-
-do en: ${servicioTitulo}`
-      : `Hola! Estoy interesado en los servicios de ${categoria.nombre}`;
+export default function CategoriaProductosPage({ categoria }: CategoriaProductosPageProps) {
+  const handleWhatsApp = (productoTitulo?: string) => {
+    const message = productoTitulo 
+      ? `Hola! Estoy interesados en: ${productoTitulo}`
+      : `Hola! Estoy interesado en los productos de ${categoria.nombre}`;
     window.open(`https://wa.me/51999999999?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -76,49 +74,49 @@ do en: ${servicioTitulo}`
           <nav className="flex items-center gap-2 text-sm text-text-muted">
             <Link href="/" className="hover:text-primary">Inicio</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/servicios" className="hover:text-primary">Servicios</Link>
+            <Link href="/productos" className="hover:text-primary">Productos</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-text-secondary truncate max-w-[200px]">{categoria.nombre}</span>
           </nav>
         </div>
       </div>
 
-      {/* Servicios en Cards Grandes */}
+      {/* Productos en Cards Grandes */}
       <div className="container-custom py-12">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-primary">
-            Explora nuestros servicios de {categoria.nombre}
+            Explora nuestros productos de {categoria.nombre}
           </h2>
           <p className="text-text-secondary mt-2">
-            {categoria.servicios.length} servicio{categoria.servicios.length !== 1 ? 's' : ''} disponible{categoria.servicios.length !== 1 ? 's' : ''}
+            {categoria.productos.length} producto{categoria.productos.length !== 1 ? 's' : ''} disponible{categoria.productos.length !== 1 ? 's' : ''}
           </p>
         </div>
 
-        {categoria.servicios.length > 0 ? (
+        {categoria.productos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {categoria.servicios.map((servicio, index) => (
+            {categoria.productos.map((producto, index) => (
               <motion.div
-                key={servicio.id}
+                key={producto.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
                 <Link
-                  href={`/servicios/${servicio.slug}`}
+                  href={`/productos/${producto.slug}`}
                   className="group block bg-white rounded-xl border hover:shadow-xl transition-all duration-300 overflow-hidden h-full"
                 >
-                  {/* Imagen grande del servicio */}
+                  {/* Imagen grande del producto */}
                   <div className="aspect-[21/9] bg-gradient-to-br from-primary to-primary-light relative overflow-hidden">
-                    {servicio.imagen ? (
+                    {producto.imagen ? (
                       <img
-                        src={servicio.imagen}
-                        alt={servicio.titulo}
+                        src={producto.imagen}
+                        alt={producto.titulo}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <span className="text-white/20 text-7xl font-bold">
-                          {servicio.titulo.charAt(0)}
+                          {producto.titulo.charAt(0)}
                         </span>
                       </div>
                     )}
@@ -133,21 +131,21 @@ do en: ${servicioTitulo}`
                   {/* Contenido del card */}
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-primary mb-3 group-hover:text-secondary transition-colors">
-                      {servicio.titulo}
+                      {producto.titulo}
                     </h3>
                     <p className="text-text-secondary line-clamp-3 mb-4">
-                      {servicio.descripcion_corta || servicio.descripcion?.substring(0, 150) + '...'}
+                      {producto.descripcion_corta || producto.descripcion?.substring(0, 150) + '...'}
                     </p>
                     
-                    {/* Features del servicio */}
+                    {/* Features del producto */}
                     <div className="space-y-2 mb-4">
-                      {servicio.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).slice(0, 3).map((feature, i) => (
+                      {producto.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).slice(0, 3).map((feature, i) => (
                         <div key={i} className="flex items-start gap-2 text-sm text-text-muted">
                           <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                           <span>{feature.replace(/^[•\-]\s*/, '')}</span>
                         </div>
                       ))}
-                      {servicio.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).length === 0 && (
+                      {producto.descripcion?.split('\n').filter(line => line.startsWith('•') || line.startsWith('-')).length === 0 && (
                         <>
                           <div className="flex items-start gap-2 text-sm text-text-muted">
                             <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -175,7 +173,7 @@ do en: ${servicioTitulo}`
         ) : (
           <div className="bg-white rounded-xl border p-12 text-center">
             <p className="text-text-muted text-lg">
-              No hay servicios disponibles en esta categoría aún.
+              No hay productos disponibles en esta categoría aún.
             </p>
             <p className="text-text-muted mt-2">
               Vuelve pronto.

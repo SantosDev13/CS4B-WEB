@@ -3,30 +3,30 @@ import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import type { Prisma } from '@prisma/client';
 
-// GET - Obtener servicio por ID
+// GET - Obtener producto por ID
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const servicio = await prisma.servicio.findUnique({
+    const producto = await prisma.producto.findUnique({
       where: { id },
       include: { categoria: true },
     });
 
-    if (!servicio) {
-      return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 });
+    if (!producto) {
+      return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data: servicio });
+    return NextResponse.json({ success: true, data: producto });
   } catch (error) {
-    console.error('Error fetching servicio:', error);
-    return NextResponse.json({ error: 'Error al obtener servicio' }, { status: 500 });
+    console.error('Error fetching producto:', error);
+    return NextResponse.json({ error: 'Error al obtener producto' }, { status: 500 });
   }
 }
 
-// PUT - Actualizar servicio (solo admin)
+// PUT - Actualizar producto (solo admin)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -34,14 +34,14 @@ export async function PUT(
   try {
     const authUser = await getAuthUser(request);
     if (!authUser || authUser.rol !== 'admin') {
-      return NextResponse.json({ error: 'Solo administradores pueden actualizar servicios' }, { status: 403 });
+      return NextResponse.json({ error: 'Solo administradores pueden actualizar productos' }, { status: 403 });
     }
 
     const { id } = await params;
     const body = await request.json();
 
-    const allowedFields = ['titulo', 'slug', 'descripcion', 'descripcion_corta', 'icono', 'imagen', 'categoria_servicio_id', 'tamanho', 'orden', 'visible'];
-    const updateData: Prisma.ServicioUpdateInput = {};
+    const allowedFields = ['titulo', 'slug', 'descripcion', 'descripcion_corta', 'icono', 'imagen', 'categoria_producto_id', 'tamanho', 'orden', 'visible'];
+    const updateData: Prisma.ProductoUpdateInput = {};
 
     for (const [key, value] of Object.entries(body)) {
       const dbKey = key === 'icon' ? 'icono' : key;
@@ -54,19 +54,19 @@ export async function PUT(
       return NextResponse.json({ error: 'No hay campos válidos para actualizar' }, { status: 400 });
     }
 
-    const servicio = await prisma.servicio.update({
+    const producto = await prisma.producto.update({
       where: { id },
       data: updateData,
     });
 
-    return NextResponse.json({ success: true, data: servicio });
+    return NextResponse.json({ success: true, data: producto });
   } catch (error) {
-    console.error('Error updating servicio:', error);
-    return NextResponse.json({ error: 'Error al actualizar servicio' }, { status: 500 });
+    console.error('Error updating producto:', error);
+    return NextResponse.json({ error: 'Error al actualizar producto' }, { status: 500 });
   }
 }
 
-// DELETE - Eliminar servicio (solo admin)
+// DELETE - Eliminar producto (solo admin)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -74,15 +74,15 @@ export async function DELETE(
   try {
     const authUser = await getAuthUser(request);
     if (!authUser || authUser.rol !== 'admin') {
-      return NextResponse.json({ error: 'Solo administradores pueden eliminar servicios' }, { status: 403 });
+      return NextResponse.json({ error: 'Solo administradores pueden eliminar productos' }, { status: 403 });
     }
 
     const { id } = await params;
-    await prisma.servicio.delete({ where: { id } });
+    await prisma.producto.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting servicio:', error);
-    return NextResponse.json({ error: 'Error al eliminar servicio' }, { status: 500 });
+    console.error('Error deleting producto:', error);
+    return NextResponse.json({ error: 'Error al eliminar producto' }, { status: 500 });
   }
 }

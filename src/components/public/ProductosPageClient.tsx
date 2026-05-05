@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import ServicioCard from "@/components/public/ServicioCard";
+import ProductoCard from "@/components/public/ProductoCard";
 import { Search, Filter, ChevronRight } from "lucide-react";
 
-interface CategoriaWithServicios {
+interface CategoriaWithProductos {
   id: string;
   nombre: string;
   slug: string;
@@ -12,7 +12,7 @@ interface CategoriaWithServicios {
   imagen: string | null;
   link: string | null;
   visible: boolean;
-  servicios: {
+  productos: {
     id: string;
     titulo: string;
     slug: string;
@@ -24,13 +24,13 @@ interface CategoriaWithServicios {
   }[];
 }
 
-interface ServiciosPageClientProps {
-  categorias: CategoriaWithServicios[];
-  allServicios: any[];
+interface ProductosPageClientProps {
+  categorias: CategoriaWithProductos[];
+  allProductos: any[];
 }
 
-export default function ServiciosPageClient({ categorias, allServicios }: ServiciosPageClientProps) {
-  const totalServicios = categorias.reduce((acc, cat) => acc + cat.servicios.length, 0);
+export default function ProductosPageClient({ categorias, allProductos }: ProductosPageClientProps) {
+  const totalProductos = categorias.reduce((acc, cat) => acc + cat.productos.length, 0);
 
   if (categorias.length === 0) {
     return (
@@ -46,7 +46,7 @@ export default function ServiciosPageClient({ categorias, allServicios }: Servic
           </div>
           <div className="container-custom relative z-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-              Todos nuestros servicios
+              Todos nuestros productos
             </h1>
             <p className="text-lg md:text-xl text-white/70 max-w-2xl">
               Encuentra la solución perfecta para tu empresa.
@@ -57,7 +57,7 @@ export default function ServiciosPageClient({ categorias, allServicios }: Servic
         <section className="py-24 bg-white">
           <div className="container-custom text-center">
             <p className="text-lg text-text-secondary">
-              No hay servicios disponibles actualmente.
+              No hay productos disponibles actualmente.
             </p>
           </div>
         </section>
@@ -79,7 +79,7 @@ export default function ServiciosPageClient({ categorias, allServicios }: Servic
         </div>
         <div className="container-custom relative z-10">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-            Todos nuestros servicios
+            Todos nuestros productos
           </h1>
           <p className="text-lg md:text-xl text-white/70 max-w-2xl">
             Encuentra la solución perfecta para tu empresa.
@@ -93,7 +93,7 @@ export default function ServiciosPageClient({ categorias, allServicios }: Servic
           <nav className="flex items-center gap-2 text-sm text-text-muted">
             <Link href="/" className="hover:text-primary">Inicio</Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-text-secondary">Servicios</span>
+            <span className="text-text-secondary">Productos</span>
           </nav>
         </div>
       </div>
@@ -111,12 +111,12 @@ export default function ServiciosPageClient({ categorias, allServicios }: Servic
                 {categorias.map((cat) => (
                   <li key={cat.id}>
                     <Link
-                      href={`/servicios/${cat.slug}`}
+                      href={`/productos/${cat.slug}`}
                       className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-bg-light transition-colors text-text-secondary hover:text-primary"
                     >
                       <span className="text-sm">{cat.nombre}</span>
                       <span className="text-xs bg-bg-light px-2 py-0.5 rounded-full">
-                        {cat.servicios.length}
+                        {cat.productos.length}
                       </span>
                     </Link>
                   </li>
@@ -127,34 +127,29 @@ export default function ServiciosPageClient({ categorias, allServicios }: Servic
 
           {/* Main content */}
           <main className="flex-1">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-text-secondary">
-                Mostrando <span className="font-semibold text-primary">{totalServicios}</span> servicios
-              </p>
-            </div>
-
+            
             {/* Categorías */}
             {categorias.map((categoria) => (
               <section key={categoria.id} id={`cat-${categoria.slug}`} className="mb-12">
                 <div className="flex items-center justify-between mb-4">
                   <Link
-                    href={`/servicios/${categoria.slug}`}
+                    href={`/productos/${categoria.slug}`}
                     className="text-2xl font-bold text-primary flex items-center gap-3 hover:text-secondary transition-colors"
                   >
                     {categoria.nombre}
                     <span className="text-sm font-normal text-text-muted bg-white px-3 py-1 rounded-full border">
-                      {categoria.servicios.length} servicios
+                      {categoria.productos.length} productos
                     </span>
                   </Link>
                 </div>
 
-                {categoria.servicios.length > 0 ? (
+                {categoria.productos.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {categoria.servicios.map((servicio) => (
-                      <ServicioCard
-                        key={servicio.id}
-                        servicio={{
-                          ...servicio,
+                    {categoria.productos.map((producto) => (
+                      <ProductoCard
+                        key={producto.id}
+                        producto={{
+                          ...producto,
                           categoria_nombre: categoria.nombre,
                           categoria_slug: categoria.slug,
                         }}
@@ -164,23 +159,23 @@ export default function ServiciosPageClient({ categorias, allServicios }: Servic
                   </div>
                 ) : (
                   <div className="bg-white rounded-xl border p-8 text-center">
-                    <p className="text-text-muted">No hay servicios en esta categoría</p>
+                    <p className="text-text-muted">No hay productos en esta categoría</p>
                   </div>
                 )}
               </section>
             ))}
 
-            {/* Otros servicios */}
-            {allServicios.filter((s: any) => !s.categoria_nombre).length > 0 && (
+            {/* Otros productos */}
+            {allProductos.filter((p: any) => !p.categoria_nombre).length > 0 && (
               <section className="mb-12">
-                <h2 className="text-2xl font-bold text-primary mb-4">Otros servicios</h2>
+                <h2 className="text-2xl font-bold text-primary mb-4">Otros productos</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {allServicios
-                    .filter((s: any) => !s.categoria_nombre)
-                    .map((servicio: any) => (
-                      <ServicioCard
-                        key={servicio.id}
-                        servicio={servicio}
+                  {allProductos
+                    .filter((p: any) => !p.categoria_nombre)
+                    .map((producto: any) => (
+                      <ProductoCard
+                        key={producto.id}
+                        producto={producto}
                       />
                     ))}
                 </div>

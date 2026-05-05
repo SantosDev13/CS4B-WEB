@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
-import { contactoSchema, serviciosSeleccionadosSchema } from '@/lib/validations';
+import { contactoSchema, productosSeleccionadosSchema } from '@/lib/validations';
 import type { Prisma } from '@prisma/client';
 
 // GET - Obtener contactos (solo admin/editor)
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Validar servicios seleccionados si existen
     let servicioInteres = servicio_interes;
     if (body.servicios_seleccionados && Array.isArray(body.servicios_seleccionados) && body.servicios_seleccionados.length > 0) {
-      const serviciosResult = serviciosSeleccionadosSchema.safeParse(body.servicios_seleccionados);
+      const serviciosResult = productosSeleccionadosSchema.safeParse(body.servicios_seleccionados);
       if (serviciosResult.success) {
         servicioInteres = JSON.stringify(body.servicios_seleccionados);
       }

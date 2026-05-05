@@ -112,9 +112,9 @@ model Contacto {
 }
 
 // ============================================
-// CATEGORÍAS DE SERVICIOS (Padre - para servicios)
+// CATEGORÍAS DE PRODUCTOS (Padre - para productos)
 // ============================================
-model Categoria_servicio {
+model Categoria_producto {
   id          String    @id @default(uuid())
   nombre      String
   slug        String    @unique
@@ -127,15 +127,15 @@ model Categoria_servicio {
   updated_at  DateTime  @updatedAt
 
   // Relaciones
-  servicios Servicio[]
+  productos Producto[]
 
-  @@map("categorias_servicios")
+  @@map("categorias_productos")
 }
 
 // ============================================
-// SERVICIOS (Hijos de categorías)
+// PRODUCTOS (Hijos de categorías)
 // ============================================
-model Servicio {
+model Producto {
   id                   String    @id @default(uuid())
   titulo               String
   slug                 String    @unique
@@ -150,10 +150,10 @@ model Servicio {
   updated_at           DateTime  @updatedAt
 
   // Clave foránea a categoría padre
-  categoria_servicio_id String?
+  categoria_producto_id String?
 
   // Relaciones
-  categoria Categoria_servicio? @relation(fields: [categoria_servicio_id], references: [id])
+  categoria Categoria_producto? @relation(fields: [categoria_producto_id], references: [id])
 
-  @@map("servicios")
+  @@map("productos")
 }

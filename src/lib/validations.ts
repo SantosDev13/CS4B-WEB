@@ -52,22 +52,22 @@ export type ContactoUpdateInput = z.infer<typeof contactoUpdateSchema>;
  export type CategoriaPostUpdateInput = z.infer<typeof categoriaPostUpdateSchema>;
 
 // --------------------------------------------
- // CATEGORÍAS DE SERVICIOS
- // --------------------------------------------
- export const categoriaServicioSchema = z.object({
-   nombre: z.string().min(1, 'El nombre es requerido'),
-   slug: z.string().min(1, 'El slug es requerido'),
-   descripcion: z.string().optional(),
-   imagen: z.string().optional(),
-   link: z.string().optional(),
-   orden: z.number().int().optional(),
-   visible: z.boolean().optional(),
- });
+  // CATEGORÍAS DE PRODUCTOS
+  // --------------------------------------------
+  export const categoriaProductoSchema = z.object({
+    nombre: z.string().min(1, 'El nombre es requerido'),
+    slug: z.string().min(1, 'El slug es requerido'),
+    descripcion: z.string().optional(),
+    imagen: z.string().optional(),
+    link: z.string().optional(),
+    orden: z.number().int().optional(),
+    visible: z.boolean().optional(),
+  });
 
- export const categoriaServicioUpdateSchema = categoriaServicioSchema.partial();
+  export const categoriaProductoUpdateSchema = categoriaProductoSchema.partial();
 
- export type CategoriaServicioInput = z.infer<typeof categoriaServicioSchema>;
- export type CategoriaServicioUpdateInput = z.infer<typeof categoriaServicioUpdateSchema>;
+  export type CategoriaProductoInput = z.infer<typeof categoriaProductoSchema>;
+  export type CategoriaProductoUpdateInput = z.infer<typeof categoriaProductoUpdateSchema>;
 
 // --------------------------------------------
 // POSTS
@@ -92,25 +92,25 @@ export type PostInput = z.infer<typeof postSchema>;
 export type PostUpdateInput = z.infer<typeof postUpdateSchema>;
 
 // --------------------------------------------
-// SERVICIOS
+// PRODUCTOS
 // --------------------------------------------
-export const servicioSchema = z.object({
+export const productoSchema = z.object({
   titulo: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
   slug: z.string().min(3, 'El slug debe tener al menos 3 caracteres').regex(/^[a-z0-9-]+$/, 'El slug debe tener solo letras minúsculas, números y guiones'),
   descripcion: z.string().min(20, 'La descripción debe tener al menos 20 caracteres'),
   descripcion_corta: z.string().max(200, 'Descripción corta máximo 200 caracteres').optional(),
   icono: z.string().optional(),
   imagen: z.string().url('URL de imagen inválida').optional().or(z.literal('')),
-  categoria_servicio_id: z.string().uuid('ID de categoría inválido').optional().or(z.literal('')),
+  categoria_producto_id: z.string().uuid('ID de categoría inválido').optional().or(z.literal('')),
   tamanho: z.enum(['small', 'medium', 'large']).optional(),
   orden: z.number().int().optional(),
   visible: z.boolean().optional(),
 });
 
-export const servicioUpdateSchema = servicioSchema.partial();
+export const productoUpdateSchema = productoSchema.partial();
 
-export type ServicioInput = z.infer<typeof servicioSchema>;
-export type ServicioUpdateInput = z.infer<typeof servicioUpdateSchema>;
+export type ProductoInput = z.infer<typeof productoSchema>;
+export type ProductoUpdateInput = z.infer<typeof productoUpdateSchema>;
 
 // --------------------------------------------
  // CONFIGURACIONES
@@ -127,17 +127,17 @@ export type ServicioUpdateInput = z.infer<typeof servicioUpdateSchema>;
  export type ConfiguracionUpdateInput = z.infer<typeof configuracionUpdateSchema>;
 
 // --------------------------------------------
-// SERVICIOS SELECCIONADOS (del carrito)
+// PRODUCTOS SELECCIONADOS (del carrito)
 // --------------------------------------------
-export const servicioSeleccionadoSchema = z.object({
-  id: z.string().uuid('ID de servicio inválido'),
+export const productoSeleccionadoSchema = z.object({
+  id: z.string().uuid('ID de producto inválido'),
   titulo: z.string().min(1, 'El título es requerido'),
   slug: z.string().min(1, 'El slug es requerido'),
   categoria: z.string().optional(),
   categoriaSlug: z.string().optional(),
 });
 
-export const serviciosSeleccionadosSchema = z.array(servicioSeleccionadoSchema);
+export const productosSeleccionadosSchema = z.array(productoSeleccionadoSchema);
 
-export type ServicioSeleccionado = z.infer<typeof servicioSeleccionadoSchema>;
-export type ServiciosSeleccionados = z.infer<typeof serviciosSeleccionadosSchema>;
+export type ProductoSeleccionado = z.infer<typeof productoSeleccionadoSchema>;
+export type ProductosSeleccionados = z.infer<typeof productosSeleccionadosSchema>;

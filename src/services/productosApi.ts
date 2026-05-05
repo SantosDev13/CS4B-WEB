@@ -1,10 +1,10 @@
 // ============================================
-// SERVICIOS API - CS4B WEB
+// PRODUCTOS API - CS4B WEB
 // ============================================
 
 import { apiFetch, type ApiResponse } from "./api";
 
-export interface Servicio {
+export interface Producto {
   id: string;
   titulo: string;
   slug: string;
@@ -12,7 +12,7 @@ export interface Servicio {
   descripcion_corta?: string;
   icono?: string;
   imagen?: string;
-  categoria_servicio_id?: string;
+  categoria_producto_id?: string;
   categoria?: string;
   categoria_slug?: string;
   tamanho?: "small" | "medium" | "large";
@@ -22,82 +22,82 @@ export interface Servicio {
   updated_at: string;
 }
 
-export interface CreateServicioInput {
+export interface CreateProductoInput {
   titulo: string;
   slug: string;
   descripcion: string;
   descripcion_corta?: string;
   icono?: string;
   imagen?: string;
-  categoria_servicio_id?: string;
+  categoria_producto_id?: string;
   tamanho?: "small" | "medium" | "large";
   orden?: number;
   visible?: boolean;
 }
 
-export interface UpdateServicioInput extends Partial<CreateServicioInput> {}
+export interface UpdateProductoInput extends Partial<CreateProductoInput> {}
 
 // --------------------------------------------
 // CRUD OPERATIONS
 // --------------------------------------------
 
-export const serviciosApi = {
+export const productosApi = {
   /**
-   * Obtener todos los servicios (público)
+   * Obtener todos los productos (público)
    */
   getAll: async (params?: {
     published?: boolean;
     limit?: number;
     page?: number;
-  }): Promise<ApiResponse<Servicio[]>> => {
+  }): Promise<ApiResponse<Producto[]>> => {
     const query = new URLSearchParams();
     if (params?.published !== undefined) query.set("published", String(params.published));
     if (params?.limit) query.set("limit", String(params.limit));
     if (params?.page) query.set("page", String(params.page));
 
-    const endpoint = `/api/servicios${query.toString() ? `?${query}` : ""}`;
-    return apiFetch<Servicio[]>(endpoint);
+    const endpoint = `/api/productos${query.toString() ? `?${query}` : ""}`;
+    return apiFetch<Producto[]>(endpoint);
   },
 
   /**
-   * Obtener un servicio por ID
+   * Obtener un producto por ID
    */
-  getById: async (id: string): Promise<ApiResponse<Servicio>> => {
-    return apiFetch<Servicio>(`/api/servicios/${id}`);
+  getById: async (id: string): Promise<ApiResponse<Producto>> => {
+    return apiFetch<Producto>(`/api/productos/${id}`);
   },
 
   /**
-   * Obtener un servicio por slug
+   * Obtener un producto por slug
    */
-  getBySlug: async (slug: string): Promise<ApiResponse<Servicio>> => {
-    return apiFetch<Servicio>(`/api/servicios/${slug}`);
+  getBySlug: async (slug: string): Promise<ApiResponse<Producto>> => {
+    return apiFetch<Producto>(`/api/productos/${slug}`);
   },
 
   /**
-   * Crear un nuevo servicio
+   * Crear un nuevo producto
    */
-  create: async (data: CreateServicioInput): Promise<ApiResponse<Servicio>> => {
-    return apiFetch<Servicio>("/api/servicios", {
+  create: async (data: CreateProductoInput): Promise<ApiResponse<Producto>> => {
+    return apiFetch<Producto>("/api/productos", {
       method: "POST",
       body: JSON.stringify(data),
     });
   },
 
   /**
-   * Actualizar un servicio
+   * Actualizar un producto
    */
-  update: async (id: string, data: UpdateServicioInput): Promise<ApiResponse<Servicio>> => {
-    return apiFetch<Servicio>(`/api/servicios/${id}`, {
+  update: async (id: string, data: UpdateProductoInput): Promise<ApiResponse<Producto>> => {
+    return apiFetch<Producto>(`/api/productos/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
   },
 
   /**
-   * Eliminar un servicio
+   * Eliminar un producto
    */
   delete: async (id: string): Promise<ApiResponse<{ success: boolean }>> => {
-    return apiFetch<{ success: boolean }>(`/api/servicios/${id}`, {
+    return apiFetch<{ success: boolean }>(`/api/productos/${id}`, {
       method: "DELETE",
     });
   },
