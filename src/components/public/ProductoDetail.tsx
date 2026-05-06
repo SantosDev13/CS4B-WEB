@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart, type CartItem } from "@/composables";
-import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle, MessageSquare, X, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Phone, Mail, MessageCircle, MessageSquare, X, Plus, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ProductoDetailProps {
@@ -69,7 +69,7 @@ export default function ProductoDetail({ producto, productosRelacionados }: Prod
 
   return (
     <div className="min-h-screen bg-bg-light">
-      {/* Header con info de la categoría - más alto y por detrás del navbar */}
+      {/* Header con info de la categoría*/}
       {producto.categoria_nombre && (
         <section className="relative bg-primary overflow-hidden -mt-14 pt-14">
           {/* Imagen de fondo de la categoría - usar la de la categoría */}
@@ -270,12 +270,12 @@ export default function ProductoDetail({ producto, productosRelacionados }: Prod
                   {inCart ? (
                     <>
                       <Check className="w-5 h-5" />
-                      Agregado al formulario
+                      Agregado al Carrito
                     </>
                   ) : (
                     <>
-                      <MessageSquare className="w-5 h-5" />
-                      Agregar al formulario 
+                      <ShoppingCart className="w-5 h-5" />
+                      Agregar al Carrito
                     </>
                   )}
                 </button>
@@ -358,7 +358,7 @@ export default function ProductoDetail({ producto, productosRelacionados }: Prod
             {inCart ? (
               <Check className="w-5 h-5 text-green-400" />
             ) : (
-              <MessageSquare className="w-5 h-5 text-green-400" />
+              <ShoppingCart className="w-5 h-5 text-green-400" />
             )}
             <span className="text-sm font-medium">{toastMessage}</span>
             <button

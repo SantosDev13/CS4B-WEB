@@ -18,11 +18,14 @@ export type LoginInput = z.infer<typeof loginSchema>;
 // CONTACTOS
 // --------------------------------------------
 export const contactoSchema = z.object({
-  nombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
+  nombre: z.string().min(1, 'El nombre es requerido'),
+  apellidos: z.string().min(1, 'Los apellidos son requeridos'),
+  interes: z.string().min(1, 'Selecciona tu interés'),
+  categoria: z.string().min(1, 'Selecciona una categoría'),
+  posicion: z.string().optional(),
+  empresa: z.string().optional(),
   email: z.string().email('Email inválido'),
   telefono: z.string().optional(),
-  empresa: z.string().optional(),
-  servicio_interes: z.string().optional(),
   mensaje: z.string().min(10, 'El mensaje debe tener al menos 10 caracteres'),
 });
 

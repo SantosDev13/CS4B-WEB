@@ -1,123 +1,183 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, CheckCircle, AlertCircle, Loader2, MessageSquare, X, Plus, Trash2 } from "lucide-react";
-import { useCart, type CartItem } from "@/composables";
-import Link from "next/link";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Send, CheckCircle, AlertCircle, Loader2, MessageSquare, Phone, Mail, MapPin, Clock } from "lucide-react";
 
-interface Categoria {
-  id: string;
+// Opciones de interés
+const INTERES_OPTIONS = [
+  { id: "cotizacion", label: "Cotización" },
+  { id: "consulta", label: "Consulta" },
+  { id: "soporte", label: "Soporte" },
+  { id: "otro", label: "Otro" },
+];
+
+// Categorías disponibles
+const CATEGORIAS = [
+  { id: "c-level", label: "C-level" },
+  { id: "director", label: "Director" },
+  { id: "manager", label: "Manager" },
+  { id: "otros", label: "Otros" },
+];
+
+// Posiciones por categoría
+const POSICIONES_POR_CATEGORIA: Record<string, { id: string; label: string }[]> = {
+  "c-level": [
+    { id: "cco", label: "Chief Communications Officer" },
+    { id: "compliance-officer", label: "Chief Compliance Officer" },
+    { id: "cdo", label: "Chief Data Officer" },
+    { id: "cdo-digital", label: "Chief Digital Officer" },
+    { id: "ceo", label: "Chief Executive Officer / Director General" },
+    { id: "cxo", label: "Chief Experience Officer" },
+    { id: "cfo", label: "Chief Financial Officer" },
+    { id: "chro", label: "Chief Human Resources Officer" },
+    { id: "ciso", label: "Chief Information Security Officer" },
+    { id: "cio-innovation", label: "Chief Innovation Officer" },
+    { id: "cio-investment", label: "Chief Investment Officer" },
+    { id: "clo", label: "Chief Legal Officer" },
+    { id: "cmo", label: "Chief Marketing Officer" },
+    { id: "coo", label: "Chief Operating Officer" },
+    { id: "cro", label: "Chief Revenue Officer" },
+    { id: "cro-risk", label: "Chief Risk Officer" },
+    { id: "cto", label: "Chief Technology Officer" },
+    { id: "cso", label: "Chief Strategy Officer" },
+    { id: "presidente", label: "Presidente" },
+  ],
+  "director": [
+    { id: "dir-ciberseguridad", label: "Ciberseguridad" },
+    { id: "dir-compliance", label: "Compliance" },
+    { id: "dir-compras", label: "Compras" },
+    { id: "dir-comunicacion", label: "Comunicacion y Medios" },
+    { id: "dir-data", label: "Data e Inteligencia de Negocios" },
+    { id: "dir-innovacion", label: "Estrategia de Innovación" },
+    { id: "dir-experiencia", label: "Experiencia de Cliente" },
+    { id: "dir-finanzas", label: "Finanzas" },
+    { id: "dir-legal", label: "Legal" },
+    { id: "dir-logistica", label: "Logistica" },
+    { id: "dir-marketing", label: "Marketing" },
+    { id: "dir-operaciones", label: "Operaciones" },
+    { id: "dir-rrhh", label: "Recursos Humanos" },
+    { id: "dir-riesgos", label: "Riesgos" },
+    { id: "dir-tecnologia", label: "Tecnología y Sistemas de Información" },
+    { id: "dir-transformacion", label: "Transformacion Digital" },
+    { id: "dir-ventas", label: "Ventas" }
+  ],
+  "manager": [
+    { id: "mgr-ciberseguridad", label: "Ciberseguridad" },
+    { id: "mgr-compliance", label: "Compliance" },
+    { id: "mgr-compras", label: "Compras" },
+    { id: "mgr-comunicacion", label: "Comunicacion y Medios" },
+    { id: "mgr-data", label: "Data e Inteligencia de Negocios" },
+    { id: "mgr-innovacion", label: "Estrategia de Innovación" },
+    { id: "mgr-experiencia", label: "Experiencia de Cliente" },
+    { id: "mgr-finanzas", label: "Finanzas" },
+    { id: "mgr-legal", label: "Legal" },
+    { id: "mgr-logistica", label: "Logistica" },
+    { id: "mgr-marketing", label: "Marketing" },
+    { id: "mgr-operaciones", label: "Operaciones" },
+    { id: "mgr-rrhh", label: "Recursos Humanos" },
+    { id: "mgr-riesgos", label: "Riesgos" },
+    { id: "mgr-tecnologia", label: "Tecnología y Sistemas de Información" },
+    { id: "mgr-transformacion", label: "Transformacion Digital" },
+    { id: "mgr-ventas", label: "Ventas" }
+  ],
+  "otros": [
+    { id: "asesor", label: "Asesor" },
+    { id: "asistente", label: "Asistente" },
+    { id: "estudiante", label: "Estudiante" },
+    { id: "jefe-proyecto", label: "Jefe de proyecto" },
+    { id: "tecnico", label: "Técnico" }
+  ]
+};
+
+interface FormData {
   nombre: string;
-  slug: string;
-}
-
-interface Servicio {
-  id: string;
-  titulo: string;
-  slug: string;
-  categoria_servicio_id: string;
+  apellidos: string;
+  interes: string;
+  categoria: string;
+  posicion: string;
+  empresa: string;
+  email: string;
+  telefono: string;
+  mensaje: string;
 }
 
 export default function ContactoPage() {
-  const { servicios: cartServicios, removeFromCart, clearCart, addToCart } = useCart();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     nombre: "",
+    apellidos: "",
+    interes: "",
+    categoria: "",
+    posicion: "",
+    empresa: "",
     email: "",
     telefono: "",
-    empresa: "",
-    servicio_interes: "",
     mensaje: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [errores, setErrores] = useState<Partial<Record<keyof FormData, string>>>({});
 
-  // Datos para selects dinámicos
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [servicios, setServicios] = useState<Servicio[]>([]);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
-  const [servicioSeleccionado, setServicioSeleccionado] = useState("");
-  const [loadingServicios, setLoadingServicios] = useState(false);
-
-  // Cargar categorías al iniciar
-  useEffect(() => {
-    fetch("/api/categorias-servicios")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.data) {
-          setCategorias(data.data);
-        }
-      })
-      .catch((err) => console.error("Error fetching categorias:", err));
-  }, []);
-
-  // Cargar servicios cuando se selecciona categoría
-  useEffect(() => {
-    if (categoriaSeleccionada) {
-      setLoadingServicios(true);
-      fetch(`/api/servicios?categoria=${categoriaSeleccionada}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.data) {
-            setServicios(data.data);
-          }
-        })
-        .catch((err) => console.error("Error fetching servicios:", err))
-        .finally(() => setLoadingServicios(false));
-    } else {
-      setServicios([]);
-      setServicioSeleccionado("");
-    }
-  }, [categoriaSeleccionada]);
+  // Opciones de posición basadas en la categoría seleccionada
+  const posiciones = formData.categoria ? POSICIONES_POR_CATEGORIA[formData.categoria] || [] : [];
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      // Limpiar posición si cambia la categoría
+      ...(name === "categoria" ? { posicion: "" } : {}),
+    }));
+    // Limpiar error del campo
+    if (errores[name as keyof FormData]) {
+      setErrores((prev) => ({ ...prev, [name]: undefined }));
+    }
   };
 
-  const handleAddManual = () => {
-    if (categoriaSeleccionada && servicioSeleccionado) {
-      const categoria = categorias.find((c) => c.id === categoriaSeleccionada);
-      const servicio = servicios.find((s) => s.id === servicioSeleccionado);
+  const validarFormulario = (): boolean => {
+    const nuevosErrores: Partial<Record<keyof FormData, string>> = {};
 
-      if (categoria && servicio) {
-        const item: CartItem = {
-          id: servicio.id,
-          titulo: servicio.titulo,
-          slug: servicio.slug,
-          categoria: categoria.nombre,
-          categoriaSlug: categoria.slug,
-        };
-        addToCart(item);
-        setCategoriaSeleccionada("");
-        setServicioSeleccionado("");
-        setServicios([]);
-      }
+    if (!formData.nombre.trim()) {
+      nuevosErrores.nombre = "El nombre es requerido";
     }
+    if (!formData.apellidos.trim()) {
+      nuevosErrores.apellidos = "Los apellidos son requeridos";
+    }
+    if (!formData.interes) {
+      nuevosErrores.interes = "Selecciona tu interés";
+    }
+    if (!formData.categoria) {
+      nuevosErrores.categoria = "Selecciona una categoría";
+    }
+    if (!formData.email.trim()) {
+      nuevosErrores.email = "El email es requerido";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      nuevosErrores.email = "Ingresa un email válido";
+    }
+    if (!formData.mensaje.trim()) {
+      nuevosErrores.mensaje = "El mensaje es requerido";
+    } else if (formData.mensaje.trim().length < 10) {
+      nuevosErrores.mensaje = "El mensaje debe tener al menos 10 caracteres";
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
-    setSuccess(false);
 
-    // Preparar datos - si hay carrito, usarlo; si no, usar selección manual
-    const serviciosSeleccionados = cartServicios.length > 0
-      ? cartServicios
-      : categoriaSeleccionada && servicioSeleccionado
-        ? [{
-            id: servicioSeleccionado,
-            titulo: servicios.find((s) => s.id === servicioSeleccionado)?.titulo || "",
-            categoria: categorias.find((c) => c.id === categoriaSeleccionada)?.nombre || "",
-          }]
-        : [];
+    if (!validarFormulario()) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/contactos", {
@@ -125,23 +185,22 @@ export default function ContactoPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          servicios_seleccionados: serviciosSeleccionados,
-        }),
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setSuccess(true);
-        clearCart();
         setFormData({
           nombre: "",
+          apellidos: "",
+          interes: "",
+          categoria: "",
+          posicion: "",
+          empresa: "",
           email: "",
           telefono: "",
-          empresa: "",
-          servicio_interes: "",
           mensaje: "",
         });
       } else {
@@ -153,8 +212,6 @@ export default function ContactoPage() {
       setLoading(false);
     }
   };
-
-  const hasServicios = cartServicios.length > 0 || (categoriaSeleccionada && servicioSeleccionado);
 
   return (
     <div className="pt-0">
@@ -198,7 +255,7 @@ export default function ContactoPage() {
                 >
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                   <div>
-                    <p className="text-green-800 font-medium">¡Recibimos tu Mensaje Exitosamente!</p>
+                    <p className="text-green-800 font-medium">¡Recibimos tu mensaje exitosamente!</p>
                     <p className="text-green-600 text-sm">Te contactaremos pronto.</p>
                   </div>
                 </motion.div>
@@ -217,118 +274,11 @@ export default function ContactoPage() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Carrito de servicios o selects dinámicos */}
-                <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-2">
-                    <MessageSquare className="w-4 h-4 inline mr-2" />
-                    Servicio de interés
-                  </label>
-
-                  {/* SI HAY SERVICIOS EN EL CARRITO */}
-                  {cartServicios.length > 0 ? (
-                    <div className="space-y-3">
-                      {/* Lista de servicios seleccionados */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="font-medium text-blue-800">
-                            Servicios seleccionados ({cartServicios.length})
-                          </span>
-                          <button
-                            type="button"
-                            onClick={clearCart}
-                            className="text-sm text-blue-600 hover:text-blue-800"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {cartServicios.map((item) => (
-                            <span
-                              key={item.id}
-                              className="inline-flex items-center gap-1 bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-full text-sm"
-                            >
-                              {item.categoria && (
-                                <span className="text-blue-500 text-xs">[{item.categoria}]</span>
-                              )}
-                              {item.titulo}
-                              <button
-                                type="button"
-                                onClick={() => removeFromCart(item.id)}
-                                className="ml-1 hover:text-red-500"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Opción de agregar más */}
-                      <Link
-                        href="/servicios"
-                        className="inline-flex items-center gap-2 text-sm text-secondary hover:text-secondary/80"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Agregar más servicios
-                      </Link>
-                    </div>
-                  ) : (
-                    /* SI NO HAY CARRITO - SELECTS DINÁMICOS */
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <select
-                          value={categoriaSeleccionada}
-                          onChange={(e) => setCategoriaSeleccionada(e.target.value)}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-white"
-                        >
-                          <option value="">Selecciona una categoría</option>
-                          {categorias.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                              {cat.nombre}
-                            </option>
-                          ))}
-                        </select>
-
-                        <select
-                          value={servicioSeleccionado}
-                          onChange={(e) => setServicioSeleccionado(e.target.value)}
-                          disabled={!categoriaSeleccionada || loadingServicios}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        >
-                          <option value="">
-                            {loadingServicios
-                              ? "Cargando..."
-                              : categoriaSeleccionada
-                                ? "Selecciona un servicio"
-                                : "Primero selecciona una categoría"}
-                          </option>
-                          {servicios.map((srv) => (
-                            <option key={srv.id} value={srv.id}>
-                              {srv.titulo}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Botón agregar manual */}
-                      {categoriaSeleccionada && servicioSeleccionado && (
-                        <button
-                          type="button"
-                          onClick={handleAddManual}
-                          className="inline-flex items-center gap-2 text-sm text-secondary hover:text-secondary/80"
-                        >
-                          <Plus className="w-4 h-4" />
-                          Agregir servicio seleccionado
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
+                {/* Nombre y Apellidos */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="nombre" className="block text-sm font-medium text-text-secondary mb-2">
-                      Nombre completo *
+                      Nombre *
                     </label>
                     <input
                       type="text"
@@ -336,27 +286,138 @@ export default function ContactoPage() {
                       name="nombre"
                       value={formData.nombre}
                       onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
-                      placeholder="Juan Pérez"
+                      className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-colors ${
+                        errores.nombre
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-gray-200 focus:border-secondary"
+                      }`}
+                      placeholder="Nombre"
                     />
+                    {errores.nombre && (
+                      <p className="mt-1 text-sm text-red-500">{errores.nombre}</p>
+                    )}
                   </div>
                   <div>
-                    <label htmlFor="empresa" className="block text-sm font-medium text-text-secondary mb-2">
-                      Empresa
+                    <label htmlFor="apellidos" className="block text-sm font-medium text-text-secondary mb-2">
+                      Apellidos *
                     </label>
                     <input
                       type="text"
-                      id="empresa"
-                      name="empresa"
-                      value={formData.empresa}
+                      id="apellidos"
+                      name="apellidos"
+                      value={formData.apellidos}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
-                      placeholder="Mi Empresa S.A.C."
+                      className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-colors ${
+                        errores.apellidos
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-gray-200 focus:border-secondary"
+                      }`}
+                      placeholder="Apellidos"
                     />
+                    {errores.apellidos && (
+                      <p className="mt-1 text-sm text-red-500">{errores.apellidos}</p>
+                    )}
                   </div>
                 </div>
 
+                {/* Interés */}
+                <div>
+                  <label htmlFor="interes" className="block text-sm font-medium text-text-secondary mb-2">
+                    <MessageSquare className="w-4 h-4 inline mr-1" />
+                    ¿En qué podemos ayudarte? *
+                  </label>
+                  <select
+                    id="interes"
+                    name="interes"
+                    value={formData.interes}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-colors bg-white ${
+                      errores.interes
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-200 focus:border-secondary"
+                    }`}
+                  >
+                    <option value="">Selecciona una opción</option>
+                    {INTERES_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errores.interes && (
+                    <p className="mt-1 text-sm text-red-500">{errores.interes}</p>
+                  )}
+                </div>
+
+                {/* Categoría y Posición */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="categoria" className="block text-sm font-medium text-text-secondary mb-2">
+                      Categoría *
+                    </label>
+                    <select
+                      id="categoria"
+                      name="categoria"
+                      value={formData.categoria}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-colors bg-white ${
+                        errores.categoria
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-gray-200 focus:border-secondary"
+                      }`}
+                    >
+                      <option value="">Selecciona una categoría</option>
+                      {CATEGORIAS.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errores.categoria && (
+                      <p className="mt-1 text-sm text-red-500">{errores.categoria}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="posicion" className="block text-sm font-medium text-text-secondary mb-2">
+                      Posición
+                    </label>
+                    <select
+                      id="posicion"
+                      name="posicion"
+                      value={formData.posicion}
+                      onChange={handleChange}
+                      disabled={!formData.categoria}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    >
+                      <option value="">
+                        {formData.categoria ? "Selecciona una posición" : "Primero selecciona una categoría"}
+                      </option>
+                      {posiciones.map((pos) => (
+                        <option key={pos.id} value={pos.id}>
+                          {pos.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Empresa */}
+                <div>
+                  <label htmlFor="empresa" className="block text-sm font-medium text-text-secondary mb-2">
+                    Empresa
+                  </label>
+                  <input
+                    type="text"
+                    id="empresa"
+                    name="empresa"
+                    value={formData.empresa}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
+                    placeholder="Empresa"
+                  />
+                </div>
+
+                {/* Email y Teléfono */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-2">
@@ -368,10 +429,16 @@ export default function ContactoPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
-                      placeholder="juan@empresa.com"
+                      className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-colors ${
+                        errores.email
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-gray-200 focus:border-secondary"
+                      }`}
+                      placeholder="Email"
                     />
+                    {errores.email && (
+                      <p className="mt-1 text-sm text-red-500">{errores.email}</p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="telefono" className="block text-sm font-medium text-text-secondary mb-2">
@@ -384,11 +451,12 @@ export default function ContactoPage() {
                       value={formData.telefono}
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors"
-                      placeholder="+51 999 999 999"
+                      placeholder="Teléfono"
                     />
                   </div>
                 </div>
 
+                {/* Mensaje */}
                 <div>
                   <label htmlFor="mensaje" className="block text-sm font-medium text-text-secondary mb-2">
                     Mensaje *
@@ -398,13 +466,20 @@ export default function ContactoPage() {
                     name="mensaje"
                     value={formData.mensaje}
                     onChange={handleChange}
-                    required
                     rows={5}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-secondary focus:outline-none transition-colors resize-none"
+                    className={`w-full px-4 py-3 rounded-lg border focus:outline-none transition-colors resize-none ${
+                      errores.mensaje
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-200 focus:border-secondary"
+                    }`}
                     placeholder="Cuéntanos sobre tu proyecto o consulta..."
                   />
+                  {errores.mensaje && (
+                    <p className="mt-1 text-sm text-red-500">{errores.mensaje}</p>
+                  )}
                 </div>
 
+                {/* Botón enviar */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -432,12 +507,10 @@ export default function ContactoPage() {
                   Información de contacto
                 </h2>
                 <div className="space-y-8">
+                  {/* Dirección */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-bg-light flex items-center justify-center text-primary flex-shrink-0">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <MapPin className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-primary mb-1">Dirección</h3>
@@ -448,11 +521,10 @@ export default function ContactoPage() {
                     </div>
                   </div>
 
+                  {/* Email */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-bg-light flex items-center justify-center text-primary flex-shrink-0">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
+                      <Mail className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-primary mb-1">Email</h3>
@@ -460,11 +532,10 @@ export default function ContactoPage() {
                     </div>
                   </div>
 
+                  {/* Teléfono */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-bg-light flex items-center justify-center text-primary flex-shrink-0">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
+                      <Phone className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-primary mb-1">Teléfono</h3>
@@ -472,11 +543,10 @@ export default function ContactoPage() {
                     </div>
                   </div>
 
+                  {/* Horario */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-bg-light flex items-center justify-center text-primary flex-shrink-0">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <Clock className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-primary mb-1">Horario de atención</h3>
@@ -499,7 +569,7 @@ export default function ContactoPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-primary">
-                      ¿Preferes WhatsApp?
+                      ¿Prefieres WhatsApp?
                     </h3>
                     <p className="text-text-secondary text-sm">
                       Chatea con nosotros directamente

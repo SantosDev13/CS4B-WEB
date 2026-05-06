@@ -95,18 +95,21 @@ model Configuracion {
 // CONTACTOS (Mensajes del formulario)
 // ============================================
 model Contacto {
-  id              String    @id @default(uuid())
-  nombre          String
-  email           String
-  telefono        String?
-  empresa         String?
-  servicio_interes String?  @db.Text // JSON con servicios seleccionados
-  mensaje         String
-  ip              String?
-  leido           Boolean   @default(false)
-  respondido      Boolean   @default(false)
-  respuesta       String?
-  created_at      DateTime  @default(now())
+  id          String    @id @default(uuid())
+  nombre      String
+  apellidos  String
+  interes    String
+  categoria  String
+  posicion   String?
+  empresa    String?
+  email      String
+  telefono   String?
+  mensaje    String
+  ip         String?
+  leido      Boolean   @default(false)
+  respondido Boolean   @default(false)
+  respuesta  String?
+  created_at DateTime  @default(now())
 
   @@map("contactos")
 }
@@ -133,27 +136,29 @@ model Categoria_producto {
 }
 
 // ============================================
-// PRODUCTOS (Hijos de categorías)
-// ============================================
-model Producto {
-  id                   String    @id @default(uuid())
-  titulo               String
-  slug                 String    @unique
-  descripcion          String    @db.Text
-  descripcion_corta    String?
-  icono                String?
-  imagen               String?
-  tamanho              String    @default("medium") // small | medium | large
-  orden                Int       @default(0)
-  visible              Boolean   @default(true)
-  created_at           DateTime  @default(now())
-  updated_at           DateTime  @updatedAt
+  // PRODUCTOS (Hijos de categorías)
+  // ============================================
+  model Producto {
+    id                   String    @id @default(uuid())
+    titulo               String
+    slug                 String    @unique
+    descripcion          String    @db.Text
+    descripcion_corta    String?
+    icono                String?
+    imagen               String?
+    tamanho              String    @default("medium") // small | medium | large
+    orden                Int       @default(0)
+    visible              Boolean   @default(true)
+    created_at           DateTime  @default(now())
+    updated_at           DateTime  @updatedAt
 
-  // Clave foránea a categoría padre
-  categoria_producto_id String?
+    // Clave foránea a categoría padre
+    categoria_producto_id String?
 
-  // Relaciones
-  categoria Categoria_producto? @relation(fields: [categoria_producto_id], references: [id])
+    // Relaciones
+    categoria Categoria_producto? @relation(fields: [categoria_producto_id], references: [id])
 
-  @@map("productos")
-}
+    @@map("productos")
+  }
+
+  

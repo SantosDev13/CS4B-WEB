@@ -14,7 +14,8 @@ import {
   MessageSquare,
   Shield,
   Briefcase,
-  Folder
+  Folder,
+  Wrench
 } from "lucide-react";
 import { useAuth } from "@/composables";
 import AdminNavbar from "@/components/admin/AdminNavbar";
@@ -29,6 +30,7 @@ const navItems: NavItem[] = [
   { href: "/admin", label: "Panel de Administración", icon: <LayoutDashboard className="w-5 h-5" /> },
   { href: "/admin/categorias-productos", label: "Categorías Productos", icon: <Folder className="w-5 h-5" /> },
   { href: "/admin/productos", label: "Productos", icon: <Briefcase className="w-5 h-5" /> },
+  { href: "/admin/servicios", label: "Servicios", icon: <Wrench className="w-5 h-5" /> },
   { href: "/admin/categorias", label: "Categorías Blog", icon: <Shield className="w-5 h-5" /> },
   { href: "/admin/posts", label: "Publicaciones", icon: <FileText className="w-5 h-5" /> },
   { href: "/admin/contactos", label: "Contactos", icon: <MessageSquare className="w-5 h-5" /> },

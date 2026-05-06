@@ -24,10 +24,13 @@ import { useAuth } from "@/composables";
 interface Contacto {
   id: string;
   nombre: string;
+  apellidos: string;
+  interes: string;
+  categoria: string;
+  posicion: string;
+  empresa: string | null;
   email: string;
   telefono: string | null;
-  empresa: string | null;
-  servicio_interes: string | null;
   mensaje: string;
   leido: boolean;
   respondido: boolean;
@@ -219,7 +222,7 @@ export default function AdminContactosPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
             type="text"
-            placeholder="Buscar por nombre, email o empresa..."
+            placeholder="Buscar por nombre, email, interés o categoría..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"
@@ -250,8 +253,9 @@ export default function AdminContactosPage() {
             <tr className="border-b border-slate-700/50">
               <th className="text-left p-4 text-slate-400 font-medium">Estado</th>
               <th className="text-left p-4 text-slate-400 font-medium">Nombre</th>
+              <th className="text-left p-4 text-slate-400 font-medium">Apellidos</th>
+              <th className="text-left p-4 text-slate-400 font-medium">Interés</th>
               <th className="text-left p-4 text-slate-400 font-medium">Email</th>
-              <th className="text-left p-4 text-slate-400 font-medium">Empresa</th>
               <th className="text-left p-4 text-slate-400 font-medium">Fecha</th>
               <th className="text-right p-4 text-slate-400 font-medium">Acciones</th>
             </tr>
@@ -291,10 +295,9 @@ export default function AdminContactosPage() {
                       {contacto.nombre}
                     </p>
                   </td>
+                  <td className="p-4 text-slate-300">{contacto.apellidos}</td>
+                  <td className="p-4 text-slate-300 capitalize">{contacto.interes}</td>
                   <td className="p-4 text-slate-300">{contacto.email}</td>
-                  <td className="p-4 text-slate-400">
-                    {contacto.empresa || "-"}
-                  </td>
                   <td className="p-4 text-slate-400 text-sm">
                     {formatDate(contacto.created_at)}
                   </td>
@@ -420,15 +423,43 @@ export default function AdminContactosPage() {
                   </div>
                 )}
 
-                {selectedContacto.servicio_interes && (
+                {selectedContacto.interes && (
                   <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-700/50">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
                         <MessageSquare className="w-5 h-5 text-green-400" />
                       </div>
                       <div>
-                        <p className="text-xs text-slate-400">Servicio de Interés</p>
-                        <p className="text-white capitalize">{selectedContacto.servicio_interes}</p>
+                        <p className="text-xs text-slate-400">Interés</p>
+                        <p className="text-white capitalize">{selectedContacto.interes}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedContacto.categoria && (
+                  <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-700/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <Building className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Categoría</p>
+                        <p className="text-white capitalize">{selectedContacto.categoria}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {selectedContacto.posicion && (
+                  <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-700/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                        <Building className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Posición</p>
+                        <p className="text-white capitalize">{selectedContacto.posicion}</p>
                       </div>
                     </div>
                   </div>

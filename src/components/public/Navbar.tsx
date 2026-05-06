@@ -12,8 +12,11 @@ import NavbarCart from "./NavbarCart";
 const navLinks = [
   { href: "/", label: "Inicio" },
   { href: "/nosotros", label: "Nosotros" },
+  { href: "/servicios", label: "Servicios" },
+  { href: "/productos", label: "Productos" },
   { href: "/blog", label: "Blog" },
-  { href: "/contacto", label: "Contacto" },
+  { href: "/contacto", label: "Contacto" }
+  
 ];
 
 export default function Navbar() {
@@ -49,7 +52,7 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
-{/* Logo */}
+          {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
               src="/logo sin fondo.png"
@@ -86,18 +89,6 @@ export default function Navbar() {
               );
             })}
             
-            {/* Botón Productos - simple link a página de productos */}
-            <Link
-              href="/productos"
-              className="relative text-sm font-medium transition-colors duration-200 group"
-            >
-              <span className={pathname === "/productos" || pathname?.startsWith("/productos") ? "text-white" : "text-white/70 hover:text-white"}>
-                Productos
-              </span>
-              <span className={`absolute left-0 -bottom-1 h-0.5 bg-accent transition-all duration-300 ${
-                pathname === "/productos" || pathname?.startsWith("/productos") ? "w-full" : "w-0 group-hover:w-full"
-              }`} />
-            </Link>
             
             {/* Blog y Contacto */}
             {navLinks.slice(2).map((link) => {
@@ -144,7 +135,7 @@ export default function Navbar() {
                   className="text-sm font-semibold text-white/70 hover:text-white px-4 py-2.5 transition-colors flex items-center gap-2"
                 >
                   <LogIn size={18} />
-                  Login
+                  
                 </Link>
                 <Link
                   href="/contacto"

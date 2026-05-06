@@ -71,17 +71,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: errores }, { status: 400 });
     }
 
-    const { nombre, email, telefono, empresa, servicio_interes, mensaje } = result.data;
+    const { nombre, apellidos, interes, categoria, posicion, empresa, email, telefono, mensaje } = result.data;
     
-    // Validar servicios seleccionados si existen
-    let servicioInteres = servicio_interes;
-    if (body.servicios_seleccionados && Array.isArray(body.servicios_seleccionados) && body.servicios_seleccionados.length > 0) {
-      const serviciosResult = productosSeleccionadosSchema.safeParse(body.servicios_seleccionados);
-      if (serviciosResult.success) {
-        servicioInteres = JSON.stringify(body.servicios_seleccionados);
-      }
-    }
-
     // Obtener IP del cliente
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
                request.headers.get('x-real-ip') ||
@@ -90,10 +81,13 @@ export async function POST(request: NextRequest) {
     const contacto = await prisma.contacto.create({
       data: {
         nombre,
+        apellidos,
+        interes,
+        categoria,
+        posicion: posicion || null,
+        empresa,
         email,
         telefono,
-        empresa,
-        servicio_interes: servicioInteres,
         mensaje,
         ip,
       },
