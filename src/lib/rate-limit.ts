@@ -107,6 +107,27 @@ export async function checkAuthRateLimit(request: NextRequest): Promise<{
   return { allowed, remaining, resetAt };
 }
 
+// ============================================
+// Rate limiting genérico para endpoints públicos
+// ============================================
+
+/**
+ * Rate limit para endpoints públicos de escritura
+ * 10 peticiones por minuto (más permisivo que auth)
+ */
+export async function checkApiRateLimit(request: NextRequest): Promise<{
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+}> {
+  const { allowed, remaining, resetAt } = withRateLimit(request, {
+    limit: 10,
+    windowMs: 60 * 1000, // 1 minuto
+  });
+
+  return { allowed, remaining, resetAt };
+}
+
 export function getRateLimitHeaders(remaining: number, resetAt: number): Record<string, string> {
   return {
     'X-RateLimit-Limit': String(DEFAULT_LIMIT),

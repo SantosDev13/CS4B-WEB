@@ -31,9 +31,12 @@ export async function GET(
     });
 
     return NextResponse.json({
-      ...post,
-      categoriaPost: post.categoriaPost,
-      autor: post.autor,
+      success: true,
+      data: {
+        ...post,
+        categoriaPost: post.categoriaPost,
+        autor: post.autor,
+      },
     });
   } catch (error) {
     console.error('Error al obtener post:', error);
@@ -48,8 +51,8 @@ export async function PUT(
 ) {
   try {
     const authUser = await getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!authUser || (authUser.rol !== 'admin' && authUser.rol !== 'editor')) {
+      return NextResponse.json({ error: 'Solo administradores o editores pueden actualizar posts' }, { status: 403 });
     }
 
     const { slug } = await params;

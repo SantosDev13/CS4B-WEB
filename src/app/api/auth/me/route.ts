@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ user: usuario });
+    return NextResponse.json({ success: true, data: usuario });
   } catch (error) {
     console.error("Error al obtener usuario:", error);
     return NextResponse.json(

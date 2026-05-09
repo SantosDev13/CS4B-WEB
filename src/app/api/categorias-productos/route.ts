@@ -11,17 +11,24 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    const categorias = await prisma.categoria_producto.findMany({
-      where: publishedOnly ? { visible: true } : undefined,
-      orderBy: { orden: 'asc' },
-      skip: offset,
-      take: limit,
-    });
+    const where = publishedOnly ? { visible: true } : undefined;
 
-    return NextResponse.json({ success: true, data: categorias });
+    const [categorias, total] = await Promise.all([
+      prisma.categoria_producto.findMany({
+        where,
+        orderBy: { orden: 'asc' },
+        skip: offset,
+        take: limit,
+      }),
+      prisma.categoria_producto.count({ where }),
+    ]);
+
+    const response = NextResponse.json({ success: true, data: categorias, total, limit, offset });
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+    return response;
   } catch (error) {
     console.error('Error fetching categorias_productos:', error);
-    return NextResponse.json({ success: true, data: [], error: 'Error al obtener categorías' }, { status: 200 });
+    return NextResponse.json({ error: 'Error al obtener categorías' }, { status: 500 });
   }
 }
 

@@ -16,7 +16,7 @@ export async function GET(
       return NextResponse.json({ error: 'Categoría no encontrada' }, { status: 404 });
     }
 
-    return NextResponse.json(categoria);
+    return NextResponse.json({ success: true, data: categoria });
   } catch (error) {
     console.error('Error al obtener categoría:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });

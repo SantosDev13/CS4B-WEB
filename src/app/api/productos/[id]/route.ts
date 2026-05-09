@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
+import { productoUpdateSchema } from '@/lib/validations';
 import type { Prisma } from '@prisma/client';
 
 // GET - Obtener producto por ID
@@ -40,23 +41,17 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    const allowedFields = ['titulo', 'slug', 'descripcion', 'descripcion_corta', 'icono', 'imagen', 'categoria_producto_id', 'tamanho', 'orden', 'visible'];
-    const updateData: Prisma.ProductoUpdateInput = {};
+    // Validar con Zod
+    const result = productoUpdateSchema.safeParse(body);
 
-    for (const [key, value] of Object.entries(body)) {
-      const dbKey = key === 'icon' ? 'icono' : key;
-      if (allowedFields.includes(dbKey)) {
-        (updateData as Record<string, unknown>)[dbKey] = value;
-      }
-    }
-
-    if (Object.keys(updateData).length === 0) {
-      return NextResponse.json({ error: 'No hay campos válidos para actualizar' }, { status: 400 });
+    if (!result.success) {
+      const errores = result.error.errors.map(e => e.message).join(', ');
+      return NextResponse.json({ error: errores }, { status: 400 });
     }
 
     const producto = await prisma.producto.update({
       where: { id },
-      data: updateData,
+      data: result.data,
     });
 
     return NextResponse.json({ success: true, data: producto });

@@ -9,8 +9,8 @@ export async function GET(
 ) {
   try {
     const authUser = await getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!authUser || (authUser.rol !== 'admin' && authUser.rol !== 'editor')) {
+      return NextResponse.json({ error: 'Solo administradores o editores pueden ver contactos' }, { status: 403 });
     }
 
     const { id } = await params;
@@ -25,7 +25,7 @@ export async function GET(
       await prisma.contacto.update({ where: { id }, data: { leido: true } });
     }
 
-    return NextResponse.json(contacto);
+    return NextResponse.json({ success: true, data: contacto });
   } catch (error) {
     console.error('Error al obtener contacto:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
@@ -39,8 +39,8 @@ export async function PUT(
 ) {
   try {
     const authUser = await getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!authUser || (authUser.rol !== 'admin' && authUser.rol !== 'editor')) {
+      return NextResponse.json({ error: 'Solo administradores o editores pueden actualizar contactos' }, { status: 403 });
     }
 
     const { id } = await params;
@@ -57,7 +57,7 @@ export async function PUT(
       data: updateData,
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     console.error('Error al actualizar contacto:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });

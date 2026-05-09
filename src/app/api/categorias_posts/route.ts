@@ -6,10 +6,15 @@ import { categoriaPostSchema } from '@/lib/validations';
 // GET - Obtener categorías de posts (público)
 export async function GET() {
   try {
-    const categorias = await prisma.categoriaPost.findMany({
-      orderBy: { orden: 'asc' },
-    });
-    return NextResponse.json({ success: true, data: categorias });
+    const [categorias, total] = await Promise.all([
+      prisma.categoriaPost.findMany({
+        orderBy: { orden: 'asc' },
+      }),
+      prisma.categoriaPost.count(),
+    ]);
+    const response = NextResponse.json({ success: true, data: categorias, total });
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+    return response;
   } catch (error) {
     console.error('Error al obtener categorías:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });

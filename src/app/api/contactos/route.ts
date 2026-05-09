@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import { contactoSchema, productosSeleccionadosSchema } from '@/lib/validations';
+import { checkApiRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import type { Prisma } from '@prisma/client';
 
 // GET - Obtener contactos (solo admin/editor)
 export async function GET(request: NextRequest) {
   try {
     const authUser = await getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!authUser || (authUser.rol !== 'admin' && authUser.rol !== 'editor')) {
+      return NextResponse.json({ error: 'Solo administradores o editores pueden ver contactos' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -61,6 +62,19 @@ export async function GET(request: NextRequest) {
 // POST - Crear contacto (público - formulario de contacto)
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const { allowed, remaining, resetAt } = await checkApiRateLimit(request);
+    if (!allowed) {
+      const response = NextResponse.json(
+        { error: 'Demasiadas solicitudes. Intenta de nuevo más tarde' },
+        { status: 429 }
+      );
+      Object.entries(getRateLimitHeaders(remaining, resetAt)).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
+    }
+
     const body = await request.json();
     
     // Validar con Zod - extraer solo los campos del schema

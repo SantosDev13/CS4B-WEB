@@ -17,15 +17,18 @@ export async function GET(request: NextRequest) {
     if (publishedOnly) where.visible = true;
     if (categoria) where.categoria_producto_id = categoria;
 
-    const productos = await prisma.producto.findMany({
-      where,
-      include: {
-        categoria: { select: { id: true, nombre: true, slug: true } },
-      },
-      orderBy: { orden: 'asc' },
-      skip: offset,
-      take: limit,
-    });
+    const [productos, total] = await Promise.all([
+      prisma.producto.findMany({
+        where,
+        include: {
+          categoria: { select: { id: true, nombre: true, slug: true } },
+        },
+        orderBy: { orden: 'asc' },
+        skip: offset,
+        take: limit,
+      }),
+      prisma.producto.count({ where }),
+    ]);
 
     // Transformar respuesta para incluir campos calculados
     const productosTransformados = productos.map((p) => ({
@@ -39,7 +42,9 @@ export async function GET(request: NextRequest) {
       } : null,
     }));
 
-    return NextResponse.json({ success: true, data: productosTransformados });
+    const response = NextResponse.json({ success: true, data: productosTransformados, total, limit, offset });
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60');
+    return response;
   } catch (error) {
     console.error('Error fetching productos:', error);
     return NextResponse.json({ error: 'Error al obtener productos' }, { status: 500 });

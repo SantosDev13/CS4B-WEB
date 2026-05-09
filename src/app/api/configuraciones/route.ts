@@ -17,7 +17,9 @@ export async function GET(request: NextRequest) {
       if (!config) {
         return NextResponse.json({ error: 'Configuración no encontrada' }, { status: 404 });
       }
-      return NextResponse.json(config);
+      const response = NextResponse.json({ success: true, data: config });
+      response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+      return response;
     }
 
     const configuraciones = await prisma.configuracion.findMany();
@@ -27,7 +29,9 @@ export async function GET(request: NextRequest) {
       configObj[c.clave] = c.valor;
     });
 
-    return NextResponse.json(configObj);
+    const response = NextResponse.json({ success: true, data: configObj });
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+    return response;
   } catch (error) {
     console.error('Error al obtener configuraciones:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
@@ -65,11 +69,6 @@ export async function POST(request: NextRequest) {
     console.error('Error al guardar configuración:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
-}
-
-// PUT - Actualizar configuración (solo admin)
-export async function PUT(request: NextRequest) {
-  return POST(request);
 }
 
 // DELETE - Eliminar configuración (solo admin)

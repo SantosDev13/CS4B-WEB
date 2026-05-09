@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import { postSchema } from '@/lib/validations';
+import { checkApiRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
 import type { Prisma } from '@prisma/client';
 
 // GET - Obtener posts (público)
@@ -51,8 +52,21 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const authUser = await getAuthUser(request);
-    if (!authUser) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!authUser || (authUser.rol !== 'admin' && authUser.rol !== 'editor')) {
+      return NextResponse.json({ error: 'Solo administradores o editores pueden crear posts' }, { status: 403 });
+    }
+
+    // Rate limiting para evitar flood de posts
+    const { allowed, remaining, resetAt } = await checkApiRateLimit(request);
+    if (!allowed) {
+      const response = NextResponse.json(
+        { error: 'Demasiadas solicitudes. Intenta de nuevo más tarde' },
+        { status: 429 }
+      );
+      Object.entries(getRateLimitHeaders(remaining, resetAt)).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
     }
 
     const body = await request.json();
