@@ -56,7 +56,7 @@ export const contactosApi = {
     });
   },
 
-  /**
+/**
    * Actualizar un contacto (marcar como leído, responder)
    */
   update: async (id: string, data: UpdateContactoInput): Promise<ApiResponse<Contacto>> => {

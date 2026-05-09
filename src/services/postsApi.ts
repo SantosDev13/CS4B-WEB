@@ -78,7 +78,7 @@ export const postsApi = {
     });
   },
 
-  /**
+/**
    * Actualizar un post
    */
   update: async (id: string, data: UpdatePostInput): Promise<ApiResponse<Post>> => {
