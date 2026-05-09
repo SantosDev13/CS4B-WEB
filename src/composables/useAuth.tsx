@@ -15,7 +15,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   mounted: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; remaining?: number; resetAt?: number }>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
@@ -58,10 +58,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: "include",
       });
 
+      // Extraer headers de rate limit
+      const remaining = parseInt(res.headers.get("X-RateLimit-Remaining") || "5", 10);
+      const resetAtHeader = res.headers.get("X-RateLimit-Reset");
+      const resetAt = resetAtHeader ? new Date(resetAtHeader).getTime() : 0;
+
       const data = await res.json();
 
       if (!res.ok) {
-        return { success: false, error: data.error };
+        return { 
+          success: false, 
+          error: data.error,
+          remaining,
+          resetAt,
+        };
       }
 
       setUser(data.user);

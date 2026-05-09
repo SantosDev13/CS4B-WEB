@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import type { Metadata } from "next";
+import DOMPurify from "isomorphic-dompurify";
+import { cookies } from "next/headers";
+import { categorizeError } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -28,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // Función para obtener un post por slug
-async function getPost(slug: string) {
+async function fetchPostBySlug(slug: string) {
   try {
     const post = await prisma.post.findUnique({
       where: { slug },
@@ -40,11 +43,26 @@ async function getPost(slug: string) {
     
     if (!post) return null;
     
-    // Incrementar vistas
-    await prisma.post.update({
-      where: { id: post.id },
-      data: { vistas: { increment: 1 } },
-    });
+    // Verificar si el usuario ya vio este post (cookie expira en 1 hora)
+    const cookieStore = await cookies();
+    const viewedPosts = cookieStore.get("viewed_posts")?.value || "";
+    const viewedList = viewedPosts ? JSON.parse(viewedPosts) : [];
+    
+    // Solo incrementar si no ha sido visto recently
+    if (!viewedList.includes(post.id)) {
+      await prisma.post.update({
+        where: { id: post.id },
+        data: { vistas: { increment: 1 } },
+      });
+      
+      // Actualizar cookie con el post visto
+      const newViewedList = [...viewedList, post.id].slice(-20); // Guardar max 20 posts
+      cookieStore.set("viewed_posts", JSON.stringify(newViewedList), {
+        httpOnly: true,
+        maxAge: 3600, // 1 hora
+        path: "/",
+      });
+    }
     
     return {
       ...post,
@@ -58,7 +76,7 @@ async function getPost(slug: string) {
 }
 
 // Función para obtener posts relacionados
-async function getRelatedPosts(categoriaId: string, currentSlug: string) {
+async function fetchRelatedPosts(categoriaId: string, currentSlug: string) {
   try {
     const posts = await prisma.post.findMany({
       where: { 
@@ -77,13 +95,13 @@ async function getRelatedPosts(categoriaId: string, currentSlug: string) {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const post = await fetchPostBySlug(slug);
   
   if (!post) {
     notFound();
   }
   
-  const relatedPosts = post.categoria_post_id ? await getRelatedPosts(post.categoria_post_id, slug) : [];
+  const relatedPosts = post.categoria_post_id ? await fetchRelatedPosts(post.categoria_post_id, slug) : [];
   
   const formatDate = (date: Date | string | null) => {
     if (!date) return "";
@@ -206,7 +224,7 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="max-w-3xl mx-auto">
             <div 
               className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: post.contenido }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.contenido) }}
             />
 
             {/* Author info */}

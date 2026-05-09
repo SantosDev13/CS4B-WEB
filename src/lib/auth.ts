@@ -2,7 +2,14 @@ import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'cs4b-dev-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET no está configurado en las variables de entorno. Agrega JWT_SECRET en tu archivo .env');
+}
+
+// Type assertion since we throw if not defined
+const JWT_SECRET_ASSERTED = JWT_SECRET as string;
 const JWT_EXPIRES_IN = '1d';
 
 export interface AuthUser {
@@ -38,7 +45,7 @@ export function createToken(user: { id: string; email: string; nombre: string; r
     rol: user.rol,
   };
   
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, JWT_SECRET_ASSERTED, { expiresIn: JWT_EXPIRES_IN });
 }
 
 /**
@@ -46,7 +53,7 @@ export function createToken(user: { id: string; email: string; nombre: string; r
  */
 export function verifyToken(token: string): { id: string; email: string; nombre: string; rol: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as { id: string; email: string; nombre: string; rol: string };
+    return jwt.verify(token, JWT_SECRET_ASSERTED) as { id: string; email: string; nombre: string; rol: string };
   } catch {
     return null;
   }

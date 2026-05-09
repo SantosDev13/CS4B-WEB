@@ -1,5 +1,6 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import { categorizeError } from "@/lib/utils";
 
 // Tipos
 interface Post {
@@ -28,7 +29,7 @@ interface Categoria {
 }
 
 // Función para obtener posts
-async function getPosts() {
+async function fetchPosts() {
   try {
     const posts = await prisma.post.findMany({
       where: { publicado: true },
@@ -50,21 +51,22 @@ async function getPosts() {
 }
 
 // Función para obtener todas las categorías
-async function getCategorias() {
+async function fetchCategorias() {
   try {
     const categorias = await prisma.categoriaPost.findMany({
       orderBy: { orden: 'asc' },
     });
     return categorias;
   } catch (error) {
-    console.error("Error fetching categorias:", error);
+    const categorized = categorizeError(error);
+    console.error(`[${categorized.code}] Error fetching categorias:`, categorized.message);
     return [];
   }
 }
 
 export default async function BlogPage() {
-  const posts = await getPosts();
-  const categorias = await getCategorias();
+  const posts = await fetchPosts();
+  const categorias = await fetchCategorias();
 
   return (
     <div className="min-h-screen bg-bg-light pt-0">

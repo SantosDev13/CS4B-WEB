@@ -1,20 +1,62 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, Lock, LogIn, Eye, EyeOff, AlertCircle, LogOut, User, Shield } from "lucide-react";
+import { Mail, Lock, LogIn, Eye, EyeOff, AlertCircle, Clock } from "lucide-react";
 import { useAuth } from "@/composables";
+import { ROUTES } from "@/constants";
+import { Spinner } from "@/components/ui/Spinner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
+  const [cooldownEndsAt, setCooldownEndsAt] = useState<number | null>(null);
   const { login, logout, isAuthenticated, user, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // Validar formato de email
+  const validateEmail = (value: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    // Limpiar error de email cuando el usuario empieza a escribir
+    if (emailError) setEmailError("");
+  };
+
+  // Mostrar countdown del cooldown
+  useEffect(() => {
+    if (!cooldownEndsAt) return;
+    
+    const interval = setInterval(() => {
+      const now = Date.now();
+      if (now >= cooldownEndsAt) {
+        setCooldownEndsAt(null);
+        setAttemptsRemaining(null);
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [cooldownEndsAt]);
+
+  // Formatear tiempo restante
+  const formatCooldown = (timestamp: number): string => {
+    const remaining = Math.max(0, timestamp - Date.now());
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   // Evitar hydration mismatch
   useEffect(() => {
@@ -24,7 +66,7 @@ export default function LoginPage() {
   // Si ya está autenticado, redirigir al admin directamente
   useEffect(() => {
     if (mounted && !authLoading && isAuthenticated) {
-      router.push("/admin");
+      router.push(ROUTES.admin);
     }
   }, [mounted, authLoading, isAuthenticated, router]);
 
@@ -32,7 +74,7 @@ export default function LoginPage() {
   if (!mounted || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+        <Spinner size="lg" className="text-cyan-500" />
       </div>
     );
   }
@@ -45,14 +87,43 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validar email en frontend
+    if (!validateEmail(email)) {
+      setEmailError("Ingresá un correo electrónico válido");
+      return;
+    }
+
+    // Validar que la contraseña no esté vacía
+    if (!password.trim()) {
+      setError("La contraseña es requerida");
+      return;
+    }
+
     setLoading(true);
 
     const result = await login(email, password);
 
     if (result.success) {
-      router.push("/admin");
+      router.push(ROUTES.admin);
     } else {
-      setError(result.error || "Error al iniciar sesión");
+      // Guardar información de rate limit para feedback visual
+      if (result.remaining !== undefined) {
+        setAttemptsRemaining(result.remaining);
+      }
+      if (result.resetAt) {
+        setCooldownEndsAt(result.resetAt);
+      }
+
+      // Construir mensaje de error con intentos restantes
+      let errorMessage = result.error || "Error al iniciar sesión";
+      if (result.remaining !== undefined && result.remaining < 5) {
+        errorMessage += ` (${result.remaining} intento${result.remaining === 1 ? "" : "s"} restante${result.remaining === 1 ? "" : "s"})`;
+      }
+      if (cooldownEndsAt) {
+        errorMessage = `Demasiados intentos. Podés reintentar en ${formatCooldown(cooldownEndsAt)}`;
+      }
+      setError(errorMessage);
     }
 
     setLoading(false);
@@ -114,12 +185,20 @@ export default function LoginPage() {
                   type="email"
                   id="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   required
+                  aria-describedby={emailError ? "email-error" : undefined}
+                  aria-invalid={emailError ? "true" : undefined}
                   className="w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
                   placeholder="correo@ejemplo.com"
                 />
               </div>
+              {emailError && (
+                <p id="email-error" className="mt-1 text-sm text-red-400 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {emailError}
+                </p>
+              )}
             </div>
 
             {/* Password */}
@@ -136,19 +215,57 @@ export default function LoginPage() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={cooldownEndsAt !== null}
                   required
-                  className="w-full pl-11 pr-12 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                  className="w-full pl-11 pr-12 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition-colors"
+                  tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
+
+            {/* Attempts remaining indicator */}
+            {attemptsRemaining !== null && !cooldownEndsAt && attemptsRemaining < 5 && (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500">
+                  Intentos restantes: 
+                </span>
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1.5 w-5 rounded-full transition-colors ${
+                        i < attemptsRemaining ? "bg-amber-500" : "bg-slate-700"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cooldown indicator */}
+            {cooldownEndsAt && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="text-center py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg"
+              >
+                <div className="flex items-center justify-center gap-2 text-amber-400">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-sm font-medium">Demasiados intentos</span>
+                </div>
+                <p className="text-amber-300/70 text-xs mt-1">
+                  Podés reintentar en <span className="font-mono">{formatCooldown(cooldownEndsAt)}</span>
+                </p>
+              </motion.div>
+            )}
 
             {/* Submit Button */}
             <button
@@ -158,10 +275,7 @@ export default function LoginPage() {
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
+                  <Spinner size="sm" />
                   Iniciando sesión...
                 </span>
               ) : (
@@ -172,7 +286,7 @@ export default function LoginPage() {
 
           {/* Back to home */}
           <div className="mt-6 text-center">
-            <a href="/" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors">
+            <a href={ROUTES.home} className="text-sm text-slate-400 hover:text-cyan-400 transition-colors">
               ← Volver al inicio
             </a>
           </div>

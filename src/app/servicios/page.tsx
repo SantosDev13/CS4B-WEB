@@ -1,47 +1,9 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { SERVICIOS } from "@/constants";
 
 export const dynamic = "force-static";
 export const revalidate = false;
-
-// DATOS DE LOS SERVICIOS - Edita aquí la lista
-const servicios = [
-  {
-    carpeta: "consultoria",
-    titulo: "Consultoría",
-    subtitulo: "Asesoría estratégica para transformar tu negocio",
-    descripcion: "Te ayudamos a identificar oportunidades de mejora y diseñar la hoja de ruta perfecta para tu empresa.",
-    color: "#3d79e2",
-  },
-  {
-    carpeta: "desarrollo",
-    titulo: "Desarrollo",
-    subtitulo: "Software a medida para tus necesidades",
-    descripcion: "Creamos soluciones de software personalizadas que se adaptan perfectamente a tus procesos de negocio.",
-    color: "#10b981",
-  },
-  {
-    carpeta: "infraestructura",
-    titulo: "Infraestructura",
-    subtitulo: "Infraestructura robusta y escalable",
-    descripcion: "Diseñamos e implementamos la infraestructura tecnológica que tu empresa necesita para crecer.",
-    color: "#8b5cf6",
-  },
-  {
-    carpeta: "seguridad",
-    titulo: "Seguridad",
-    subtitulo: "Protección integral para tus datos",
-    descripcion: "Protegemos tus activos más valiosos con soluciones de ciberseguridad de nivel empresarial.",
-    color: "#ef4444",
-  },
-  {
-    carpeta: "soporte",
-    titulo: "Soporte",
-    subtitulo: "Asistencia técnica especializada",
-    descripcion: "Equipo de soporte disponible 24/7 para resolver cualquier incidencia.",
-    color: "#f59e0b",
-  },
-];
 
 export default function ServiciosPage() {
   return (
@@ -67,7 +29,7 @@ export default function ServiciosPage() {
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="space-y-6">
-            {servicios.map((servicio) => (
+            {SERVICIOS.map((servicio) => (
               <div
                 key={servicio.carpeta}
                 className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden"

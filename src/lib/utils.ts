@@ -71,3 +71,58 @@ export function formatPhone(phone: string): string {
 export function generateId(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
+
+// ============================================
+// ERROR HANDLING
+// ============================================
+
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly statusCode: number = 500,
+    public readonly isOperational: boolean = true
+  ) {
+    super(message);
+    this.name = "AppError";
+  }
+}
+
+export class DatabaseError extends AppError {
+  constructor(message: string) {
+    super(message, "DATABASE_ERROR", 500);
+    this.name = "DatabaseError";
+  }
+}
+
+export class NetworkError extends AppError {
+  constructor(message: string) {
+    super(message, "NETWORK_ERROR", 503);
+    this.name = "NetworkError";
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message: string) {
+    super(message, "VALIDATION_ERROR", 400);
+    this.name = "ValidationError";
+  }
+}
+
+export function categorizeError(error: unknown): AppError {
+  if (error instanceof AppError) {
+    return error;
+  }
+  
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  
+  if (errorMessage.includes("prisma") || errorMessage.includes("database")) {
+    return new DatabaseError("Error de base de datos");
+  }
+  
+  if (errorMessage.includes("fetch") || errorMessage.includes("network") || errorMessage.includes("ECONNREFUSED")) {
+    return new NetworkError("Error de conexión");
+  }
+  
+  return new AppError(errorMessage, "UNKNOWN_ERROR", 500);
+}

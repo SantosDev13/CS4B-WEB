@@ -22,7 +22,7 @@ interface CategoriaWithProductos {
   }[];
 }
 
-async function getCategoriasConProductos() {
+async function fetchCategoriasConProductos() {
   try {
     // Usar Prisma - import directo
     const { PrismaClient } = await import('@prisma/client');
@@ -79,7 +79,7 @@ export default async function ProductosPage() {
   let categorias: CategoriaWithProductos[] = [];
 
   try {
-    categorias = await getCategoriasConProductos();
+    categorias = await fetchCategoriasConProductos();
   } catch (error) {
     console.error("Error loading categorias:", error);
   }

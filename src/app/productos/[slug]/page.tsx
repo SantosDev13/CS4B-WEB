@@ -45,7 +45,7 @@ interface CategoriaWithProductos {
 }
 
 // Buscar categoría por slug
-async function getCategoriaBySlug(slug: string): Promise<CategoriaWithProductos | null> {
+async function fetchCategoriaBySlug(slug: string): Promise<CategoriaWithProductos | null> {
   try {
     const categoria = await prisma.categoria_producto.findUnique({
       where: { slug, visible: true },
@@ -79,7 +79,7 @@ async function getCategoriaBySlug(slug: string): Promise<CategoriaWithProductos 
 }
 
 // Buscar producto por slug
-async function getProductoBySlug(slug: string): Promise<ProductoDB | null> {
+async function fetchProductoBySlug(slug: string): Promise<ProductoDB | null> {
   try {
     const producto = await prisma.producto.findUnique({
       where: { slug, visible: true },
@@ -111,7 +111,7 @@ async function getProductoBySlug(slug: string): Promise<ProductoDB | null> {
   }
 }
 
-async function getProductosRelacionados(excludeId: string, limit = 3): Promise<{slug: string, titulo: string}[]> {
+async function fetchProductosRelacionados(excludeId: string, limit = 3): Promise<{slug: string, titulo: string}[]> {
   try {
     const productos = await prisma.producto.findMany({
       where: { id: { not: excludeId }, visible: true },
@@ -129,20 +129,20 @@ export default async function ProductoPage({ params }: Props) {
   const { slug } = await params;
   
   // Primero buscar si es una categoría
-  const categoria = await getCategoriaBySlug(slug);
+  const categoria = await fetchCategoriaBySlug(slug);
   
   if (categoria) {
     return <CategoriaProductosPage categoria={categoria} />;
   }
   
   // No es categoría, buscar si es un producto
-  const producto = await getProductoBySlug(slug);
+  const producto = await fetchProductoBySlug(slug);
   
   if (!producto) {
     notFound();
   }
   
-  const productosRelacionados = await getProductosRelacionados(producto.id);
+  const productosRelacionados = await fetchProductosRelacionados(producto.id);
 
   const productoTransformado = {
     ...producto,
