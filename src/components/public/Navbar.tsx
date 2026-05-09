@@ -135,7 +135,6 @@ export default function Navbar() {
                   className="text-sm font-semibold text-white/70 hover:text-white px-4 py-2.5 transition-colors flex items-center gap-2"
                 >
                   <LogIn size={18} />
-                  
                 </Link>
                 <Link
                   href="/contacto"
