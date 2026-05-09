@@ -2,6 +2,10 @@ import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
+// Definir JWT_SECRET para tests (evita el error en auth.ts)
+process.env.JWT_SECRET = 'test-jwt-secret-for-testing-only-not-production';
+process.env.NODE_ENV = 'test';
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();

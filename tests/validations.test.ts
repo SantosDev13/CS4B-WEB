@@ -22,6 +22,9 @@ describe('contactoSchema', () => {
   it('should validate correct contacto data', () => {
     const result = contactoSchema.safeParse({
       nombre: 'Juan Pérez',
+      apellidos: 'Pérez García',
+      interes: 'cotizacion',
+      categoria: 'c-level',
       email: 'juan@example.com',
       mensaje: 'Estoy interesado en sus servicios de consultoría.',
     });
@@ -30,7 +33,10 @@ describe('contactoSchema', () => {
 
   it('should reject short nombre', () => {
     const result = contactoSchema.safeParse({
-      nombre: 'J',
+      nombre: '',  // vacío - el schema requiere min(1)
+      apellidos: 'Pérez',
+      interes: 'consulta',
+      categoria: 'director',
       email: 'juan@example.com',
       mensaje: 'Estoy interesado en sus servicios.',
     });
@@ -40,6 +46,9 @@ describe('contactoSchema', () => {
   it('should reject short mensaje', () => {
     const result = contactoSchema.safeParse({
       nombre: 'Juan',
+      apellidos: 'Pérez',
+      interes: 'soporte',
+      categoria: 'manager',
       email: 'juan@example.com',
       mensaje: 'Hola',
     });
@@ -49,12 +58,40 @@ describe('contactoSchema', () => {
   it('should accept optional fields', () => {
     const result = contactoSchema.safeParse({
       nombre: 'Juan Pérez',
+      apellidos: 'Pérez García',
+      interes: 'cotizacion',
+      categoria: 'c-level',
       email: 'juan@example.com',
       telefono: '+51 999 999 999',
       empresa: 'Mi Empresa',
-      mensaje: 'Quiero información sobre servicios.',
+      posicion: 'ceo',
+      mensaje: 'Quiero información sobre servicios de consultoría.',
     });
     expect(result.success).toBe(true);
+  });
+
+  it('should accept with all optional fields', () => {
+    const result = contactoSchema.safeParse({
+      nombre: 'Ana García',
+      apellidos: 'García López',
+      interes: 'consulta',
+      categoria: 'director',
+      email: 'ana@example.com',
+      telefono: '+51 988 888 888',
+      empresa: 'Empresa XYZ',
+      posicion: 'dir-marketing',
+      mensaje: 'Necesito información sobre los servicios de desarrollo web.',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject without required fields', () => {
+    const result = contactoSchema.safeParse({
+      nombre: 'Juan',
+      email: 'juan@example.com',
+      mensaje: 'Este es un mensaje suficientemente largo',
+    });
+    expect(result.success).toBe(false);
   });
 });
 
