@@ -8,8 +8,6 @@ yarn-error.log*
 .next/
 out/
 
-# Environment variables
-!.env.example
 
 # Logs
 *.log
