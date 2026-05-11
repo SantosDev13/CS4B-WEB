@@ -41,6 +41,10 @@ interface Producto {
   tamanho: 'small' | 'medium' | 'large';
   orden: number;
   visible: boolean;
+  precio: number | null;
+  precio_anterior: number | null;
+  tipo_moneda: string;
+  mostrar_precio: boolean;
   created_at: string;
   categoria_producto?: Categoria_producto;
 }
@@ -62,6 +66,11 @@ const TAMANOS = [
   { value: 'large', label: 'Grande (2x2)' },
 ];
 
+const MONEDAS = [
+  { value: 'PEN', label: 'S/ PEN (Soles)' },
+  { value: 'USD', label: '$ USD (Dólares)' },
+];
+
 export default function AdminProductosPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -80,6 +89,11 @@ export default function AdminProductosPage() {
     tamanho: "medium",
     orden: 0,
     visible: true,
+    // Precio
+    precio: "",
+    precio_anterior: "",
+    tipo_moneda: "PEN",
+    mostrar_precio: true,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -137,6 +151,11 @@ export default function AdminProductosPage() {
         tamanho: formData.tamanho,
         orden: parseInt(String(formData.orden)) || 0,
         visible: formData.visible,
+        // Precio
+        precio: formData.precio ? parseFloat(formData.precio) : null,
+        precio_anterior: formData.precio_anterior ? parseFloat(formData.precio_anterior) : null,
+        tipo_moneda: formData.tipo_moneda,
+        mostrar_precio: formData.mostrar_precio,
       };
 
       const res = await fetch(url, {
@@ -176,6 +195,11 @@ export default function AdminProductosPage() {
       tamanho: producto.tamanho,
       orden: producto.orden,
       visible: producto.visible,
+      // Precio
+      precio: producto.precio ? String(producto.precio) : "",
+      precio_anterior: producto.precio_anterior ? String(producto.precio_anterior) : "",
+      tipo_moneda: producto.tipo_moneda || "PEN",
+      mostrar_precio: producto.mostrar_precio ?? true,
     });
     setShowModal(true);
   };
@@ -222,6 +246,11 @@ export default function AdminProductosPage() {
       tamanho: "medium",
       orden: 0,
       visible: true,
+      // Precio
+      precio: "",
+      precio_anterior: "",
+      tipo_moneda: "PEN",
+      mostrar_precio: true,
     });
   };
 
@@ -291,6 +320,7 @@ export default function AdminProductosPage() {
               <th className="text-left p-4 text-slate-400 font-medium">Icono</th>
               <th className="text-left p-4 text-slate-400 font-medium">Título</th>
               <th className="text-left p-4 text-slate-400 font-medium">Categoría</th>
+              <th className="text-center p-4 text-slate-400 font-medium">Precio</th>
               <th className="text-center p-4 text-slate-400 font-medium">Tamaño</th>
               <th className="text-center p-4 text-slate-400 font-medium">Visible</th>
               <th className="text-right p-4 text-slate-400 font-medium">Acciones</th>
@@ -299,7 +329,7 @@ export default function AdminProductosPage() {
           <tbody>
             {filteredProductos.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-slate-500">
+                <td colSpan={7} className="p-8 text-center text-slate-500">
                   No hay productos disponibles
                 </td>
               </tr>
@@ -326,6 +356,22 @@ export default function AdminProductosPage() {
                       <span className="text-slate-300 capitalize">
                         {producto.categoria_producto?.nombre || 'Sin categoría'}
                       </span>
+                    </td>
+                    <td className="p-4 text-center">
+                      {producto.mostrar_precio && producto.precio ? (
+                        <div className="flex flex-col items-center">
+                          <span className="font-semibold text-white">
+                            {producto.tipo_moneda === 'PEN' ? 'S/' : '$'}{producto.precio}
+                          </span>
+                          {producto.precio_anterior && producto.precio_anterior > producto.precio && (
+                            <span className="text-xs text-slate-500 line-through">
+                              {producto.tipo_moneda === 'PEN' ? 'S/' : '$'}{producto.precio_anterior}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-slate-500 text-sm">Por cotizar</span>
+                      )}
                     </td>
                     <td className="p-4 text-center">
                       <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-700 text-slate-300 capitalize">
@@ -523,6 +569,74 @@ export default function AdminProductosPage() {
                     className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
                     placeholder="https://..."
                   />
+                </div>
+
+                {/* Sección de Precio */}
+                <div className="border-t border-slate-700/50 pt-4 mt-4">
+                  <h3 className="text-sm font-semibold text-slate-300 mb-4">Precio</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Precio (Opcional)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.precio}
+                        onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
+                        className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
+                        placeholder="299.00"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Precio Anterior (descuento)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.precio_anterior}
+                        onChange={(e) => setFormData({ ...formData, precio_anterior: e.target.value })}
+                        className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
+                        placeholder="399.00"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Moneda
+                      </label>
+                      <select
+                        value={formData.tipo_moneda}
+                        onChange={(e) => setFormData({ ...formData, tipo_moneda: e.target.value })}
+                        className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
+                      >
+                        {MONEDAS.map((mon) => (
+                          <option key={mon.value} value={mon.value}>
+                            {mon.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex items-end">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          id="mostrar_precio"
+                          checked={formData.mostrar_precio}
+                          onChange={(e) => setFormData({ ...formData, mostrar_precio: e.target.checked })}
+                          className="w-5 h-5 rounded bg-slate-900 border-slate-600 text-cyan-500 focus:ring-cyan-500/50"
+                        />
+                        <label htmlFor="mostrar_precio" className="text-slate-300">
+                          Mostrar precio
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3">
