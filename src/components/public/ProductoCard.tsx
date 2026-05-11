@@ -18,6 +18,11 @@ interface ProductoCardProps {
     tamanho: string;
     categoria_nombre?: string;
     categoria_slug?: string;
+    // Precio
+    precio?: number | null;
+    precio_anterior?: number | null;
+    tipo_moneda?: string;
+    mostrar_precio?: boolean;
   };
   categoriaNombre?: string;
 }
@@ -101,6 +106,24 @@ export default function ProductoCard({ producto, categoriaNombre }: ProductoCard
           <p className="text-sm text-text-secondary line-clamp-2">
             {producto.descripcion_corta || producto.descripcion?.substring(0, 100) + "..."}
           </p>
+
+          {/* Precio */}
+          {producto.mostrar_precio && producto.precio ? (
+            <div className="mt-3 flex items-center gap-2">
+              <span className="text-xl font-bold text-primary">
+                {producto.tipo_moneda === 'PEN' ? 'S/' : '$'}{Number(producto.precio).toFixed(2)}
+              </span>
+              {producto.precio_anterior && Number(producto.precio_anterior) > Number(producto.precio) && (
+                <span className="text-sm text-text-muted line-through">
+                  {producto.tipo_moneda === 'PEN' ? 'S/' : '$'}{Number(producto.precio_anterior).toFixed(2)}
+                </span>
+              )}
+            </div>
+          ) : (
+            <div className="mt-3 text-sm font-medium text-secondary">
+              Por cotizar
+            </div>
+          )}
 
           {/* Footer del card */}
           <div className="mt-4 pt-3 border-t flex items-center justify-between">

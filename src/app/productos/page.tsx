@@ -19,6 +19,10 @@ interface CategoriaWithProductos {
     icono: string | null;
     imagen: string | null;
     tamanho: string;
+    precio?: number | null;
+    precio_anterior?: number | null;
+    tipo_moneda?: string;
+    mostrar_precio?: boolean;
   }[];
 }
 
@@ -57,6 +61,11 @@ async function fetchCategoriasConProductos() {
             icono: p.icono,
             imagen: p.imagen,
             tamanho: p.tamanho,
+            // Convertir Decimals a números
+            precio: p.precio ? Number(p.precio) : null,
+            precio_anterior: p.precio_anterior ? Number(p.precio_anterior) : null,
+            tipo_moneda: p.tipo_moneda,
+            mostrar_precio: p.mostrar_precio,
           })),
         });
       } catch (err) {
@@ -100,6 +109,9 @@ export default async function ProductosPage() {
     
     allProductos = (result as any[]).map((p) => ({
       ...p,
+      // Convertir Decimals a números
+      precio: p.precio ? Number(p.precio) : null,
+      precio_anterior: p.precio_anterior ? Number(p.precio_anterior) : null,
       categoria_nombre: p.categoria_nombre,
       categoria_slug: p.categoria_slug,
     }));

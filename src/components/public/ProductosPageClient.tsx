@@ -21,6 +21,11 @@ interface CategoriaWithProductos {
     icono: string | null;
     imagen: string | null;
     tamanho: string;
+    // Precio
+    precio?: number | null;
+    precio_anterior?: number | null;
+    tipo_moneda?: string;
+    mostrar_precio?: boolean;
   }[];
 }
 
