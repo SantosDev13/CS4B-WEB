@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         categoria_producto_id: categoria_producto_id || null,
         tamanho: tamanho || 'medium',
         orden: orden || 0,
-        // Precio
+        // Precio es opcional, si no se proporciona se guarda como null
         precio: precio ?? null,
         precio_anterior: precio_anterior ?? null,
         tipo_moneda: tipo_moneda || 'PEN',
