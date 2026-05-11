@@ -116,7 +116,7 @@ model Contacto {
 }
 
 // ============================================
-// CATEGORÍAS DE PRODUCTOS (Padre - para productos)
+// CATEGORÍAS DE PRODUCTOS 
 // ============================================
 model Categoria_producto {
   id          String    @id @default(uuid())
@@ -136,8 +136,7 @@ model Categoria_producto {
   @@map("categorias_productos")
 }
 
-// ============================================
-  // PRODUCTOS (Hijos de categorías)
+// PRODUCTOS 
   // ============================================
   model Producto {
     id                   String    @id @default(uuid())
@@ -148,12 +147,18 @@ model Categoria_producto {
     icono                String?
     imagen               String?
     tamanho              String    @default("medium") // small | medium | large
+
+    precio              Decimal?  @db.Decimal(10, 2) // ej: 299.00
+    precio_anterior      Decimal?  @db.Decimal(10, 2) // precio tachado si hay descuento
+    tipo_moneda          String    @default("PEN")   // PEN | USD
+    mostrar_precio       Boolean   @default(true)    // false = "Por cotizar"
+
     orden                Int       @default(0)
     visible              Boolean   @default(true)
     created_at           DateTime  @default(now())
     updated_at           DateTime  @updatedAt
 
-    // Clave foránea a categoría padre
+    // Clave foránea a categoría_product
     categoria_producto_id String?
 
     // Relaciones
