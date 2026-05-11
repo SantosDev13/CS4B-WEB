@@ -108,6 +108,11 @@ export const productoSchema = z.object({
   tamanho: z.enum(['small', 'medium', 'large']).optional(),
   orden: z.number().int().optional(),
   visible: z.boolean().optional(),
+  // Precio
+  precio: z.number().positive('El precio debe ser positivo').optional().nullable(),
+  precio_anterior: z.number().positive('El precio anterior debe ser positivo').optional().nullable(),
+  tipo_moneda: z.enum(['PEN', 'USD']).optional(),
+  mostrar_precio: z.boolean().optional(),
 });
 
 export const productoUpdateSchema = productoSchema.partial();

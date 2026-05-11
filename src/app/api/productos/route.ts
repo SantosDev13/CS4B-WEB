@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: errores }, { status: 400 });
     }
 
-    const { titulo, slug, descripcion, descripcion_corta, icono, imagen, categoria_producto_id, tamanho, orden } = result.data;
+    const { titulo, slug, descripcion, descripcion_corta, icono, imagen, categoria_producto_id, tamanho, orden, precio, precio_anterior, tipo_moneda, mostrar_precio } = result.data;
 
     // Verificar slug único
     const existing = await prisma.producto.findUnique({ where: { slug } });
@@ -88,6 +88,11 @@ export async function POST(request: NextRequest) {
         categoria_producto_id: categoria_producto_id || null,
         tamanho: tamanho || 'medium',
         orden: orden || 0,
+        // Precio
+        precio: precio ?? null,
+        precio_anterior: precio_anterior ?? null,
+        tipo_moneda: tipo_moneda || 'PEN',
+        mostrar_precio: mostrar_precio ?? true,
       },
     });
 
