@@ -87,8 +87,20 @@ export default function CheckoutPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
                       >
-                        <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <ShoppingBag className="w-6 h-6 text-gray-400" />
+                        <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                          {item.imagen ? (
+                            <img
+                              src={item.imagen}
+                              alt={item.titulo}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-primary-light">
+                              <span className="text-white/50 text-lg font-medium">
+                                {item.titulo.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex-1 min-w-0">
