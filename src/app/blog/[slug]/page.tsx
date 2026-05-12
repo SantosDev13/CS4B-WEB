@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import type { Metadata } from "next";
 import DOMPurify from "isomorphic-dompurify";
-import { cookies } from "next/headers";
 import { categorizeError } from "@/lib/utils";
+import ViewCounter from "@/components/public/ViewCounter";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -43,26 +43,11 @@ async function fetchPostBySlug(slug: string) {
     
     if (!post) return null;
     
-    // Verificar si el usuario ya vio este post (cookie expira en 1 hora)
-    const cookieStore = await cookies();
-    const viewedPosts = cookieStore.get("viewed_posts")?.value || "";
-    const viewedList = viewedPosts ? JSON.parse(viewedPosts) : [];
-    
-    // Solo incrementar si no ha sido visto recently
-    if (!viewedList.includes(post.id)) {
-      await prisma.post.update({
-        where: { id: post.id },
-        data: { vistas: { increment: 1 } },
-      });
-      
-      // Actualizar cookie con el post visto
-      const newViewedList = [...viewedList, post.id].slice(-20); // Guardar max 20 posts
-      cookieStore.set("viewed_posts", JSON.stringify(newViewedList), {
-        httpOnly: true,
-        maxAge: 3600, // 1 hora
-        path: "/",
-      });
-    }
+    // Opción 1: Incrementar vistas sin cookie (simplificado)
+    await prisma.post.update({
+      where: { id: post.id },
+      data: { vistas: { increment: 1 } },
+    });
     
     return {
       ...post,
@@ -289,6 +274,9 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </section>
       )}
+      
+      {/* Opción 3: Incrementar vistas desde el cliente */}
+      <ViewCounter slug={slug} />
     </div>
   );
 }
