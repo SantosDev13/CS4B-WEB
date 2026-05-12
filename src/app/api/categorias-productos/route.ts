@@ -23,9 +23,8 @@ export async function GET(request: NextRequest) {
       prisma.categoria_producto.count({ where }),
     ]);
 
-    const response = NextResponse.json({ success: true, data: categorias, total, limit, offset });
-    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
-    return response;
+    // No cachear - datos dinámicos en admin
+    return NextResponse.json({ success: true, data: categorias, total, limit, offset });
   } catch (error) {
     console.error('Error fetching categorias_productos:', error);
     return NextResponse.json({ error: 'Error al obtener categorías' }, { status: 500 });

@@ -56,16 +56,21 @@ export default function AdminCategoriasProductosPage() {
       const res = await fetch("/api/categorias-productos?published=false", { 
         credentials: "include" 
       });
-      const data = await res.json();
+      const json = await res.json();
       
-      if (data.error) {
-        console.error("API error:", data.error);
-        setCategorias([]);
-      } else {
-        setCategorias(Array.isArray(data.data) ? data.data : []);
+      // Manejo defensivo como en admin/categorias
+      let cats = [];
+      if (Array.isArray(json.data)) {
+        cats = json.data;
+      } else if (Array.isArray(json)) {
+        cats = json;
+      } else if (json.error) {
+        console.error("API error:", json.error);
       }
+      
+      setCategorias(cats);
     } catch (err) {
-      console.error("Error fetching categorias_servicios:", err);
+      console.error("Error fetching categorias-productos:", err);
       setCategorias([]);
     } finally {
       setLoading(false);
