@@ -144,9 +144,7 @@ model Categoria_producto {
     slug                 String    @unique
     descripcion          String    @db.Text
     descripcion_corta    String?
-    icono                String?
     imagen               String?
-    tamanho              String    @default("medium") // small | medium | large
 
     precio              Decimal?  @db.Decimal(10, 2) // ej: 299.00
     precio_anterior      Decimal?  @db.Decimal(10, 2) // precio tachado si hay descuento

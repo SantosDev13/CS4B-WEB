@@ -28,7 +28,6 @@ interface Producto {
   icono: string | null;
   imagen: string | null;
   categoria_producto_id: string | null;
-  tamanho: 'small' | 'medium' | 'large';
   orden: number;
   visible: boolean;
   precio: number | null;
@@ -38,12 +37,6 @@ interface Producto {
   created_at: string;
   categoria_producto?: Categoria_producto;
 }
-
-const TAMANOS = [
-  { value: 'small', label: 'Pequeño (1 celda)' },
-  { value: 'medium', label: 'Mediano (1x2)' },
-  { value: 'large', label: 'Grande (2x2)' },
-];
 
 const MONEDAS = [
   { value: 'PEN', label: 'S/ PEN (Soles)' },
@@ -64,7 +57,6 @@ export default function AdminProductosPage() {
     descripcion: "",
     imagen: "",
     categoria_producto_id: "",
-    tamanho: "medium",
     orden: 0,
     visible: true,
     // Precio
@@ -125,7 +117,6 @@ export default function AdminProductosPage() {
         imagen: formData.imagen || null,
         categoria_producto_id: formData.categoria_producto_id || null,
         categoria: selectedCat?.nombre || null,
-        tamanho: formData.tamanho,
         orden: parseInt(String(formData.orden)) || 0,
         visible: formData.visible,
         // Precio
@@ -168,7 +159,6 @@ export default function AdminProductosPage() {
       descripcion: producto.descripcion,
       imagen: producto.imagen || "",
       categoria_producto_id: producto.categoria_producto_id || "",
-      tamanho: producto.tamanho,
       orden: producto.orden,
       visible: producto.visible,
       // Precio
@@ -218,7 +208,6 @@ export default function AdminProductosPage() {
       descripcion: "",
       imagen: "",
       categoria_producto_id: "",
-      tamanho: "medium",
       orden: 0,
       visible: true,
       // Precio
@@ -291,7 +280,6 @@ export default function AdminProductosPage() {
               <th className="text-left p-4 text-slate-400 font-medium">Título</th>
               <th className="text-left p-4 text-slate-400 font-medium">Categoría</th>
               <th className="text-center p-4 text-slate-400 font-medium">Precio</th>
-              <th className="text-center p-4 text-slate-400 font-medium">Tamaño</th>
               <th className="text-center p-4 text-slate-400 font-medium">Visible</th>
               <th className="text-right p-4 text-slate-400 font-medium">Acciones</th>
             </tr>
@@ -299,7 +287,7 @@ export default function AdminProductosPage() {
           <tbody>
             {filteredProductos.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-slate-500">
+                <td colSpan={6} className="p-8 text-center text-slate-500">
                   No hay productos disponibles
                 </td>
               </tr>
@@ -349,11 +337,6 @@ export default function AdminProductosPage() {
                       ) : (
                         <span className="text-slate-500 text-sm">Por cotizar</span>
                       )}
-                    </td>
-                    <td className="p-4 text-center">
-                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-700 text-slate-300 capitalize">
-                        {producto.tamanho}
-                      </span>
                     </td>
                     <td className="p-4 text-center">
                       <button
@@ -472,36 +455,17 @@ export default function AdminProductosPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Tamaño
-                    </label>
-                    <select
-                      value={formData.tamanho}
-                      onChange={(e) => setFormData({ ...formData, tamanho: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
-                    >
-                      {TAMANOS.map((tam) => (
-                        <option key={tam.value} value={tam.value}>
-                          {tam.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Orden
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.orden}
-                      onChange={(e) => setFormData({ ...formData, orden: parseInt(e.target.value) || 0 })}
-                      min={0}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Orden
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.orden}
+                    onChange={(e) => setFormData({ ...formData, orden: parseInt(e.target.value) || 0 })}
+                    min={0}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
+                  />
                 </div>
 
                 <div>
