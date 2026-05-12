@@ -22,6 +22,11 @@ interface ProductoDB {
   categoria_slug?: string;
   categoria_descripcion?: string;
   categoria_imagen?: string;
+  // Precio
+  precio?: number | null;
+  precio_anterior?: number | null;
+  tipo_moneda?: string;
+  mostrar_precio?: boolean;
 }
 
 interface CategoriaWithProductos {
@@ -104,6 +109,11 @@ async function fetchProductoBySlug(slug: string): Promise<ProductoDB | null> {
       categoria_slug: producto.categoria?.slug || undefined,
       categoria_descripcion: producto.categoria?.descripcion || undefined,
       categoria_imagen: producto.categoria?.imagen || undefined,
+      // Precio
+      precio: producto.precio ? Number(producto.precio) : null,
+      precio_anterior: producto.precio_anterior ? Number(producto.precio_anterior) : null,
+      tipo_moneda: producto.tipo_moneda,
+      mostrar_precio: producto.mostrar_precio,
     };
   } catch (error) {
     console.error("Error fetching producto:", error);

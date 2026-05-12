@@ -23,6 +23,11 @@ interface ProductoDetailProps {
     categoria_slug?: string;
     categoria_descripcion?: string;
     categoria_imagen?: string;
+    // Precio
+    precio?: number | null;
+    precio_anterior?: number | null;
+    tipo_moneda?: string;
+    mostrar_precio?: boolean;
   };
   productosRelacionados: { slug: string; titulo: string }[];
 }
@@ -45,7 +50,7 @@ export default function ProductoDetail({ producto, productosRelacionados }: Prod
 
   const handleWhatsApp = () => {
     const message = `Hola! Estoy interesado en el producto: ${producto.titulo}`;
-    window.open(`https://wa.me/51999999999?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/51988227755?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleCartClick = () => {
@@ -220,9 +225,34 @@ export default function ProductoDetail({ producto, productosRelacionados }: Prod
 
               {/* Short description */}
               {producto.descripcion_corta && (
-                <p className="text-text-secondary mb-6">
+                <p className="text-text-secondary mb-4">
                   {producto.descripcion_corta}
                 </p>
+              )}
+
+              {/* Precio */}
+              {producto.mostrar_precio && producto.precio ? (
+                <div className="mb-6 p-4 bg-bg-light rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl font-bold text-primary">
+                      {producto.tipo_moneda === 'PEN' ? 'S/' : '$'}{Number(producto.precio).toFixed(2)}
+                    </span>
+                    {producto.precio_anterior && Number(producto.precio_anterior) > Number(producto.precio) && (
+                      <span className="text-lg text-text-muted line-through">
+                        {producto.tipo_moneda === 'PEN' ? 'S/' : '$'}{Number(producto.precio_anterior).toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                  {producto.precio_anterior && Number(producto.precio_anterior) > Number(producto.precio) && (
+                    <span className="inline-block mt-2 text-sm bg-green-100 text-green-700 px-2 py-1 rounded">
+                      -{Math.round((1 - Number(producto.precio) / Number(producto.precio_anterior)) * 100)}% OFF
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="mb-6 p-4 bg-bg-light rounded-lg">
+                  <span className="text-xl font-semibold text-secondary">Precio por cotizar</span>
+                </div>
               )}
 
               {/* Features */}
