@@ -7,19 +7,9 @@ import {
   Search, 
   Edit3, 
   Trash2, 
-  Eye, 
-  EyeOff,
   X,
   Save,
-  FileKey, 
-  Shield, 
-  Monitor, 
-  Code, 
-  BrainCircuit, 
-  GraduationCap,
-  Server,
-  Image,
-  LayoutGrid
+  Image
 } from "lucide-react";
 import { useAuth } from "@/composables";
 import { slugify } from "@/lib/utils";
@@ -49,17 +39,6 @@ interface Producto {
   categoria_producto?: Categoria_producto;
 }
 
-const ICONOS = [
-  { value: 'FileKey', label: 'FileKey (Licencias)', Icon: FileKey },
-  { value: 'Shield', label: 'Shield (Seguridad)', Icon: Shield },
-  { value: 'Monitor', label: 'Monitor (Hardware)', Icon: Monitor },
-  { value: 'Code', label: 'Code (Desarrollo)', Icon: Code },
-  { value: 'BrainCircuit', label: 'BrainCircuit (Consultoría)', Icon: BrainCircuit },
-  { value: 'GraduationCap', label: 'GraduationCap (Capacitación)', Icon: GraduationCap },
-  { value: 'Server', label: 'Server (Infraestructura)', Icon: Server },
-  { value: 'LayoutGrid', label: 'LayoutGrid (General)', Icon: LayoutGrid },
-];
-
 const TAMANOS = [
   { value: 'small', label: 'Pequeño (1 celda)' },
   { value: 'medium', label: 'Mediano (1x2)' },
@@ -83,7 +62,6 @@ export default function AdminProductosPage() {
     titulo: "",
     slug: "",
     descripcion: "",
-    icon: "FileKey",
     imagen: "",
     categoria_producto_id: "",
     tamanho: "medium",
@@ -144,7 +122,6 @@ export default function AdminProductosPage() {
         titulo: formData.titulo,
         slug: formData.slug,
         descripcion: formData.descripcion,
-        icono: formData.icon,
         imagen: formData.imagen || null,
         categoria_producto_id: formData.categoria_producto_id || null,
         categoria: selectedCat?.nombre || null,
@@ -189,7 +166,6 @@ export default function AdminProductosPage() {
       titulo: producto.titulo,
       slug: producto.slug,
       descripcion: producto.descripcion,
-      icon: producto.icono || "FileKey",
       imagen: producto.imagen || "",
       categoria_producto_id: producto.categoria_producto_id || "",
       tamanho: producto.tamanho,
@@ -240,7 +216,6 @@ export default function AdminProductosPage() {
       titulo: "",
       slug: "",
       descripcion: "",
-      icon: "FileKey",
       imagen: "",
       categoria_producto_id: "",
       tamanho: "medium",
@@ -265,11 +240,6 @@ export default function AdminProductosPage() {
   const filteredProductos = productos.filter((s) =>
     s.titulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const getIcono = (iconName: string) => {
-    const iconObj = ICONOS.find(i => i.value === iconName);
-    return iconObj ? iconObj.Icon : LayoutGrid;
-  };
 
   if (authLoading || loading) {
     return (
@@ -317,7 +287,7 @@ export default function AdminProductosPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-700/50">
-              <th className="text-left p-4 text-slate-400 font-medium">Icono</th>
+              <th className="text-left p-4 text-slate-400 font-medium">Imagen</th>
               <th className="text-left p-4 text-slate-400 font-medium">Título</th>
               <th className="text-left p-4 text-slate-400 font-medium">Categoría</th>
               <th className="text-center p-4 text-slate-400 font-medium">Precio</th>
@@ -335,16 +305,23 @@ export default function AdminProductosPage() {
               </tr>
             ) : (
               filteredProductos.map((producto) => {
-                const IconComponent = getIcono(producto.icono || 'LayoutGrid');
                 return (
                   <tr
                     key={producto.id}
                     className="border-b border-slate-700/30 hover:bg-slate-800/30"
                   >
                     <td className="p-4">
-                      <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
-                        <IconComponent className="w-5 h-5 text-cyan-400" />
-                      </div>
+                      {producto.imagen ? (
+                        <img
+                          src={producto.imagen}
+                          alt={producto.titulo}
+                          className="w-10 h-10 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-slate-400 font-medium text-sm">
+                          {producto.titulo.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </td>
                     <td className="p-4">
                       <div>
@@ -495,24 +472,7 @@ export default function AdminProductosPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Icono
-                    </label>
-                    <select
-                      value={formData.icon}
-                      onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:border-cyan-500/50"
-                    >
-                      {ICONOS.map((icon) => (
-                        <option key={icon.value} value={icon.value}>
-                          {icon.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
                       Tamaño
