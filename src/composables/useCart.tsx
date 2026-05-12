@@ -7,6 +7,7 @@ export interface CartItem {
   id: string;
   titulo: string;
   slug: string;
+  imagen?: string;
   categoria?: string;
   categoriaSlug?: string;
 }

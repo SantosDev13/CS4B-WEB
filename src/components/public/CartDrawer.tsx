@@ -110,9 +110,21 @@ interface CartItemRowProps {
 function CartItemRow({ item, onRemove }: CartItemRowProps) {
   return (
     <li className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-      {/* Placeholder icon */}
-      <div className="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-        <ShoppingBag className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+      {/* Thumbnail */}
+      <div className="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+        {item.imagen ? (
+          <img
+            src={item.imagen}
+            alt={item.titulo}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary to-primary-light">
+            <span className="text-white/50 text-sm font-medium">
+              {item.titulo.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Info */}

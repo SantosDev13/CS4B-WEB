@@ -45,6 +45,7 @@ export default function ProductoCard({ producto, categoriaNombre }: ProductoCard
         id: producto.id,
         titulo: producto.titulo,
         slug: producto.slug,
+        imagen: producto.imagen || undefined,
         categoria: producto.categoria_nombre || categoriaNombre,
         categoriaSlug: producto.categoria_slug,
       };
