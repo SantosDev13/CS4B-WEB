@@ -42,9 +42,8 @@ export async function GET(request: NextRequest) {
       } : null,
     }));
 
-    const response = NextResponse.json({ success: true, data: productosTransformados, total, limit, offset });
-    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=60');
-    return response;
+    // No cachear - datos dinámicos en admin
+    return NextResponse.json({ success: true, data: productosTransformados, total, limit, offset });
   } catch (error) {
     console.error('Error fetching productos:', error);
     return NextResponse.json({ error: 'Error al obtener productos' }, { status: 500 });
