@@ -1,5 +1,5 @@
 // ============================================
-// CONTACTOS API - CS4B WEB
+// CONTACTOS API - PANEL DE ADMIN - CS4B WEB
 // ============================================
 
 import { apiFetch, type ApiResponse } from "./api";
