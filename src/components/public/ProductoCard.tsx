@@ -15,7 +15,6 @@ interface ProductoCardProps {
     descripcion_corta: string | null;
     icono: string | null;
     imagen: string | null;
-    tamanho: string;
     categoria_nombre?: string;
     categoria_slug?: string;
     // Precio

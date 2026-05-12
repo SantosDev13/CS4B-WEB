@@ -105,7 +105,6 @@ export const productoSchema = z.object({
   icono: z.string().optional(),
   imagen: z.string().url('URL de imagen inválida').optional().or(z.literal('')),
   categoria_producto_id: z.string().uuid('ID de categoría inválido').optional().or(z.literal('')),
-  tamanho: z.enum(['small', 'medium', 'large']).optional(),
   orden: z.number().int().optional(),
   visible: z.boolean().optional(),
   // Precio

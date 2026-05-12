@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: errores }, { status: 400 });
     }
 
-    const { titulo, slug, descripcion, descripcion_corta, icono, imagen, categoria_producto_id, tamanho, orden, precio, precio_anterior, tipo_moneda, mostrar_precio } = result.data;
+    const { titulo, slug, descripcion, descripcion_corta, icono, imagen, categoria_producto_id, orden, precio, precio_anterior, tipo_moneda, mostrar_precio } = result.data;
 
     // Verificar slug único
     const existing = await prisma.producto.findUnique({ where: { slug } });
@@ -86,7 +86,6 @@ export async function POST(request: NextRequest) {
         icono,
         imagen,
         categoria_producto_id: categoria_producto_id || null,
-        tamanho: tamanho || 'medium',
         orden: orden || 0,
         // Precio es opcional, si no se proporciona se guarda como null
         precio: precio ?? null,

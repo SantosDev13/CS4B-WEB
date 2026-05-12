@@ -21,7 +21,6 @@ interface CategoriaWithProductos {
     descripcion_corta: string | null;
     icono: string | null;
     imagen: string | null;
-    tamanho: string;
   }[];
 }
 

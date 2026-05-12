@@ -45,7 +45,6 @@ interface CategoriaWithProductos {
     descripcion_corta: string | null;
     icono: string | null;
     imagen: string | null;
-    tamanho: string;
   }[];
 }
 
@@ -74,7 +73,6 @@ async function fetchCategoriaBySlug(slug: string): Promise<CategoriaWithProducto
         descripcion_corta: p.descripcion_corta,
         icono: p.icono,
         imagen: p.imagen,
-        tamanho: p.tamanho,
       })),
     };
   } catch (error) {

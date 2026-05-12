@@ -20,7 +20,6 @@ interface CategoriaWithProductos {
     descripcion_corta: string | null;
     icono: string | null;
     imagen: string | null;
-    tamanho: string;
     // Precio
     precio?: number | null;
     precio_anterior?: number | null;

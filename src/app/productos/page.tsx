@@ -18,7 +18,6 @@ interface CategoriaWithProductos {
     descripcion_corta: string | null;
     icono: string | null;
     imagen: string | null;
-    tamanho: string;
     precio?: number | null;
     precio_anterior?: number | null;
     tipo_moneda?: string;
@@ -60,7 +59,6 @@ async function fetchCategoriasConProductos() {
             descripcion_corta: p.descripcion_corta,
             icono: p.icono,
             imagen: p.imagen,
-            tamanho: p.tamanho,
             // Convertir Decimals a números
             precio: p.precio ? Number(p.precio) : null,
             precio_anterior: p.precio_anterior ? Number(p.precio_anterior) : null,
