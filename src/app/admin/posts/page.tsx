@@ -98,7 +98,7 @@ export default function AdminPostsPage() {
       setPosts(posts);
       setCategorias(Array.isArray(catsData.data) ? catsData.data : []);
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error("Error al obtener datos:", err);
     } finally {
       setLoading(false);
     }
@@ -192,7 +192,7 @@ export default function AdminPostsPage() {
         fetchData();
       }
     } catch (err) {
-      console.error("Error deleting post:", err);
+      console.error("Error al borrar post:", err);
     }
   };
 
@@ -206,7 +206,7 @@ export default function AdminPostsPage() {
       });
       fetchData();
     } catch (err) {
-      console.error("Error toggling publish:", err);
+      console.error("Error al alternar publicación:", err);
     }
   };
 
