@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { ArrowRight, Users, Award, Globe, Rocket, Target, Eye, TrendingUp, Star } from "lucide-react";
+import { ArrowRight, Target, Leaf, Users, Lightbulb, Cpu, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 
@@ -30,10 +30,12 @@ const contentSections = [
 
 1
 const valores = [
-  { title: "Innovación", description: "Buscamos constantemente nuevas formas de resolver desafíos empresariales." },
-  { title: "Integridad", description: "Actuamos con transparencia y ética en cada interacción." },
-  { title: "Excelencia", description: "Nos esforzamos por superar expectativas en cada proyecto." },
-  { title: "Compromiso", description: "Tu éxito es nuestro éxito. Estamos comprometidos con tus resultados." },
+  { title: "Estrategia adaptable y personalizada", description: "Diseñamos soluciones que se adaptan a cada contexto y necesidad única.", icon: Target, color: "text-blue-600", bg: "bg-blue-100" },
+  { title: "Foco en la sostenibilidad y el impacto social", description: "Comprometidos con generar valor jangka panjang para comunidad y medio ambiente.", icon: Leaf, color: "text-green-600", bg: "bg-green-100" },
+  { title: "Cultura colaborativa e inclusiva", description: "Fomentamos equipos diversos que aportan perspectivas únicas.", icon: Users, color: "text-purple-600", bg: "bg-purple-100" },
+  { title: "Innovación centrada en el valor", description: "Cada solución busca impactar métricas reales del negocio.", icon: Lightbulb, color: "text-amber-600", bg: "bg-amber-100" },
+  { title: "Tecnología como motor de transformación", description: "Usamos herramientas de vanguardia para generar resultados.", icon: Cpu, color: "text-cyan-600", bg: "bg-cyan-100" },
+  { title: "Liderazgo impulsado por datos", description: "Decisiones basadas en evidencia y análisis preciso.", icon: BarChart3, color: "text-rose-600", bg: "bg-rose-100" },
 ];
 
 // Galería de imágenes
@@ -294,62 +296,55 @@ export default function AboutContent() {
         </div>
       </section>
 
-      {/* Leadership Spotlight - CEO + Video */}
+              <hr />
+
+      {/* Info del Gerente + video */}
       <section className="py-24 px-6 md:px-12 bg-white">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center"
-          >
-            {/* CEO Portrait */}
-            <div className="md:col-span-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            {/* Lado izquierdo: Foto + Info del Gerente */}
+            <div className="flex gap-8 items-start">
+              {/* Foto del Gerente */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="relative group"
+                className="flex-shrink-0 w-1/2"
               >
-                <div className="absolute -inset-4 bg-primary/5 rounded-xl transition-all duration-500 group-hover:bg-primary/10"></div>
                 <img
-                  alt="Raul - CEO"
-                  className="relative rounded-xl w-full h-[600px] object-cover shadow-sm"
+                  alt="Raul - Gerente General"
+                  className="w-full h-[500px] rounded-xl object-cover shadow-lg"
                   src="/raul.jpg"
                 />
-                <div className="mt-8">
-                  <h4 className="text-3xl font-bold text-primary">Raul</h4>
-                  <p className="text-primary font-bold tracking-widest uppercase text-xs mt-2">Fundador & CEO</p>
-                  <p className="mt-6 text-text-secondary leading-relaxed">
-                    Raul lidera CS4B con una visión para la transformación digital.
-                    Con más de 15 años de experiencia en tecnología empresarial,
-                    ha encabezado proyectos de transformación digital para las empresas más importantes del país.
-                  </p>
-                  {/* Logros del CEO */}
-                  <div className="mt-6 p-4 bg-primary/5 rounded-xl border-l-4 border-primary">
-                    <p className="text-sm text-text-secondary leading-relaxed">
-                      Nuestro CEO fue uno de los tres finalistas en la categoría
-                      <span className="font-bold"> «Arquitecto Empresarial»</span> en el año 2023,
-                      organizada por el podcast <span className="font-semibold">«Hablemos de Arquitectura Empresarial»</span>.
-                      Una experiencia increíble haber sido reconocido como finalista en esta prestigioso ceremonia. 🏆✨
-                    </p>
-                    <p className="text-sm text-text-muted mt-3">
-                      Agradecimiento especial a <span className="font-semibold">Israel Tavares Martínez</span> & <span className="font-semibold">Carlos Adán Moctezuma Figueroa</span> de México
-                    </p>
-                  </div>
-                </div>
+              </motion.div>
+
+              {/* Info del gerente a la derecha de la foto */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="flex-1"
+              >
+                <h1 className="text-5xl font-bold text-primary">Raul</h1>
+                <h2 className="text-primary font-bold tracking-widest uppercase text-xl mt-1 mb-4">Gerente General</h2>
+                <h3>
+                  Raul lidera CS4B con una visión para la transformación digital.
+                  Con más de 15 años de experiencia en tecnología empresarial,
+                  ha encabezado proyectos de transformación digital para las empresas más importantes del país.
+                </h3>
               </motion.div>
             </div>
 
-            {/* Video Section */}
-            <div className="md:col-span-7">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden shadow-lg"
-              >
+            {/* Lado derecho: Video + Título + Descripción */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col"
+            >
+              {/* Video */}
+              <div className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden shadow-lg mb-6">
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src="https://www.youtube.com/embed/M0G_psFPuDk?start=7"
@@ -357,15 +352,24 @@ export default function AboutContent() {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
-              </motion.div>
-            </div>
-          </motion.div>
+              </div>
+              {/* Título y descripción del video */}
+              <div>
+                <h3 className="text-2xl font-bold text-primary mb-3">Finalista en la categoría Arquitecto Empresarial en 2023,
+                    organizado por el podcast Hablemos de Arquitectura Empresarial
+                </h3>
+                <p className="text-text-secondary leading-relaxed">
+                  Descubre cómo Raul guía a CS4B en su misión de transformar empresas mediante tecnología e innovación digital en Perú y Latinoamérica.
+                </p>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="py-24 px-6 md:px-12 bg-bg-light">
-        <div className="max-w-7xl mx-auto">
+      {/* Values Section - Minimalista */}
+      <section className="py-24 px-6 md:px-12 bg-white">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -380,7 +384,8 @@ export default function AboutContent() {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Grid minimal - solo cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {valores.map((valor, index) => (
               <motion.div
                 key={valor.title}
@@ -388,75 +393,132 @@ export default function AboutContent() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-xl p-6 shadow-md text-center"
+                className="group p-8 rounded-2xl hover:bg-primary/5 transition-colors"
               >
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Award className="w-8 h-8 text-primary" />
+                <div className={`w-14 h-14 rounded-2xl ${valor.bg} flex items-center justify-center mb-5 group-hover:opacity-80 transition-opacity`}>
+                  <valor.icon className={`w-7 h-7 ${valor.color}`} />
                 </div>
-                <h3 className="text-xl font-bold text-primary mb-2">{valor.title}</h3>
-                <p className="text-text-secondary text-sm">{valor.description}</p>
+                <h3 className="text-xl font-bold text-primary mb-3">{valor.title}</h3>
+                <p className="text-text-secondary leading-relaxed">{valor.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Visual Gallery - Bento Style */}
+      {/* Equipo - Cards con hover */}
       <section className="py-24 px-6 md:px-12 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16">
-            <div className="md:w-1/2">
-              <h2 className="text-5xl font-extrabold text-primary tracking-tighter mb-4">
-                Conoce CS4B
-              </h2>
-              <p className="text-text-secondary max-w-md">
-                Nuestro workspace es un ecosistema diseñado para impulsar la colaboración y la excelencia tecnológica.
-              </p>
-            </div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <span className="inline-block text-primary font-semibold text-sm tracking-wider uppercase mb-4">
+              Nuestro Equipo
+            </span>
+            <h2 className="text-4xl font-bold text-primary">
+              Las personas detrás de CS4B
+            </h2>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-[800px]">
-            {galleryImages.map((img, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Raul",
+                role: "CEO - FUNDADOR",
+                image: "/raul.jpg",
+                bio: "Liderando la transformación digital con más de 15 años de experiencia.",
+              },
+              {
+                name: "Ivan",
+                role: "DIRECTOR DE OPERACIONES",
+                image: "/ivan.jpg",
+                bio: "Asegurando la excelencia operativa en cada proyecto.",
+              },
+              {
+                name: "Luis",
+                role: "DIRECTOR DE TECNOLOGÍA",
+                image: "/luis.jpeg",
+                bio: "Innovación tecnológica al servicio de nuestros clientes.",
+              },
+            ].map((member, index) => (
               <motion.div
-                key={img.alt}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                key={member.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`bg-gray-100 rounded-xl overflow-hidden ${img.className || 'md:col-span-1'}`}
+                className="group relative rounded-xl overflow-hidden"
               >
+                {/* Imagen */}
                 <img
-                  alt={img.alt}
-                  className="w-full h-full object-cover"
-                  src={img.src}
+                  alt={member.name}
+                  className="w-full h-[400px] object-cover"
+                  src={member.image}
                 />
+                {/* Overlay con hover */}
+                <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6">
+                  <div className="text-center">
+                    <p className="text-white font-medium">{member.bio}</p>
+                  </div>
+                </div>
+                {/* Nombre y rol debajo */}
+                <div className="bg-bg-light p-4 text-center">
+                  <h3 className="text-xl font-bold text-primary">{member.name}</h3>
+                  <p className="text-primary font-bold tracking-widest uppercase text-xs mt-1">{member.role}</p>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 px-6 md:px-12 bg-primary">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* CTA Section - Destacado para /nosotros */}
+      <section className="py-24 px-6 md:px-12 bg-primary relative overflow-hidden">
+        {/* Pattern de fondo sutil */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+            backgroundSize: '32px 32px'
+          }} />
+        </div>
+
+        {/* Elementos decorativos */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/20 rounded-full blur-[100px]" />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tighter mb-6 leading-tight">
-              ¿Listo para transformar <br />tu empresa?
+            {/* Borde dorado decorativo arriba */}
+            <div className="w-24 h-1 bg-accent mx-auto mb-8 rounded-full" />
+            
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              ¿Listo para transformar tu empresa?
             </h2>
-            <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
+            <p className="text-white/70 text-lg mb-10 max-w-xl mx-auto">
               Conversemos sobre cómo podemos ayudarte a alcanzar tus objetivos de transformación digital.
             </p>
-            <Link
-              href="/contacto"
-              className="inline-flex items-center gap-3 bg-white text-primary px-10 py-4 rounded-xl text-lg font-bold hover:bg-secondary hover:text-white transition-colors"
-            >
-              Iniciar Conversación
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/contacto"
+                className="inline-flex items-center gap-2 bg-accent text-primary px-8 py-4 rounded-xl font-semibold hover:bg-white hover:scale-105 transition-all shadow-lg shadow-accent/30"
+              >
+                Agendar Consultoría
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href="/servicios"
+                className="inline-flex items-center gap-2 bg-white/10 text-white border-2 border-white/30 px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all"
+              >
+                Ver Servicios
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>
