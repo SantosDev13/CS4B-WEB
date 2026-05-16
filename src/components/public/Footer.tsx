@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const footerLinks = {
@@ -22,21 +23,26 @@ export default function Footer() {
     <footer className="bg-primary py-16">
       <div className="container-custom">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Company Info */}
+          {/* Informacion de la empresa */}
           <div className="md:col-span-2">
             <Link href="/" className="inline-block mb-4">
-              <span className="text-2xl font-bold text-white tracking-tight">
-                CS<span className="text-accent">4</span>B
-              </span>
+              <Image
+                src="/logo_footer.png"
+                alt="CS4B"
+                width={80}
+                height={28}
+                className="h-auto w-auto"
+              />
             </Link>
             <p className="text-white/60 mb-6 leading-relaxed max-w-md">
               Consulting Strategic for Digital Business. 
               Transformamos empresas mediante soluciones 
               tecnológicas integrales en Perú.
             </p>
-            <div className="flex gap-3">
+            {/* Redes sociales */}
+            <div className="flex gap-3"> 
               <a
-                href="#"
+                href="https://www.linkedin.com/in/raulcastiglione/"
                 className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-secondary transition-colors"
                 aria-label="LinkedIn"
               >
@@ -45,7 +51,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/cs4digitalbusiness"
                 className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-secondary transition-colors"
                 aria-label="Facebook"
               >
@@ -56,10 +62,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Enlaces Rápidos */}
           <div>
             <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-              Enlaces
+              Enlaces Rápidos
             </h4>
             <ul className="space-y-3">
               {footerLinks.quickLinks.map((link) => (
@@ -75,7 +81,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Servicios */}
           <div>
             <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
               Servicios
