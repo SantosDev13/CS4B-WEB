@@ -94,11 +94,6 @@ export async function POST(request: NextRequest) {
       ALLOWED_ATTR: [],
     });
 
-    // Obtener IP del cliente
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
-               request.headers.get('x-real-ip') ||
-               '0.0.0.0';
-
     const contacto = await prisma.contacto.create({
       data: {
         nombre,
@@ -110,7 +105,6 @@ export async function POST(request: NextRequest) {
         email,
         telefono,
         mensaje: mensajeSanitizado,
-        ip,
       },
     });
 

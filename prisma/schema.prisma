@@ -106,7 +106,6 @@ model Contacto {
   email      String
   telefono   String?
   mensaje    String
-  ip         String?
   leido      Boolean   @default(false)
   respondido Boolean   @default(false)
   respuesta  String?
