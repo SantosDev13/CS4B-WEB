@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ContactForm } from "@/components/ui";
+import { ContactForm, FAQ } from "@/components/ui";
 
 export const dynamic = "force-static";
 export const revalidate = false;
@@ -18,6 +18,50 @@ const metricas = [
   { valor: "500+", label: "Proyectos completados" },
   { valor: "98%", label: "Satisfacción del cliente" },
   { valor: "24/7", label: "Soporte disponible" },
+];
+
+// BENEFICIOS DEL SERVICIO
+const beneficios = [
+  {
+    titulo: "Diagnóstico integral",
+    descripcion: "Evaluamos tu estado actual para identificar oportunidades de mejora y diseñar una hoja de ruta personalizada.",
+  },
+  {
+    titulo: "Diseño de arquitectura",
+    descripcion: "Creamos una estructura tecnológica escalable que se adapta al crecimiento de tu empresa.",
+  },
+  {
+    titulo: "Implementación guiada",
+    descripcion: "Te acompañamos en cada paso de la transformación con metodologías probadas.",
+  },
+  {
+    titulo: "Capacitación del equipo",
+    descripcion: "Aseguramos que tu equipo adopte las nuevas herramientas y procesos efectivamente.",
+  },
+];
+
+// PREGUNTAS FRECUENTES
+const faqs = [
+  {
+    pregunta: "¿Cuánto tiempo toma un proyecto de transformación digital?",
+    respuesta: "El tiempo varía según la magnitud del proyecto. Un diagnóstico inicial toma aproximadamente 2-3 semanas, mientras que la implementación completa puede variar de 3 a 12 meses dependiendo de la complejidad y los objetivos definidos.",
+  },
+  {
+    pregunta: "¿Necesito tener una empresa grande para adoptar transformación digital?",
+    respuesta: "No, la transformación digital es para empresas de cualquier tamaño. Adaptamos nuestras soluciones a las necesidades y recursos de cada cliente, desde pequeñas empresas hasta grandes corporaciones.",
+  },
+  {
+    pregunta: "¿Qué incluye el servicio de arquitectura empresarial?",
+    respuesta: "Incluye análisis de procesos actuales, diseño de la visión tecnológica, roadmap de implementación, selección de tecnologías, governance de datos y estructura organizacional necesaria para soportar la transformación.",
+  },
+  {
+    pregunta: "¿Ofrecen soporte después de la implementación?",
+    respuesta: "Sí, ofrecemos planes de soporte continuo que incluyen monitoreo, optimización, actualizaciones y asistencia técnica para garantizar el éxito a largo plazo de tu transformación digital.",
+  },
+  {
+    pregunta: "¿Cómo se mide el retorno de inversión en transformación digital?",
+    respuesta: "Definimos KPIs personalizados desde el inicio del proyecto: reducción de costos operativos, increase de productividad, mejora en experiencia del cliente, tiempos de respuesta más rápidos y otros indicadores relevantes para tu industria.",
+  },
 ];
 
 export default function ConsultoriaPage() {
@@ -65,6 +109,32 @@ export default function ConsultoriaPage() {
         </div>
       </section>
 
+
+      {/* Beneficios */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <p className="text-sm text-gray-500 mb-2">¿POR QUÉ ELEGIRNOS?</p>
+            <h2 className="text-3xl font-bold text-gray-900">Beneficios de nuestro servicio</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            {beneficios.map((beneficio, index) => (
+              <div key={index} className="text-center p-6">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-primary">{index + 1}</span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  {beneficio.titulo}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {beneficio.descripcion}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Formulario separado - debajo del hero */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 max-w-3xl">
@@ -90,7 +160,18 @@ export default function ConsultoriaPage() {
         </div>
       </section>
 
-      
+
+
+      {/* Preguntas Frecuentes */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <FAQ
+            subtitulo="CONTÁCTANOS"
+            titulo="PREGUNTAS FRECUENTES"
+            items={faqs}
+          />
+        </div>
+      </section>
 
       {/* Footer minimal */}
       <footer className="py-8 bg-slate-900 text-center">

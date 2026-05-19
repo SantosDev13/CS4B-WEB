@@ -6,3 +6,4 @@ export { Select, type SelectProps, type SelectOption } from "./Select";
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, type CardProps } from "./Card";
 export { Badge, type BadgeProps } from "./Badge";
 export { ContactForm, type ContactFormData, type ContactFormProps } from "./ContactForm";
+export { FAQ, type FAQItem, type FAQProps } from "./FAQ";
