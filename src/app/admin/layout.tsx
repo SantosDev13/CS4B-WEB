@@ -32,8 +32,7 @@ const navItems: NavItem[] = [
   { href: "/admin/productos", label: "Productos", icon: <Briefcase className="w-5 h-5" /> },
   { href: "/admin/categorias", label: "Categorías del Blog", icon: <Shield className="w-5 h-5" /> },
   { href: "/admin/posts", label: "Publicaciones (Blog)", icon: <FileText className="w-5 h-5" /> },
-  { href: "/admin/contactos", label: "Contactos", icon: <MessageSquare className="w-5 h-5" /> },
-  { href: "/admin/configuracion", label: "Configuración", icon: <Settings className="w-5 h-5" /> },
+  { href: "/admin/contactos", label: "Contactos", icon: <MessageSquare className="w-5 h-5" /> }
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

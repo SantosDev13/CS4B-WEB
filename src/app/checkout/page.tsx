@@ -2,11 +2,11 @@
 
 import { useCart } from "@/composables";
 import { motion } from "framer-motion";
-import { ShoppingBag, ArrowLeft, Trash2 } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Trash2, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function CheckoutPage() {
-  const { servicios, removeFromCart, clearCart, cartCount } = useCart();
+  const { productos, removeFromCart, clearCart, cartCount } = useCart();
 
   return (
     <div className="min-h-screen bg-bg-light">
@@ -64,7 +64,7 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
-                {servicios.length === 0 ? (
+                {productos.length === 0 ? (
                   <div className="p-12 text-center">
                     <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-500 mb-2">Tu carrito está vacío</p>
@@ -80,7 +80,7 @@ export default function CheckoutPage() {
                   </div>
                 ) : (
                   <ul className="divide-y divide-gray-100">
-                    {servicios.map((item) => (
+                    {productos.map((item) => (
                       <motion.li
                         key={item.id}
                         initial={{ opacity: 0, y: 10 }}
@@ -159,21 +159,32 @@ export default function CheckoutPage() {
 
                 <div className="bg-bg-light rounded-xl p-4 mb-6">
                   <p className="text-sm text-text-secondary">
-                    Los precios finales se confirmarán al contactarte con nuestro equipo.
-                    Recibirás una cotización personalizada.
+                    Solicita tu cotización directamente por WhatsApp. Te responderemos en breve.
                   </p>
                 </div>
 
-                <Link
-                  href="/contacto"
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-accent hover:bg-accent/90 text-primary font-semibold rounded-lg transition-colors"
-                >
-                  Solicitar Cotización
-                </Link>
+                {/* WhatsApp Button */}
 
-                <p className="text-center text-xs text-text-muted mt-4">
-                  Al continuar, serás redirigido a nuestro formulario de contacto
-                </p>
+                {productos.length > 0 ? (
+                  <a
+                    href={`https://wa.me/51988227755?text=${encodeURIComponent(
+                      `Hola CS4B, me interesa cotizar los siguientes productos:\n\n${productos.map(p => `• ${p.titulo}`).join('\n')}\n\nGracias!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold rounded-lg transition-colors"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Enviar por WhatsApp
+                  </a>
+                ) : (
+                  <Link
+                    href="/productos"
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-colors"
+                  >
+                    Ver Productos
+                  </Link>
+                )}
               </div>
             </div>
           </div>

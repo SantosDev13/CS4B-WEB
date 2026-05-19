@@ -23,8 +23,7 @@ const navItems: NavItem[] = [
   { href: "/admin/productos", label: "Productos", icon: <Package className="w-4 h-4" /> },
   { href: "/admin/posts", label: "Publicaciones", icon: <FileText className="w-4 h-4" /> },
   { href: "/admin/contactos", label: "Contactos", icon: <MessageSquare className="w-4 h-4" /> },
-  { href: "/admin/categorias-productos", label: "Categorías Productos", icon: <Shield className="w-4 h-4" /> },
-  { href: "/admin/configuracion", label: "Configuración", icon: <Settings className="w-4 h-4" /> },
+  { href: "/admin/categorias-productos", label: "Categorías Productos", icon: <Shield className="w-4 h-4" /> }
 ];
 
 export default function AdminNavbar() {

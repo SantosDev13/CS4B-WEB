@@ -13,7 +13,7 @@ export interface CartItem {
 }
 
 interface CartContextType {
-  servicios: CartItem[];
+  productos: CartItem[];
   addToCart: (servicio: CartItem) => void;
   removeFromCart: (serviceId: string) => void;
   clearCart: () => void;
@@ -26,7 +26,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_STORAGE_KEY = STORAGE_KEYS.cart;
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [servicios, setServicios] = useState<CartItem[]>([]);
+  const [productos, setProductos] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Cargar desde localStorage al iniciar
@@ -36,7 +36,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       try {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          setServicios(parsed);
+          setProductos(parsed);
         }
       } catch (error) {
         console.error("Error parsing cart from localStorage:", error);
@@ -48,12 +48,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Guardar en localStorage cuando cambie el carrito
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(servicios));
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(productos));
     }
-  }, [servicios, isLoaded]);
+  }, [productos, isLoaded]);
 
   const addToCart = (servicio: CartItem) => {
-    setServicios((prev) => {
+    setProductos((prev) => {
       // Evitar duplicados
       if (prev.some((item) => item.id === servicio.id)) {
         return prev;
@@ -63,23 +63,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const removeFromCart = (serviceId: string) => {
-    setServicios((prev) => prev.filter((item) => item.id !== serviceId));
+    setProductos((prev) => prev.filter((item) => item.id !== serviceId));
   };
 
   const clearCart = () => {
-    setServicios([]);
+    setProductos([]);
   };
 
   const isInCart = (serviceId: string) => {
-    return servicios.some((item) => item.id === serviceId);
+    return productos.some((item) => item.id === serviceId);
   };
 
-  const cartCount = servicios.length;
+  const cartCount = productos.length;
 
   return (
     <CartContext.Provider
       value={{
-        servicios,
+        productos,
         addToCart,
         removeFromCart,
         clearCart,
