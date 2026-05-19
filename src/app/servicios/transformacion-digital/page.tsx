@@ -75,18 +75,7 @@ export default function ConsultoriaPage() {
         </div>
       </section>
 
-      {/* Sección de contacto */}
-      <section id="contacto" className="py-16 bg-white">
-        <div className="container mx-auto px-4 max-w-2xl">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">¿Interesado?</h2>
-            <p className="text-gray-600">Contáctanos para discutir tu proyecto</p>
-          </div>
-          <div className="bg-gray-50 p-8 rounded-xl">
-            <ContactForm />
-          </div>
-        </div>
-      </section>
+      
 
       {/* Footer minimal */}
       <footer className="py-8 bg-slate-900 text-center">

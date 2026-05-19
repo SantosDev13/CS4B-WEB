@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 import { contactoSchema, productosSeleccionadosSchema } from '@/lib/validations';
 import { checkApiRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+import DOMPurify from 'isomorphic-dompurify';
 import type { Prisma } from '@prisma/client';
 
 // GET - Obtener contactos (solo admin/editor)
@@ -87,6 +88,12 @@ export async function POST(request: NextRequest) {
 
     const { nombre, apellidos, interes, categoria, posicion, empresa, email, telefono, mensaje } = result.data;
     
+    // Sanitizar el mensaje para prevenir XSS
+    const mensajeSanitizado = DOMPurify.sanitize(mensaje, {
+      ALLOWED_TAGS: [], // Sin etiquetas HTML permitidas
+      ALLOWED_ATTR: [],
+    });
+
     // Obtener IP del cliente
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
                request.headers.get('x-real-ip') ||
@@ -102,7 +109,7 @@ export async function POST(request: NextRequest) {
         empresa,
         email,
         telefono,
-        mensaje,
+        mensaje: mensajeSanitizado,
         ip,
       },
     });
